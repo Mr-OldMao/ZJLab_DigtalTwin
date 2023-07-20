@@ -102,6 +102,7 @@ public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
             Debug.LogError("Generate Fail，roomSize：" + roomInfo.roomSize);
             Debug.LogError("Generate Fail，roomPosMin：" + roomInfo.roomPosMin);
             Debug.LogError("Generate Fail，roomPosMax：" + roomInfo.roomPosMax);
+            return;
         }
         //当前房间的根节点
         GameObject roomRoot = new GameObject(roomInfo.roomType.ToString());
@@ -195,7 +196,6 @@ public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
             Destroy(m_DicRoomEntity[roomTypes[i]]);
             m_DicRoomEntity.Remove(roomTypes[i]);
         }
-
         m_DicBorderItemInfo.Clear();
     }
 
@@ -232,7 +232,6 @@ public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
                 curEntityIsExist = true;
             }
         }
-
         return curEntityIsExist;
     }
 
@@ -297,8 +296,6 @@ public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
                 pos = new Vector2(curX, roomInfo.roomPosMax.y),
                 entityModelType = EntityModelType.Wall
             });
-
-
         }
 
         for (int i = (int)roomInfo.roomPosMin.y; i < (int)roomInfo.roomPosMax.y; i++)
@@ -337,61 +334,6 @@ public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
         return borderItemPosInfos;
 
     }
-
-    /// <summary>
-    /// 获取房间横向x轴所占矩形的坐标
-    /// 根据左下，右上位置，获取整个矩形各个坐标，坐标间隔1米
-    /// 左闭右开 [roomPosMin，roomPosMax)
-    /// </summary>
-    /// <param name="roomPosMin"></param>
-    /// <param name="roomPosMax"></param>
-    /// <returns></returns>
-    private List<Vector2> GetRoomAllXAxisPos(Vector2 roomPosMin, Vector2 roomPosMax)
-    {
-        List<Vector2> result = new List<Vector2>();
-        for (int i = (int)roomPosMin.x; i < (int)roomPosMax.x; i++)
-        {
-            int curX = i;
-            result.Add(new Vector2(curX, roomPosMin.y));
-            result.Add(new Vector2(curX, roomPosMax.y));
-        }
-
-        //TEST
-        foreach (var item in result)
-        {
-            Debug.Log("pos:" + item);
-        }
-        return result;
-    }
-
-    /// <summary>
-    /// 获取房间横向y轴所占矩形的坐标
-    /// 根据左下，右上位置，获取整个矩形各个坐标，坐标间隔1米
-    /// 左闭右开 [roomPosMin，roomPosMax)
-    /// </summary>
-    /// <param name="roomPosMin"></param>
-    /// <param name="roomPosMax"></param>
-    /// <returns></returns>
-    private List<Vector2> GetRoomAllYAxisPos(Vector2 roomPosMin, Vector2 roomPosMax)
-    {
-        List<Vector2> result = new List<Vector2>();
-        for (int i = (int)roomPosMin.y; i < (int)roomPosMax.y; i++)
-        {
-            int curY = i;
-            result.Add(new Vector2(roomPosMin.x, curY));
-            result.Add(new Vector2(roomPosMax.x, curY));
-
-        }
-
-        //TEST
-        foreach (var item in result)
-        {
-            Debug.Log("pos:" + item);
-        }
-        return result;
-    }
-
-
 }
 
 public enum RoomType
