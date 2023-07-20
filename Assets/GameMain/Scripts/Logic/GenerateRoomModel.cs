@@ -10,6 +10,7 @@ using MFramework;
 /// </summary>
 public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
 {
+
     //TODO 后面根据ab包加载资源
     public GameObject wallX;
     public GameObject wallY;
