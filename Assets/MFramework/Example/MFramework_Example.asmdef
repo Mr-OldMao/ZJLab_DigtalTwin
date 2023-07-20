@@ -1,0 +1,18 @@
+{
+    "name": "MFramework_Example",
+    "rootNamespace": "",
+    "references": [
+        "GUID:743b92d464a44cb4ab868b8c1714bc25",
+        "GUID:986079a2645d5cd48a673bf7b19102b1",
+        "GUID:917ae83e2ef9c4c4bae6cbe0e3c1400a"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
