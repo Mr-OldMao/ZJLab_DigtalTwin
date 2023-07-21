@@ -13,7 +13,7 @@ using static UnityEditor.Progress;
 /// 时间：20230719
 /// </summary>
 public class TestGenerateRoom : MonoBehaviour
-{
+{ 
     public Button btnFixedGenerate;
     public Button btnRandomGenerate;
     private void Start()
