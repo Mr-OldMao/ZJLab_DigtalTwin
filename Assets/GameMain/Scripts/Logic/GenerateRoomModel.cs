@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MFramework;
+using static GenerateRoomModel;
 
 /// <summary>
 /// 标题：房间模型布局自动生成器
@@ -10,28 +11,33 @@ using MFramework;
 /// </summary>
 public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
 {
-
     //TODO 后面根据ab包加载资源
-    public GameObject wallX;
-    public GameObject wallY;
-    public GameObject doorX;
-    public GameObject doorY;
-    private Transform m_RoomGroup;
+    public GameObject modelWallX;
+    public GameObject modelWallY;
+    public GameObject modelDoorX;
+    public GameObject modelDoorY;
+    public GameObject modelFloor;
+    public GameObject modelWallSmallX;
+    public GameObject modelWallSmallY;
+
+    private Transform m_RoomRootNode;
     public Transform RoomGroup
     {
-        get { return m_RoomGroup; }
-        set { m_RoomGroup = value; }
+        get { return m_RoomRootNode; }
+        set { m_RoomRootNode = value; }
     }
+
     /// <summary>
     /// 缓存已生成实体的数据信息 k-实体坐标(唯一) v-当前实体坐标对于的实体信息
     /// </summary>
     private Dictionary<Vector2, BorderInfo> m_DicBorderItemInfo;
 
+
     /// <summary>
     /// 缓存所有房间实体    k-房间类型 v-实体
     /// </summary>
     private Dictionary<RoomType, GameObject> m_DicRoomEntity;
-    public struct RoomInfo
+    public class RoomInfo
     {
         public RoomType roomType;
         /// <summary>
@@ -89,100 +95,132 @@ public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
         m_DicBorderItemInfo = new Dictionary<Vector2, BorderInfo>();
         m_DicRoomEntity = new Dictionary<RoomType, GameObject>();
     }
-
     /// <summary>
     /// 生成房间模型，对外接口
     /// </summary>
-    /// <param name="roomInfo"></param>
-    public void GenerateRoom(RoomInfo roomInfo)
+    /// <param name="roomInfo">需要传入房间的详细信息</param>
+    /// <param name="borderEntityDatas">房间所有边界(墙、门、地板)数据</param>
+    public void GenerateRoom(List<BorderEntityData> borderEntityDatas)
     {
-        if (roomInfo.roomType == RoomType.Null || roomInfo.roomSize == null || roomInfo.roomPosMin == null || roomInfo.roomPosMax == null)
-        {
-            Debug.LogError("Generate Fail，roomType：" + roomInfo.roomType);
-            Debug.LogError("Generate Fail，roomSize：" + roomInfo.roomSize);
-            Debug.LogError("Generate Fail，roomPosMin：" + roomInfo.roomPosMin);
-            Debug.LogError("Generate Fail，roomPosMax：" + roomInfo.roomPosMax);
-            return;
-        }
-        //当前房间的根节点
-        GameObject roomRoot = new GameObject(roomInfo.roomType.ToString());
-        roomRoot.transform.parent = m_RoomGroup;
-        roomRoot.transform.position = Vector3.zero;
-        roomRoot.transform.rotation = Quaternion.identity;
-        roomRoot.transform.localScale = Vector3.one;
-        if (!m_DicRoomEntity.ContainsKey(roomInfo.roomType))
-        {
-            m_DicRoomEntity.Add(roomInfo.roomType, roomRoot);
-        }
-        else
-        {
-            Debug.LogError("cur roomType is exist,roomType:" + roomInfo.roomType);
-        }
+        ClearRoom();
 
-        //获取当前房间的所有边界实体信息
-        List<BorderEntityData> borderItemPosInfoData = GetRoomBorderInfo(roomInfo);
-        for (int i = 0; i < borderItemPosInfoData?.Count; i++)
+        for (int i = 0; i < GenerateRoomData.GetInstance.listRoomBuilderInfo.Count; i++)
         {
-            //判定当前位置是否已存在同种类型实体，存在则弹出并缓存其所属的房间类型，反之不重复生成实体。判定条件 实体坐标、轴向、类型一致
-            if (JudgeBorderEntityDataIsExist(borderItemPosInfoData[i], roomInfo.roomType))
-            {
-                continue;
-            }
-
-            GameObject targetItem = null;
-            switch (borderItemPosInfoData[i].entityModelType)
+            BorderEntityData borderEntityData = GenerateRoomData.GetInstance.listRoomBuilderInfo[i];
+            GameObject entityModel = null;
+            switch (borderEntityData.entityModelType)
             {
                 case EntityModelType.Null:
                     break;
                 case EntityModelType.Wall:
-                    targetItem = borderItemPosInfoData[i].entityAxis == 0 ? wallX : wallY;
+                    entityModel = borderEntityData.entityAxis == 0 ? modelWallX : modelWallY;
                     break;
                 case EntityModelType.Door:
-                    targetItem = borderItemPosInfoData[i].entityAxis == 0 ? doorX : doorY;
+                    entityModel = borderEntityData.entityAxis == 0 ? modelDoorX : modelDoorY;
+                    break;
+                case EntityModelType.Floor:
+                    entityModel = modelFloor;
+                    break;
+                default:
                     break;
             }
-            if (targetItem != null)
+            if (entityModel != null)
             {
-                GameObject clone = Instantiate(targetItem, new Vector3(borderItemPosInfoData[i].pos.x, 0, borderItemPosInfoData[i].pos.y), Quaternion.identity);
-                clone.name = targetItem?.name + "_" + borderItemPosInfoData[i].pos.x + "_" + borderItemPosInfoData[i].pos.y;
-                clone.transform.parent = roomRoot.transform;
+                GameObject clone = Instantiate(entityModel, new Vector3(borderEntityData.pos.x, 0, borderEntityData.pos.y), Quaternion.identity);
+                clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
+                clone.transform.parent = GetRoomRootNode(borderEntityData.listRoomType[0]).transform; //TODO listRoomType[0]
             }
-            //缓存当前生成的边界实体信息
-            CacheBorderEntityData(borderItemPosInfoData[i], roomInfo.roomType);
+            if (borderEntityData.entityModelType == EntityModelType.Wall || borderEntityData.entityModelType == EntityModelType.Door)
+            {
+                GameObject modelWallSmall = borderEntityData.entityAxis == 0 ? modelWallSmallX : modelWallSmallY;
+                GameObject clone = Instantiate(modelWallSmall, new Vector3(borderEntityData.pos.x, 0, borderEntityData.pos.y), Quaternion.identity);
+                clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
+                clone.transform.parent = GetRoomRootNode(borderEntityData.listRoomType[0]).transform; //TODO listRoomType[0]
+            }
         }
+
     }
 
-    /// <summary>
-    /// 清空指定房间
-    /// </summary>
-    /// <param name="roomType"></param>
-    public void ClearRoom(RoomType roomType)
+    ///// <summary>
+    ///// 生成房间模型，对外接口
+    ///// </summary>
+    ///// <param name="roomInfo">需要传入房间的详细信息</param>
+    //public void GenerateRoom(params RoomInfo[] roomInfoArr)
+    //{
+    //    if (roomInfoArr.Length > 0)
+    //    {
+    //        ClearRoom();
+    //    }
+    //    for (int i = 0; i < roomInfoArr.Length; i++)
+    //    {
+    //        RoomInfo roomInfo = roomInfoArr[i];
+    //        if (roomInfo.roomType == RoomType.Null || roomInfo.roomSize == null || roomInfo.roomPosMin == null || roomInfo.roomPosMax == null)
+    //        {
+    //            Debug.LogError("Generate Fail，roomType：" + roomInfo.roomType);
+    //            Debug.LogError("Generate Fail，roomSize：" + roomInfo.roomSize);
+    //            Debug.LogError("Generate Fail，roomPosMin：" + roomInfo.roomPosMin);
+    //            Debug.LogError("Generate Fail，roomPosMax：" + roomInfo.roomPosMax);
+    //            continue;
+    //        }
+    //        GameObject roomRootNode = GetRoomRootNode(roomInfoArr[i].roomType);
+
+    //        //获取当前房间的所有边界实体信息
+    //        List<BorderEntityData> borderItemPosInfoData = GetRoomBorderInfo(roomInfo);
+    //        for (int j = 0; j < borderItemPosInfoData?.Count; j++)
+    //        {
+    //            //判定当前位置是否已存在同种类型实体，存在则弹出并缓存其所属的房间类型，反之不重复生成实体。判定条件 实体坐标、轴向、类型一致
+    //            if (JudgeBorderEntityDataIsExist(borderItemPosInfoData[j], roomInfo.roomType))
+    //            {
+    //                continue;
+    //            }
+
+    //            GameObject targetItem = null;
+    //            switch (borderItemPosInfoData[j].entityModelType)
+    //            {
+    //                case EntityModelType.Null:
+    //                    break;
+    //                case EntityModelType.Wall:
+    //                    targetItem = borderItemPosInfoData[j].entityAxis == 0 ? wallX : wallY;
+    //                    break;
+    //                case EntityModelType.Door:
+    //                    targetItem = borderItemPosInfoData[j].entityAxis == 0 ? doorX : doorY;
+    //                    break;
+    //            }
+    //            if (targetItem != null)
+    //            {
+    //                GameObject clone = Instantiate(targetItem, new Vector3(borderItemPosInfoData[j].pos.x, 0, borderItemPosInfoData[j].pos.y), Quaternion.identity);
+    //                clone.name = targetItem?.name + "_" + borderItemPosInfoData[j].pos.x + "_" + borderItemPosInfoData[j].pos.y;
+    //                clone.transform.parent = roomRootNode.transform;
+    //            }
+    //            //缓存当前生成的边界实体信息
+    //            CacheBorderEntityData(borderItemPosInfoData[j], roomInfo.roomType);
+    //        }
+    //    }
+
+    //    foreach (BorderInfo borderInfo in GenerateRoomData.GetInstance.dicRoomFloorInfo.Values)
+    //    {
+    //        GenerateFloorEntity(borderInfo.borderItemPosInfoX.pos, borderInfo.borderItemPosInfoX.listRoomType[0]);
+    //    }
+    //}
+
+    private GameObject GetRoomRootNode(RoomType roomType)
     {
-        bool isExistTargetRoom = false;
-        foreach (var item in m_DicRoomEntity.Keys)
+        if (!m_DicRoomEntity.ContainsKey(roomType))
         {
-            if (item == roomType)
-            {
-                isExistTargetRoom = true;
-                break;
-            }
+            //当前房间的根节点
+            GameObject roomRoot = new GameObject(roomType.ToString());
+            roomRoot.transform.parent = m_RoomRootNode;
+            roomRoot.transform.position = Vector3.zero;
+            roomRoot.transform.rotation = Quaternion.identity;
+            roomRoot.transform.localScale = Vector3.one;
+            m_DicRoomEntity.Add(roomType, roomRoot);
         }
-        if (isExistTargetRoom)
-        {
-            Destroy(m_DicRoomEntity[roomType]);
-            m_DicRoomEntity.Remove(roomType);
-            
-        }
-        else
-        {
-            Debug.LogError("remove fail,targetRoomType not find,roomType:" + roomType);
-        }
-        //TODO
-        //m_DicBorderItemInfo.Remove
+        return m_DicRoomEntity[roomType];
     }
 
+
     /// <summary>
-    /// 清空所有房间
+    /// 清空所有房间模型、数据
     /// </summary>
     public void ClearRoom()
     {
@@ -191,7 +229,7 @@ public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
         {
             roomTypes.Add(item);
         }
-        for (int i = 0;i< roomTypes.Count;i++) 
+        for (int i = 0; i < roomTypes.Count; i++)
         {
             Destroy(m_DicRoomEntity[roomTypes[i]]);
             m_DicRoomEntity.Remove(roomTypes[i]);
@@ -199,141 +237,90 @@ public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
         m_DicBorderItemInfo.Clear();
     }
 
-    /// <summary>
-    /// 判定当前位置是否已存在同种类型实体，存在则弹出并缓存其所属的房间类型，反之不重复生成实体。判定条件 实体坐标、轴向、类型一致
-    /// </summary>
-    /// <param name="borderEntityData"></param>
-    /// <returns></returns>
-    private bool JudgeBorderEntityDataIsExist(BorderEntityData borderEntityData, RoomType curRoomType)
-    {
-        bool curEntityIsExist = false;
-        //判定当前位置是否已生成实体对象，根据之前生成实体时所缓存的信息查询
-        if (m_DicBorderItemInfo.ContainsKey(borderEntityData.pos))
-        {
-            BorderInfo curCacheBorderInfo = m_DicBorderItemInfo[borderEntityData.pos];
+    ///// <summary>
+    ///// 判定当前位置是否已存在同种类型实体，存在则弹出并缓存其所属的房间类型，反之不重复生成实体。判定条件 实体坐标、轴向、类型一致
+    ///// </summary>
+    ///// <param name="borderEntityData"></param>
+    ///// <returns></returns>
+    //public bool JudgeBorderEntityDataIsExist(BorderEntityData borderEntityData, RoomType curRoomType)
+    //{
+    //    bool curEntityIsExist = false;
+    //    //判定当前位置是否已生成实体对象，根据之前生成实体时所缓存的信息查询
+    //    if (m_DicBorderItemInfo.ContainsKey(borderEntityData.pos))
+    //    {
+    //        BorderInfo curCacheBorderInfo = m_DicBorderItemInfo[borderEntityData.pos];
 
-            //判定当前位置是否已存在同种类型实体，存在则弹出不重复生成实体，判定条件 实体坐标、轴向、类型一致
-            if (borderEntityData.entityAxis == 0 && curCacheBorderInfo?.borderItemPosInfoX?.entityModelType == borderEntityData.entityModelType)
-            {
-                Debug.Log("cur pos exist entityX:" + curCacheBorderInfo.borderItemPosInfoX?.pos + "," + curCacheBorderInfo.borderItemPosInfoX?.entityAxis);
-                if (!curCacheBorderInfo.borderItemPosInfoX.listRoomType.Contains(curRoomType))
-                {
-                    curCacheBorderInfo.borderItemPosInfoX.listRoomType.Add(curRoomType);
-                }
-                curEntityIsExist = true;
-            }
-            else if (borderEntityData.entityAxis == 1 && curCacheBorderInfo?.borderItemPosInfoY?.entityModelType == borderEntityData.entityModelType)
-            {
-                Debug.Log("cur pos exist entityY:" + curCacheBorderInfo.borderItemPosInfoY?.pos + "," + curCacheBorderInfo.borderItemPosInfoY?.entityAxis);
-                if (!curCacheBorderInfo.borderItemPosInfoY.listRoomType.Contains(curRoomType))
-                {
-                    curCacheBorderInfo.borderItemPosInfoY.listRoomType.Add(curRoomType);
-                }
-                curEntityIsExist = true;
-            }
-        }
-        return curEntityIsExist;
-    }
+    //        //判定当前位置是否已存在同种类型实体，存在则弹出不重复生成实体，判定条件 实体坐标、轴向、类型一致
+    //        if (borderEntityData.entityAxis == 0 && curCacheBorderInfo?.borderItemPosInfoX?.entityModelType == borderEntityData.entityModelType)
+    //        {
+    //            Debug.Log("cur pos exist entityX:" + curCacheBorderInfo.borderItemPosInfoX?.pos + "," + curCacheBorderInfo.borderItemPosInfoX?.entityAxis);
+    //            if (!curCacheBorderInfo.borderItemPosInfoX.listRoomType.Contains(curRoomType))
+    //            {
+    //                curCacheBorderInfo.borderItemPosInfoX.listRoomType.Add(curRoomType);
+    //            }
+    //            curEntityIsExist = true;
+    //        }
+    //        else if (borderEntityData.entityAxis == 1 && curCacheBorderInfo?.borderItemPosInfoY?.entityModelType == borderEntityData.entityModelType)
+    //        {
+    //            Debug.Log("cur pos exist entityY:" + curCacheBorderInfo.borderItemPosInfoY?.pos + "," + curCacheBorderInfo.borderItemPosInfoY?.entityAxis);
+    //            if (!curCacheBorderInfo.borderItemPosInfoY.listRoomType.Contains(curRoomType))
+    //            {
+    //                curCacheBorderInfo.borderItemPosInfoY.listRoomType.Add(curRoomType);
+    //            }
+    //            curEntityIsExist = true;
+    //        }
+    //    }
+    //    return curEntityIsExist;
+    //}
 
-    /// <summary>
-    /// 缓存实体数据信息到字典
-    /// </summary>
-    /// <param name="borderEntityData"></param>
-    /// <param name="curRoomType"></param>
-    private void CacheBorderEntityData(BorderEntityData borderEntityData, RoomType curRoomType)
-    {
-        if (!m_DicBorderItemInfo.ContainsKey(borderEntityData.pos))
-        {
-            //Debug.LogError("pos:" + borderItemPosInfoData[i].pos + " data is exist");
-            m_DicBorderItemInfo.Add(borderEntityData.pos, new BorderInfo());
-        }
-        if (borderEntityData.entityAxis == 0)
-        {
-            m_DicBorderItemInfo[borderEntityData.pos].borderItemPosInfoX = new BorderEntityData
-            {
-                entityAxis = borderEntityData.entityAxis,
-                pos = borderEntityData.pos,
-                entityModelType = borderEntityData.entityModelType,
-                listRoomType = new List<RoomType> { curRoomType }
-            };
-        }
-        else if (borderEntityData.entityAxis == 1)
-        {
-            m_DicBorderItemInfo[borderEntityData.pos].borderItemPosInfoY = new BorderEntityData
-            {
-                entityAxis = borderEntityData.entityAxis,
-                pos = borderEntityData.pos,
-                entityModelType = borderEntityData.entityModelType,
-                listRoomType = new List<RoomType> { curRoomType }
-            };
-        }
-    }
+    ///// <summary>
+    ///// 缓存实体数据信息到字典
+    ///// </summary>
+    ///// <param name="borderEntityData"></param>
+    ///// <param name="curRoomType"></param>
+    //public void CacheBorderEntityData(BorderEntityData borderEntityData, RoomType curRoomType)
+    //{
+    //    if (!m_DicBorderItemInfo.ContainsKey(borderEntityData.pos))
+    //    {
+    //        //Debug.LogError("pos:" + borderItemPosInfoData[i].pos + " data is exist");
+    //        BorderInfo borderInfo = new BorderInfo();
+    //        m_DicBorderItemInfo.Add(borderEntityData.pos, borderInfo);
+    //    }
+    //    if (borderEntityData.entityAxis == 0)
+    //    {
+    //        m_DicBorderItemInfo[borderEntityData.pos].borderItemPosInfoX = new BorderEntityData
+    //        {
+    //            entityAxis = borderEntityData.entityAxis,
+    //            pos = borderEntityData.pos,
+    //            entityModelType = borderEntityData.entityModelType,
+    //            listRoomType = new List<RoomType> { curRoomType }
+    //        };
+    //    }
+    //    else if (borderEntityData.entityAxis == 1)
+    //    {
+    //        m_DicBorderItemInfo[borderEntityData.pos].borderItemPosInfoY = new BorderEntityData
+    //        {
+    //            entityAxis = borderEntityData.entityAxis,
+    //            pos = borderEntityData.pos,
+    //            entityModelType = borderEntityData.entityModelType,
+    //            listRoomType = new List<RoomType> { curRoomType }
+    //        };
+    //    }
+    //}
 
-    /// <summary>
-    /// 获取房间横向x轴所占矩形的坐标
-    /// 根据左下，右上位置，获取整个矩形各个坐标，坐标间隔1米
-    /// 左闭右开 [roomPosMin，roomPosMax)
-    /// </summary>
-    /// <param name="roomPosMin"></param>
-    /// <param name="roomPosMax"></param>
-    /// <returns></returns>
-    private List<BorderEntityData> GetRoomBorderInfo(RoomInfo roomInfo)
-    {
-        List<BorderEntityData> borderItemPosInfos = new List<BorderEntityData>();
+    ///// <summary>
+    ///// 生成地砖实体模型
+    ///// </summary>
+    ///// <param name="pos"></param>
+    ///// <param name="roomType"></param>
+    //public void GenerateFloorEntity(Vector2 pos, RoomType roomType)
+    //{
+    //    GameObject clone = Instantiate(modelFloor, new Vector3(pos.x, 0, pos.y), Quaternion.identity);
+    //    GameObject floorGroup = GetRoomRootNode(roomType);
 
-        for (int i = (int)roomInfo.roomPosMin.x; i < (int)roomInfo.roomPosMax.x; i++)
-        {
-            int curX = i;
-            borderItemPosInfos.Add(new BorderEntityData
-            {
-                entityAxis = 0,
-                pos = new Vector2(curX, roomInfo.roomPosMin.y),
-                entityModelType = EntityModelType.Wall
-            });
-            borderItemPosInfos.Add(new BorderEntityData
-            {
-                entityAxis = 0,
-                pos = new Vector2(curX, roomInfo.roomPosMax.y),
-                entityModelType = EntityModelType.Wall
-            });
-        }
-
-        for (int i = (int)roomInfo.roomPosMin.y; i < (int)roomInfo.roomPosMax.y; i++)
-        {
-            int curY = i;
-            borderItemPosInfos.Add(new BorderEntityData
-            {
-                entityAxis = 1,
-                pos = new Vector2(roomInfo.roomPosMin.x, curY),
-                entityModelType = EntityModelType.Wall
-            });
-            borderItemPosInfos.Add(new BorderEntityData
-            {
-                entityAxis = 1,
-                pos = new Vector2(roomInfo.roomPosMax.x, curY),
-                entityModelType = EntityModelType.Wall
-            });
-        }
-
-        for (int i = 0; i < roomInfo.listDoorPosInfo?.Count; i++)
-        {
-            int temp = i;
-            BorderEntityData borderItemPosInfo = borderItemPosInfos.Find((p) => { return p.pos == roomInfo.listDoorPosInfo[temp].pos && p.entityAxis == roomInfo.listDoorPosInfo[temp].entityAxis; });
-            borderItemPosInfo.entityModelType = roomInfo.listDoorPosInfo[temp].entityModelType;
-            Debug.Log("更正实体类型：" + borderItemPosInfo.pos + "," + borderItemPosInfo.entityModelType);
-        }
-
-        for (int i = 0; i < roomInfo.listEmptyPosInfo?.Count; i++)
-        {
-            int temp = i;
-            BorderEntityData borderItemPosInfo = borderItemPosInfos.Find((p) => { return p.pos == roomInfo.listEmptyPosInfo[temp].pos && p.entityAxis == roomInfo.listEmptyPosInfo[temp].entityAxis; });
-            borderItemPosInfo.entityModelType = roomInfo.listEmptyPosInfo[temp].entityModelType;
-            Debug.Log("更正实体类型：" + borderItemPosInfo.pos + "," + borderItemPosInfo.entityModelType);
-
-        }
-        return borderItemPosInfos;
-
-    }
+    //    clone.name = "floor_" + pos.x + "_" + pos.y;
+    //    clone.transform.SetParent(floorGroup.transform);
+    //}
 }
 
 public enum RoomType
@@ -380,6 +367,8 @@ public enum EntityModelType
 {
     //无墙
     Null,
-    Wall,
+    Wall,//轴心点在左下侧
     Door,
+    //地砖
+    Floor
 }
