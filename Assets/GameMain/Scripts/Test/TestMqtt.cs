@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Net;
 using uPLibrary.Networking.M2Mqtt;
@@ -37,7 +37,7 @@ public class TestMqtt : MonoBehaviour {
        
         
         Subscribenewtopic(topic1);
-        string message = "test,robot,mqtt"; // 替换为你要订阅的主题名称
+        string message = "test,robot,mqtt"; // 替换为你要发布的主题内容
         PublishMessage(topic1,message);
     
 
