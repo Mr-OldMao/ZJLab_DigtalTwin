@@ -19,181 +19,45 @@ public class TestGenerateRoom : MonoBehaviour
     public Button btnFixedGenerate;
     public Button btnHalfRandomGenerate;
     public Button btnFullRandomGenerate;
+
+    public InputField txtFullRandomCount;
+    public InputField txtFullRandomLengthRangeMin;
+    public InputField txtFullRandomLengthRangeMax;
+    public InputField txtFullRandomWidthRangeMin;
+    public InputField txtFullRandomWidthRangeMax;
+
+
     private void Start()
     {
         //固定生成
         btnFixedGenerate?.onClick.AddListener(() => { TestGenerateFixed(); });
         //半随机，需要指定各个房间大小以及邻接方位,系统自动随机所在位置
         btnHalfRandomGenerate?.onClick.AddListener(() => { TestGenerateHalfRandom(); });
+
+
         //完全随机
-        btnFullRandomGenerate?.onClick?.AddListener(() => { TestGenerateFullRandom(); });
+        btnFullRandomGenerate?.onClick?.AddListener(() =>
+        {
+            if (uint.TryParse(txtFullRandomCount.text, out uint roomCount)
+            && uint.TryParse(txtFullRandomLengthRangeMin.text, out uint lengthRangeMin)
+            && uint.TryParse(txtFullRandomLengthRangeMax.text, out uint lengthRangeMax)
+            && uint.TryParse(txtFullRandomWidthRangeMin.text, out uint widthRangeMin)
+            && uint.TryParse(txtFullRandomWidthRangeMax.text, out uint widthRangeMax))
+            {
+                TestGenerateFullRandom(new FullRandomData
+                {
+                    roomCount = roomCount,
+                    lengthRangeMin = lengthRangeMin,
+                    lengthRangeMax = lengthRangeMax,
+                    widthRangeMax = widthRangeMax,
+                    widthRangeMin = widthRangeMin,
+                });
+            }
+        });
     }
 
     private void TestGenerateFixed()
     {
-        ////TEST 模拟数据
-        //GenerateRoomModel.GetInstance.RoomGroup = transform;
-        //RoomInfo roomA = new RoomInfo()
-        //{
-        //    roomType = RoomType.LivingRoom,
-        //    roomSize = new uint[2] { 4, 3 },
-        //    roomPosMin = new Vector2(0, 0),
-        //    roomPosMax = new Vector2(4, 3),
-        //    listDoorPosInfo = new List<BorderEntityData>()
-        //    {
-        //        new BorderEntityData
-        //        {
-        //            entityModelType = EntityModelType.Door,
-        //            pos = new Vector2(0, 2),
-        //            entityAxis = 1
-        //        },
-        //        new BorderEntityData
-        //        {
-        //            entityModelType = EntityModelType.Door,
-        //            pos =new Vector2(1, 3),
-        //            entityAxis = 0
-        //        },
-        //        new BorderEntityData
-        //        {
-        //            entityModelType = EntityModelType.Door,
-        //            pos =new Vector2(3, 3),
-        //            entityAxis = 0
-        //        },
-        //        new BorderEntityData
-        //        {
-        //            entityModelType = EntityModelType.Door,
-        //            pos =new Vector2(2, 0),
-        //            entityAxis = 0
-        //        }
-        //    },
-        //    listEmptyPosInfo = new List<BorderEntityData>()
-        //    {
-        //         new BorderEntityData
-        //         {
-        //              entityModelType = EntityModelType.Null,
-        //              pos = new Vector2(4, 0),
-        //              entityAxis = 1
-        //         },
-        //         new BorderEntityData
-        //         {
-        //              entityModelType = EntityModelType.Null,
-        //              pos = new Vector2(4, 1),
-        //              entityAxis = 1
-        //         }
-        //    }
-        //};
-        //RoomInfo roomB = new RoomInfo()
-        //{
-        //    roomType = RoomType.BalconyRoom,
-        //    roomSize = new uint[2] { 3, 4 },
-        //    roomPosMin = new Vector2(-3, 0),
-        //    roomPosMax = new Vector2(0, 4),
-        //    listDoorPosInfo = new List<BorderEntityData>()
-        //    {
-        //        new BorderEntityData
-        //        {
-        //            entityModelType = EntityModelType.Door,
-        //            pos = new Vector2(0, 2),
-        //            entityAxis = 1
-        //        }
-        //    }
-        //};
-        //RoomInfo roomC = new RoomInfo()
-        //{
-        //    roomType = RoomType.FirstBedRoom,
-        //    roomSize = new uint[2] { 3, 4 },
-        //    roomPosMin = new Vector2(0, 3),
-        //    roomPosMax = new Vector2(3, 8),
-        //    listDoorPosInfo = new List<BorderEntityData>()
-        //    {
-        //         new BorderEntityData
-        //         {
-        //             entityModelType = EntityModelType.Door,
-        //             pos =new Vector2(1, 3),
-        //             entityAxis = 0
-        //         }
-        //    }
-        //};
-        //RoomInfo roomD = new RoomInfo()
-        //{
-        //    roomType = RoomType.KitChenRoom,
-        //    roomSize = new uint[2] { 3, 3 },
-        //    roomPosMin = new Vector2(3, 3),
-        //    roomPosMax = new Vector2(6, 6),
-        //    listDoorPosInfo = new List<BorderEntityData>()
-        //    {
-        //        new BorderEntityData
-        //        {
-        //            entityModelType = EntityModelType.Door,
-        //            pos =new Vector2(3, 3),
-        //            entityAxis = 0
-        //        }
-        //    }
-        //};
-        //RoomInfo roomE = new RoomInfo()
-        //{
-        //    roomType = RoomType.StorageRoom,
-        //    roomSize = new uint[2] { 3, 3 },
-        //    roomPosMin = new Vector2(3, -3),
-        //    roomPosMax = new Vector2(6, 0),
-        //    listDoorPosInfo = new List<BorderEntityData>()
-        //    {
-        //        new BorderEntityData
-        //        {
-        //            entityModelType = EntityModelType.Door,
-        //            pos =new Vector2(4, 0),
-        //            entityAxis = 0
-        //        }
-        //    }
-        //};
-        //RoomInfo roomF = new RoomInfo()
-        //{
-        //    roomType = RoomType.SecondBedRoom,
-        //    roomSize = new uint[2] { 2, 2 },
-        //    roomPosMin = new Vector2(4, 0),
-        //    roomPosMax = new Vector2(6, 2),
-        //    listDoorPosInfo = new List<BorderEntityData>()
-        //    {
-        //        new BorderEntityData
-        //        {
-        //            entityModelType = EntityModelType.Door,
-        //            pos =new Vector2(4, 0),
-        //            entityAxis = 0
-        //        }
-        //    },
-        //    listEmptyPosInfo = new List<BorderEntityData>()
-        //    {
-        //         new BorderEntityData
-        //         {
-        //              entityModelType = EntityModelType.Null,
-        //              pos = new Vector2(4, 0),
-        //              entityAxis = 1
-        //         },
-        //         new BorderEntityData
-        //         {
-        //              entityModelType = EntityModelType.Null,
-        //              pos = new Vector2(4, 1),
-        //              entityAxis = 1
-        //         }
-        //    }
-        //};
-        //RoomInfo roomG = new RoomInfo()
-        //{
-        //    roomType = RoomType.StudyRoom,
-        //    roomSize = new uint[2] { 4, 2 },
-        //    roomPosMin = new Vector2(-1, -2),
-        //    roomPosMax = new Vector2(3, 0),
-        //    listDoorPosInfo = new List<BorderEntityData>()
-        //    {
-        //        new BorderEntityData
-        //        {
-        //            entityModelType = EntityModelType.Door,
-        //            pos = new Vector2(2, 0),
-        //            entityAxis = 0
-        //        }
-        //    }
-        //};
-        //GenerateRoomModel.GetInstance.GenerateRoom(roomA, roomB, roomC, roomD, roomE, roomF, roomG);
     }
 
     private void TestGenerateHalfRandom()
@@ -282,18 +146,19 @@ public class TestGenerateRoom : MonoBehaviour
             }
             else
             {
-                TestGenerateFullRandom();
+                Debug.LogError("helf random is fail");
             }
         });
     }
 
+    #region FullRandom
 
     private RoomType GetRandomRoomType(RoomType curRoomType)
     {
         RoomType res = RoomType.Null;
         do
         {
-            res = (RoomType)Random.Range(1, 9);
+            res = (RoomType)Random.Range(1, m_RoomCount + 1);
         } while (res == curRoomType);
         return res;
     }
@@ -304,25 +169,28 @@ public class TestGenerateRoom : MonoBehaviour
     }
 
 
-    private void TestGenerateFullRandom()
+    private uint m_RoomCount = 4;
+    private void TestGenerateFullRandom(FullRandomData fullRandomData)
     {
-        Vector2 roomXRange = new Vector2(3, 8);
-        Vector2 roomYRange = new Vector2(3, 6);
+        m_RoomCount = fullRandomData.roomCount;
+        Vector2 roomXRange = new Vector2(fullRandomData.lengthRangeMin, fullRandomData.lengthRangeMax);
+        Vector2 roomYRange = new Vector2(fullRandomData.widthRangeMin, fullRandomData.widthRangeMax);
 
         List<RoomBaseInfo> roomBaseInfos = new List<RoomBaseInfo>();
 
-        for (int i = 1; i < 8; i++)
+        for (int i = 1; i <= fullRandomData.roomCount; i++)
         {
             roomBaseInfos.Add(new RoomBaseInfo
             {
                 curRoomType = (RoomType)i,
-                roomSize = new uint[] { (uint)Random.Range(roomXRange.x, roomXRange.y), (uint)Random.Range(roomYRange.x, roomYRange.y) },
+                roomSize = new uint[] { (uint)Random.Range(roomXRange.x, roomXRange.y + 1), (uint)Random.Range(roomYRange.x, roomYRange.y + 1) },
                 targetRoomsDirRelation = new List<RoomsDirRelation>()
                 {
                     new RoomsDirRelation { targetRoomType = GetRandomRoomType((RoomType)i), locationRelation = GetRandomDir(), isCommonWall = true },
                 },
             });
         }
+
         GenerateRoomData.GetInstance.GenerateRandomRoomInfoData(roomBaseInfos, (p) =>
         {
             if (p != null)
@@ -331,10 +199,20 @@ public class TestGenerateRoom : MonoBehaviour
             }
             else
             {
-                TestGenerateFullRandom();
+                Debug.LogError("FullRandom Fail Regenerate...");
+                TestGenerateFullRandom(fullRandomData);
             }
         });
-
     }
+
+    class FullRandomData
+    {
+        public uint roomCount;
+        public uint lengthRangeMin;
+        public uint lengthRangeMax;
+        public uint widthRangeMin;
+        public uint widthRangeMax;
+    }
+    #endregion
 
 }
