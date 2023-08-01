@@ -1,15 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MFramework;
-using static GenerateRoomModel;
 
 /// <summary>
-/// 标题：房间模型布局自动生成器
+/// 标题：房间边界模型(墙壁、门、地砖)自动生成器
 /// 功能：1.生成模型，根据房间信息数据生成与之匹配的3D房间模型；2.清空场景模型
 /// 作者：毛俊峰
 /// 时间：2023.07.18-2023.07.20
 /// </summary>
-public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
+public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
 {
     //TODO 后面根据ab包加载资源
     public GameObject modelWallX;
@@ -96,11 +95,11 @@ public class GenerateRoomModel : SingletonByMono<GenerateRoomModel>
         m_DicRoomEntity = new Dictionary<RoomType, GameObject>();
     }
     /// <summary>
-    /// 生成房间模型，对外接口
+    /// 生成房间边界模型，对外接口
     /// </summary>
     /// <param name="roomInfo">需要传入房间的详细信息</param>
     /// <param name="borderEntityDatas">房间所有边界(墙、门、地板)数据</param>
-    public void GenerateRoom(List<BorderEntityData> borderEntityDatas)
+    public void GenerateRoomBorder(List<BorderEntityData> borderEntityDatas)
     {
         ClearRoom();
 

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 using static GenerateRoomData;
-using static GenerateRoomModel;
+using static GenerateRoomBorderModel;
 using static UnityEditor.Progress;
 
 /// <summary>
@@ -54,6 +54,13 @@ public class TestGenerateRoom : MonoBehaviour
                 });
             }
         });
+
+        Transform RoomGroupNode = GameObject.Find("RoomGroupNode")?.transform;
+        if (RoomGroupNode == null)
+        {
+            RoomGroupNode = new GameObject("RoomGroupNode").transform;
+        }
+        GenerateRoomBorderModel.GetInstance.RoomGroup = RoomGroupNode;
     }
 
     private void TestGenerateFixed()
@@ -142,7 +149,7 @@ public class TestGenerateRoom : MonoBehaviour
         {
             if (p != null)
             {
-                GenerateRoomModel.GetInstance.GenerateRoom(p);
+                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
             }
             else
             {
@@ -195,7 +202,7 @@ public class TestGenerateRoom : MonoBehaviour
         {
             if (p != null)
             {
-                GenerateRoomModel.GetInstance.GenerateRoom(p);
+                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
             }
             else
             {

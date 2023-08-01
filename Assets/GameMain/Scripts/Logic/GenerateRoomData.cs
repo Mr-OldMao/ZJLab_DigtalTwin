@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static GenerateRoomModel;
+using static GenerateRoomBorderModel;
 using MFramework;
 using System.Linq;
 using System;
 using Unity.VisualScripting;
+using static UnityEditor.Progress;
 
 /// <summary>
 /// 标题：生成房间信息数据，为生成房间模型服务
@@ -98,7 +99,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         }
 
         ClearRoom();
-        GenerateRoomModel.GetInstance.ClearRoom();
+        GenerateRoomBorderModel.GetInstance.ClearRoom();
 
         UpadteRoomsDirRelation(ref roomBaseInfos);
 
@@ -705,11 +706,11 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 }
             }
 
-            //log 当前房间允许放置门的随机位置
-            foreach (BorderEntityData item in listDoorRandomPosInfo)
-            {
-                Debug.Log("curRoomType:" + roomBaseInfos[i].curRoomType + ",允许放置门的位置：" + item.pos + ",entityAxis:" + item.entityAxis);
-            }
+            ////log 当前房间允许放置门的随机位置
+            //foreach (BorderEntityData item in listDoorRandomPosInfo)
+            //{
+            //    Debug.Log("curRoomType:" + roomBaseInfos[i].curRoomType + ",允许放置门的位置：" + item.pos + ",entityAxis:" + item.entityAxis);
+            //}
 
             //当前房间门的位置
             if (listDoorRandomPosInfo.Count == 0)
@@ -719,6 +720,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             }
             int doorRandomIndex = UnityEngine.Random.Range(0, listDoorRandomPosInfo.Count);
             BorderEntityData doorData = listDoorRandomPosInfo[doorRandomIndex];
+            Debug.Log("curRoomType:" + roomBaseInfos[i].curRoomType + ",doorPos：" + doorData.pos + ",entityAxis:" + doorData.entityAxis);
 
             //替换边界信息 wall=》door
             BorderEntityData doorBorderEntityData = new BorderEntityData
