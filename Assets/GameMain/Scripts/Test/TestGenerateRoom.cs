@@ -26,11 +26,19 @@ public class TestGenerateRoom : MonoBehaviour
     public InputField txtFullRandomWidthRangeMin;
     public InputField txtFullRandomWidthRangeMax;
 
+    private void Awake()
+    {
+        txtFullRandomCount.text = "3";
+        txtFullRandomLengthRangeMin.text = "4";
+        txtFullRandomLengthRangeMax.text = "7";
+        txtFullRandomWidthRangeMin.text = "4";
+        txtFullRandomWidthRangeMax.text= "8";
+    }
 
     private void Start()
     {
-        //固定生成
-        btnFixedGenerate?.onClick.AddListener(() => { TestGenerateFixed(); });
+        ////固定生成
+        //btnFixedGenerate?.onClick.AddListener(() => { TestGenerateFixed(); });
         //半随机，需要指定各个房间大小以及邻接方位,系统自动随机所在位置
         btnHalfRandomGenerate?.onClick.AddListener(() => { TestGenerateHalfRandom(); });
 
@@ -55,17 +63,15 @@ public class TestGenerateRoom : MonoBehaviour
             }
         });
 
-        Transform RoomGroupNode = GameObject.Find("RoomGroupNode")?.transform;
-        if (RoomGroupNode == null)
+        Transform RoomBorderGroupNode = GameObject.Find("RoomBorderGroupNode")?.transform;
+        if (RoomBorderGroupNode == null)
         {
-            RoomGroupNode = new GameObject("RoomGroupNode").transform;
+            RoomBorderGroupNode = new GameObject("RoomBorderGroupNode").transform;
         }
-        GenerateRoomBorderModel.GetInstance.RoomGroup = RoomGroupNode;
+        GenerateRoomBorderModel.GetInstance.RoomGroup = RoomBorderGroupNode;
     }
 
-    private void TestGenerateFixed()
-    {
-    }
+
 
     private void TestGenerateHalfRandom()
     {
@@ -145,16 +151,18 @@ public class TestGenerateRoom : MonoBehaviour
                  }
             },
         };
-        GenerateRoomData.GetInstance.GenerateRandomRoomInfoData(roomBaseInfos, (p) =>
+        GenerateRoomData.GetInstance.GenerateRandomRoomInfoData(roomBaseInfos, (p, k) =>
         {
-            if (p != null)
-            {
-                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
-            }
-            else
+            if (p == null || k == null)
             {
                 Debug.LogError("helf random is fail");
             }
+            else
+            {
+                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
+                GenerageRoomItemModel.GetInstance.GenerateRoomItem(k);
+            }
+            
         });
     }
 
@@ -198,16 +206,17 @@ public class TestGenerateRoom : MonoBehaviour
             });
         }
 
-        GenerateRoomData.GetInstance.GenerateRandomRoomInfoData(roomBaseInfos, (p) =>
+        GenerateRoomData.GetInstance.GenerateRandomRoomInfoData(roomBaseInfos, (p, k) =>
         {
-            if (p != null)
-            {
-                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
-            }
-            else
+            if (p == null || k == null)
             {
                 Debug.LogError("FullRandom Fail Regenerate...");
                 TestGenerateFullRandom(fullRandomData);
+            }
+            else
+            {
+                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
+                GenerageRoomItemModel.GetInstance.GenerateRoomItem(k);
             }
         });
     }

@@ -31,7 +31,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     /// <summary>
     /// 缓存已经建造的房间信息
     /// </summary>
-    private List<RoomInfo> m_ListRoomInfo = new List<RoomInfo>();
+    public List<RoomInfo> m_ListRoomInfo = new List<RoomInfo>();
 
     /// <summary>
     /// 各个坐标的实体信息，供生成对于模型使用， k-实体坐标(唯一) v-当前实体坐标对于的实体信息
@@ -90,11 +90,11 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     /// </summary>
     /// <param name="callback">随机生成房间基础数据</param>
     /// <param name="roomBaseInfos">生成完成回调 P-房间各个节点位置的详细信息，生成失败则为null</param>
-    public void GenerateRandomRoomInfoData(List<RoomBaseInfo> roomBaseInfos, Action<List<BorderEntityData>> callback)
+    public void GenerateRandomRoomInfoData(List<RoomBaseInfo> roomBaseInfos, Action<List<BorderEntityData>, List<RoomInfo>> callback)
     {
         if (roomBaseInfos == null || roomBaseInfos.Count == 0)
         {
-            callback(null);
+            callback(null,null);
             return;
         }
 
@@ -137,7 +137,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             //容错 避免死循环
             if (curLoopCount > loopCpuntMax)
             {
-                callback(null);
+                callback(null, null);
                 return;
             }
             //邻接的房间是否全部都已生成，未完成则先创建其他的房间
@@ -197,7 +197,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         }
         if (!isGenerateSuc)
         {
-            callback(null);
+            callback(null, null);
             return;
         }
 
@@ -207,7 +207,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         GenerateDoorData(roomBaseInfosClone, ref m_ListRoomInfo);
 
         //Debug.Log("房间邻接的边界信息生成成功！");
-        callback(listRoomBuilderInfo);
+        callback(listRoomBuilderInfo, m_ListRoomInfo);
     }
 
     /// <summary>
