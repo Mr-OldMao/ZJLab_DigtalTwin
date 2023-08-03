@@ -574,7 +574,12 @@ MonoBehaviour:
   ItemBin: {fileID: 2132300190566104974, guid: e2d214b9ebdde0245b48e41b0a7207aa, type: 3}
   ItemComputerDeskChair: {fileID: 7591925620371409027, guid: b49f8136cdcc9a14fb015f93b615f696, type: 3}
   ItemWardrobe: {fileID: 6877009726032391401, guid: 216a812ad8dce69439b2acf87ebe16c8, type: 3}
-  ItemEntityGroupNode: {fileID: 0}
+  ItemSofaSmall1: {fileID: 8874422182452153823, guid: 63aad37250e880c4abf78c1f781db7b8, type: 3}
+  ItemSofaSmall2: {fileID: 2354332567457815766, guid: c8d61de7cb2ab8a4780e1ccd4fc22d77, type: 3}
+  ItemSofaBig1: {fileID: 5792890154657153377, guid: 5ad89f9a2ff38da438ea4ab6b2f14357, type: 3}
+  ItemSofaBig2: {fileID: 7768915020588452246, guid: e9202a7cd3fbc0942a078ce455586bdd, type: 3}
+  ItemSofaBig3: {fileID: 6729951340616546559, guid: 4dd206cebfd38704e90fc5963efa1b7a, type: 3}
+  ItemPool: {fileID: 7712143488384914139, guid: c4f5ab08e997d9545a48db6ee0608288, type: 3}
 --- !u!1 &337470184
 GameObject:
   m_ObjectHideFlags: 0

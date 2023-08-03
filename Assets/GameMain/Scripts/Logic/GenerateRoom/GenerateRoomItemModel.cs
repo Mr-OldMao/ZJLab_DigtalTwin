@@ -1,21 +1,16 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static GenerateRoomBorderModel;
 using MFramework;
 using static GenerateRoomData;
-using System.Linq;
-using static GenerageRoomItemModel;
 using System;
-using static UnityEditor.Progress;
-using Unity.VisualScripting;
 /// <summary>
 /// 标题：生成各个房间内所有道具(床桌椅板凳等)
 /// 功能：针对每个房间生成合理的道具，摆放位置随机且合理(1.各个房间内部物品都朝向当前房间的中心点)
 /// 作者：毛俊峰
 /// 时间：2023.07.31
 /// </summary>
-public class GenerageRoomItemModel : SingletonByMono<GenerageRoomItemModel>
+public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
 {
     //各个房间的可放置坐标节点  v-各个坐标点 放置信息
     private Dictionary<RoomType, List<ItemModelInfo>> m_DicItemModelInfo;
@@ -29,13 +24,19 @@ public class GenerageRoomItemModel : SingletonByMono<GenerageRoomItemModel>
     public GameObject ItemBin;
     public GameObject ItemComputerDeskChair;
     public GameObject ItemWardrobe;
+    public GameObject ItemSofaSmall1;
+    public GameObject ItemSofaSmall2;
+    public GameObject ItemSofaBig1;
+    public GameObject ItemSofaBig2;
+    public GameObject ItemSofaBig3;
+    public GameObject ItemPool;
 
     /// <summary>
     /// 是否限制门周边两米位置放置道具
     /// </summary>
     private bool m_IsLimitPutPos = false;
 
-    public Transform ItemEntityGroupNode;
+    private Transform ItemEntityGroupNode;
 
     /// <summary>
     /// 坐标点的放置信息
@@ -59,9 +60,25 @@ public class GenerageRoomItemModel : SingletonByMono<GenerageRoomItemModel>
     public enum ItemModelType
     {
         Null = 0,
-        /*common*/
 
+        /*common*/
+        ItemSofaSmall1,
+        ItemSofaSmall2,
         ItemBin,
+
+        /*客厅*/
+        /// <summary>
+        /// 沙发茶几组
+        /// </summary>
+        ItemSofaBig1,
+        ItemSofaBig2,
+        ItemSofaBig3,
+
+        /*浴室*/
+        /// <summary>
+        /// 浴池
+        /// </summary>
+        ItemPool,
 
         /*主卧*/
         ItemBed,
@@ -223,15 +240,19 @@ public class GenerageRoomItemModel : SingletonByMono<GenerageRoomItemModel>
             List<ItemModelType> itemModels = new List<ItemModelType>();
             switch (roomInfos[i].roomType)
             {
-                case RoomType.LivingRoom:
+                case RoomType.LivingRoom://Add原则 尽量占地面积大的物品放在前列，后续随机放置物品时会按此顺序顺次放置
+                    //TODO 后面需要随机取 ItemSofaBig1，ItemSofaBig2，ItemSofaBig3
+                    itemModels.Add(ItemModelType.ItemSofaBig1);
                     itemModels.Add(ItemModelType.ItemComputerDeskChair);
                     itemModels.Add(ItemModelType.ItemBin);
                     itemModels.Add(ItemModelType.ItemBin);
                     itemModels.Add(ItemModelType.ItemBin);
                     break;
                 case RoomType.RestRoom:
+                    itemModels.Add(ItemModelType.ItemPool);
+                    itemModels.Add(ItemModelType.ItemBin);
                     break;
-                case RoomType.FirstBedRoom: //Add原则 尽量占地面积大的物品放在前列，后续随机放置物品时会按此顺序顺次放置
+                case RoomType.FirstBedRoom: 
                     itemModels.Add(ItemModelType.ItemBed);
                     itemModels.Add(ItemModelType.ItemComputerDeskChair);
                     itemModels.Add(ItemModelType.ItemWardrobe);
@@ -266,6 +287,12 @@ public class GenerageRoomItemModel : SingletonByMono<GenerageRoomItemModel>
             { ItemBin.name ,ItemBin },
             { ItemComputerDeskChair.name ,ItemComputerDeskChair },
             { ItemWardrobe.name ,ItemWardrobe },
+            { ItemSofaSmall1.name ,ItemSofaSmall1 },
+            { ItemSofaSmall2.name ,ItemSofaSmall2 },
+            { ItemSofaBig1.name ,ItemSofaBig1 },
+            { ItemSofaBig2.name ,ItemSofaBig2 },
+            { ItemSofaBig3.name ,ItemSofaBig3 },
+            { ItemPool.name,ItemPool }
         };
 
     }
@@ -316,6 +343,7 @@ public class GenerageRoomItemModel : SingletonByMono<GenerageRoomItemModel>
                 int itemWidch;
                 //找到当前房间所有可放置的位置信息
                 List<ItemModelInfo> itemModelInfos = m_DicItemModelInfo[roomType];
+
                 //已经找到可用位置
                 bool canUse = true;
                 foreach (ItemModelInfo itemInfo in itemModelInfos)
@@ -325,76 +353,82 @@ public class GenerageRoomItemModel : SingletonByMono<GenerageRoomItemModel>
                         continue;
                     }
                     Vector2 curPos = itemInfo.pos;
+                    //当前坐标位置相对于当前房间的方位
+                    DirEnum curPosDir = itemInfo.posDir;
+
                     //对当前房间每个坐标点进行上下左右是个方向查询是否都可放置，查询范围，从当前坐标点开始到物体的长宽结束，物体锚点默认在左下角
-                    for (int j = 0; j < Enum.GetValues(typeof(DirEnum)).Length; j++)
+                    //优先找朝向房间中心位置的方向
+                    DirEnum curDir = (DirEnum)(((int)curPosDir + 2) % Enum.GetValues(typeof(DirEnum)).Length);//初始方向与curPosDir相反
+                    int curLoopCount = 0;
+                    int loopMaxCount = 4;
+                    while (curLoopCount < loopMaxCount)
                     {
                         //当前模型所需占用的坐标位置
                         List<Vector2> itemPosArr = new List<Vector2>();
                         canUse = true;
                         clone.transform.position = new Vector3(curPos.x, 0, curPos.y);
-                        if (j == 0)//up  当前物体锚点在物体的右上角 朝向下方
+                        switch (curDir)
                         {
-                            model.transform.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));
-                            itemLength = (int)size.transform.localScale.x;
-                            itemWidch = (int)size.transform.localScale.z;
-                            for (int m = (int)curPos.x - itemLength; m <= (int)curPos.x; m++)
-                            {
-                                for (int n = (int)curPos.y - itemWidch; n <= (int)curPos.y; n++)
+                            case DirEnum.Up://up  当前物体锚点在物体的右上角 朝向下方
+                                clone.transform.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));
+                                itemLength = (int)size.transform.localScale.x;
+                                itemWidch = (int)size.transform.localScale.z;
+                                for (int m = (int)curPos.x - itemLength; m <= (int)curPos.x; m++)
                                 {
-                                    if (!itemPosArr.Contains(new Vector2(m, n)))
+                                    for (int n = (int)curPos.y - itemWidch; n <= (int)curPos.y; n++)
                                     {
-                                        itemPosArr.Add(new Vector2(m, n));
+                                        if (!itemPosArr.Contains(new Vector2(m, n)))
+                                        {
+                                            itemPosArr.Add(new Vector2(m, n));
+                                        }
                                     }
                                 }
-                            }
-                        }
-                        else if (j == 1) //left 当前物体锚点在物体的左上角 朝向右方
-                        {
-                            model.transform.localRotation = Quaternion.Euler(new Vector3(0, 90, 0));
-                            itemLength = (int)size.transform.localScale.z;
-                            itemWidch = (int)size.transform.localScale.x;
-                            for (int m = (int)curPos.x; m <= (int)curPos.x + itemLength; m++)
-                            {
-                                for (int n = (int)curPos.y - itemWidch; n <= (int)curPos.y; n++)
+                                break;
+                            case DirEnum.Left://left 当前物体锚点在物体的左上角 朝向右方
+                                clone.transform.localRotation = Quaternion.Euler(new Vector3(0, 90, 0));
+                                itemLength = (int)size.transform.localScale.z;
+                                itemWidch = (int)size.transform.localScale.x;
+                                for (int m = (int)curPos.x; m <= (int)curPos.x + itemLength; m++)
                                 {
-                                    if (!itemPosArr.Contains(new Vector2(m, n)))
+                                    for (int n = (int)curPos.y - itemWidch; n <= (int)curPos.y; n++)
                                     {
-                                        itemPosArr.Add(new Vector2(m, n));
+                                        if (!itemPosArr.Contains(new Vector2(m, n)))
+                                        {
+                                            itemPosArr.Add(new Vector2(m, n));
+                                        }
                                     }
                                 }
-                            }
-                        }
-                        else if (j == 2) //down 当前物体锚点在物体的左下角 朝向上方
-                        {
-                            model.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
-                            itemLength = (int)size.transform.localScale.x;
-                            itemWidch = (int)size.transform.localScale.z;
-                            for (int m = (int)curPos.x; m <= (int)curPos.x + itemLength; m++)
-                            {
-                                for (int n = (int)curPos.y; n <= (int)curPos.y + itemWidch; n++)
+                                break;
+                            case DirEnum.Down://down 当前物体锚点在物体的左下角 朝向上方
+                                clone.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
+                                itemLength = (int)size.transform.localScale.x;
+                                itemWidch = (int)size.transform.localScale.z;
+                                for (int m = (int)curPos.x; m <= (int)curPos.x + itemLength; m++)
                                 {
-                                    if (!itemPosArr.Contains(new Vector2(m, n)))
+                                    for (int n = (int)curPos.y; n <= (int)curPos.y + itemWidch; n++)
                                     {
-                                        itemPosArr.Add(new Vector2(m, n));
+                                        if (!itemPosArr.Contains(new Vector2(m, n)))
+                                        {
+                                            itemPosArr.Add(new Vector2(m, n));
+                                        }
                                     }
                                 }
-                            }
-                        }
-                        else if (j == 3) //right 当前物体锚点在物体的右下角 朝向左方
-                        {
-                            model.transform.localRotation = Quaternion.Euler(new Vector3(0, -90, 0));
-                            itemLength = (int)size.transform.localScale.z;
-                            itemWidch = (int)size.transform.localScale.x;
-                            for (int m = (int)curPos.x - itemLength; m <= (int)curPos.x; m++)
-                            {
-                                for (int n = (int)curPos.y; n <= (int)curPos.y + itemWidch; n++)
+                                break;
+                            case DirEnum.Right://right 当前物体锚点在物体的右下角 朝向左方
+                                clone.transform.localRotation = Quaternion.Euler(new Vector3(0, -90, 0));
+                                itemLength = (int)size.transform.localScale.z;
+                                itemWidch = (int)size.transform.localScale.x;
+                                for (int m = (int)curPos.x - itemLength; m <= (int)curPos.x; m++)
                                 {
-                                    if (!itemPosArr.Contains(new Vector2(m, n)))
+                                    for (int n = (int)curPos.y; n <= (int)curPos.y + itemWidch; n++)
                                     {
-                                        itemPosArr.Add(new Vector2(m, n));
+                                        if (!itemPosArr.Contains(new Vector2(m, n)))
+                                        {
+                                            itemPosArr.Add(new Vector2(m, n));
+                                        }
                                     }
                                 }
-                            }
+                                break;
                         }
                         //判定所有坐标是否全部可用
                         if (itemPosArr.Count == 0)
@@ -430,6 +464,8 @@ public class GenerageRoomItemModel : SingletonByMono<GenerageRoomItemModel>
                                 break;
                             }
                         }
+                        curLoopCount++;
+                        curDir = (DirEnum)(((int)curPosDir + 1) % Enum.GetValues(typeof(DirEnum)).Length);
                     }
                     if (canUse)
                     {
@@ -440,12 +476,6 @@ public class GenerageRoomItemModel : SingletonByMono<GenerageRoomItemModel>
         }
     }
 
-    //设置当前实体模型位置
-    //对当前房间每个坐标点进行上下左右是个方向查询所有节点是否都可放置，长度为物体的长宽，物体锚点默认在左下角
-    private void SetEntityPos()
-    {
-
-    }
     //清理实体对象
     private void ClearItemEntity()
     {
@@ -459,44 +489,12 @@ public class GenerageRoomItemModel : SingletonByMono<GenerageRoomItemModel>
     private ItemModelType GetItemModelType(string itemName)
     {
         ItemModelType res = ItemModelType.Null;
-        //for (int i = 0; i < Enum.GetValues(typeof(ItemModelType)).Length; i++)
-        //{
-        //    if (((ItemModelType)i).ToString() == itemName)
-        //    {
-        //        res = (ItemModelType)i;
-        //        break;
-        //    }
-        //}
-
         if (Enum.TryParse(typeof(ItemModelType), itemName, out object p))
         {
             res = (ItemModelType)p;
         }
         return res;
     }
-
-    ///// <summary>
-    ///// 获取实体所占所有坐标位置
-    ///// </summary>
-    ///// <param name="pos"></param>
-    ///// <param name="size"></param>
-    ///// <param name="dirEnum">当前物体相对当前房间中心的方向</param>
-    ///// <returns></returns>
-    //private List<Vector2> GetItemAllPos(Vector2 pos, Vector2 size, DirEnum dirEnum)
-    //{
-    //    switch (dirEnum)
-    //    {
-    //        case DirEnum.Up:
-
-    //            break;
-    //        case DirEnum.Left:
-    //            break;
-    //        case DirEnum.Down:
-    //            break;
-    //        case DirEnum.Right:
-    //            break;
-    //    }
-    //}
 
     private void Update()
     {

@@ -28,7 +28,7 @@ public class TestGenerateRoom : MonoBehaviour
 
     private void Awake()
     {
-        txtFullRandomCount.text = "3";
+        txtFullRandomCount.text = "4";
         txtFullRandomLengthRangeMin.text = "4";
         txtFullRandomLengthRangeMax.text = "7";
         txtFullRandomWidthRangeMin.text = "4";
@@ -160,7 +160,7 @@ public class TestGenerateRoom : MonoBehaviour
             else
             {
                 GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
-                GenerageRoomItemModel.GetInstance.GenerateRoomItem(k);
+                GenerateRoomItemModel.GetInstance.GenerateRoomItem(k);
             }
             
         });
@@ -216,7 +216,7 @@ public class TestGenerateRoom : MonoBehaviour
             else
             {
                 GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
-                GenerageRoomItemModel.GetInstance.GenerateRoomItem(k);
+                GenerateRoomItemModel.GetInstance.GenerateRoomItem(k);
             }
         });
     }
