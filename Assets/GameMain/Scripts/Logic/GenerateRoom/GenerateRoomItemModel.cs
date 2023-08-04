@@ -4,6 +4,7 @@ using static GenerateRoomBorderModel;
 using MFramework;
 using static GenerateRoomData;
 using System;
+using System.Linq;
 /// <summary>
 /// 标题：生成各个房间内所有道具(床桌椅板凳等)
 /// 功能：针对每个房间生成合理的道具，摆放位置随机且合理(1.各个房间内部物品都朝向当前房间的中心点)
@@ -14,22 +15,6 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
 {
     //各个房间的可放置坐标节点  v-各个坐标点 放置信息
     private Dictionary<RoomType, List<ItemModelInfo>> m_DicItemModelInfo;
-
-    //缓存模型实体 k-实体名称（与ItemModelType枚举值一致）v-实体模型
-    public Dictionary<string, GameObject> dicCacheModelEntity;
-
-
-    //TODO 后面从ab包中加载资源并缓存
-    public GameObject ItemBed;
-    public GameObject ItemBin;
-    public GameObject ItemComputerDeskChair;
-    public GameObject ItemWardrobe;
-    public GameObject ItemSofaSmall1;
-    public GameObject ItemSofaSmall2;
-    public GameObject ItemSofaBig1;
-    public GameObject ItemSofaBig2;
-    public GameObject ItemSofaBig3;
-    public GameObject ItemPool;
 
     /// <summary>
     /// 是否限制门周边两米位置放置道具
@@ -99,8 +84,6 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         {
             ItemEntityGroupNode = new GameObject("ItemEntityGroupNode").transform;
         }
-
-        CacheItenEntityModel();
     }
 
     /// <summary>
@@ -109,6 +92,8 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     /// <param name="borderEntityDatas">所有房间边界信息</param>
     public void GenerateRoomItem(List<RoomInfo> roomInfos)
     {
+        //CacheItenEntityModel();
+
         /*根据边界信息找到各个房间的可放置坐标节点，屏蔽"门"模型前后坐标节点，避免物体堵门*/
         ChcheItemModelTypeInfo(roomInfos);
 
@@ -252,7 +237,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     itemModels.Add(ItemModelType.ItemPool);
                     itemModels.Add(ItemModelType.ItemBin);
                     break;
-                case RoomType.FirstBedRoom: 
+                case RoomType.FirstBedRoom:
                     itemModels.Add(ItemModelType.ItemBed);
                     itemModels.Add(ItemModelType.ItemComputerDeskChair);
                     itemModels.Add(ItemModelType.ItemWardrobe);
@@ -276,27 +261,6 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         return res;
     }
 
-    //缓存实体模型
-    private void CacheItenEntityModel()
-    {
-        //TODO 后面从ab包中加载资源并缓存
-
-        dicCacheModelEntity = new Dictionary<string, GameObject>
-        {
-            { ItemBed.name ,ItemBed },
-            { ItemBin.name ,ItemBin },
-            { ItemComputerDeskChair.name ,ItemComputerDeskChair },
-            { ItemWardrobe.name ,ItemWardrobe },
-            { ItemSofaSmall1.name ,ItemSofaSmall1 },
-            { ItemSofaSmall2.name ,ItemSofaSmall2 },
-            { ItemSofaBig1.name ,ItemSofaBig1 },
-            { ItemSofaBig2.name ,ItemSofaBig2 },
-            { ItemSofaBig3.name ,ItemSofaBig3 },
-            { ItemPool.name,ItemPool }
-        };
-
-    }
-
     /// <summary>
     /// 获取模型实体
     /// </summary>
@@ -307,9 +271,9 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         var res = new List<GameObject>();
         for (int i = 0; i < itemModelTypes?.Length; i++)
         {
-            if (dicCacheModelEntity.ContainsKey(itemModelTypes[i].ToString()))
+            if (ResourcesLoad.GetInstance.dicCacheEntityRes.ContainsKey(itemModelTypes[i].ToString()))
             {
-                GameObject go = dicCacheModelEntity[itemModelTypes[i].ToString()];
+                GameObject go = ResourcesLoad.GetInstance.dicCacheEntityRes[itemModelTypes[i].ToString()];
                 res.Add(go);
             }
             else

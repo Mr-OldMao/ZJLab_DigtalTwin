@@ -32,43 +32,49 @@ public class TestGenerateRoom : MonoBehaviour
         txtFullRandomLengthRangeMin.text = "4";
         txtFullRandomLengthRangeMax.text = "7";
         txtFullRandomWidthRangeMin.text = "4";
-        txtFullRandomWidthRangeMax.text= "8";
+        txtFullRandomWidthRangeMax.text = "8";
     }
 
     private void Start()
     {
         ////固定生成
         //btnFixedGenerate?.onClick.AddListener(() => { TestGenerateFixed(); });
-        //半随机，需要指定各个房间大小以及邻接方位,系统自动随机所在位置
-        btnHalfRandomGenerate?.onClick.AddListener(() => { TestGenerateHalfRandom(); });
 
-
-        //完全随机
-        btnFullRandomGenerate?.onClick?.AddListener(() =>
+        ResourcesLoad.GetInstance.AsyncLoadResources(() =>
         {
-            if (uint.TryParse(txtFullRandomCount.text, out uint roomCount)
-            && uint.TryParse(txtFullRandomLengthRangeMin.text, out uint lengthRangeMin)
-            && uint.TryParse(txtFullRandomLengthRangeMax.text, out uint lengthRangeMax)
-            && uint.TryParse(txtFullRandomWidthRangeMin.text, out uint widthRangeMin)
-            && uint.TryParse(txtFullRandomWidthRangeMax.text, out uint widthRangeMax))
+            //半随机，需要指定各个房间大小以及邻接方位,系统自动随机所在位置
+            btnHalfRandomGenerate?.onClick.AddListener(() =>
             {
-                TestGenerateFullRandom(new FullRandomData
-                {
-                    roomCount = roomCount,
-                    lengthRangeMin = lengthRangeMin,
-                    lengthRangeMax = lengthRangeMax,
-                    widthRangeMax = widthRangeMax,
-                    widthRangeMin = widthRangeMin,
-                });
-            }
-        });
+                TestGenerateHalfRandom();
+            });
 
-        Transform RoomBorderGroupNode = GameObject.Find("RoomBorderGroupNode")?.transform;
-        if (RoomBorderGroupNode == null)
-        {
-            RoomBorderGroupNode = new GameObject("RoomBorderGroupNode").transform;
-        }
-        GenerateRoomBorderModel.GetInstance.RoomGroup = RoomBorderGroupNode;
+            //完全随机
+            btnFullRandomGenerate?.onClick?.AddListener(() =>
+            {
+                if (uint.TryParse(txtFullRandomCount.text, out uint roomCount)
+                && uint.TryParse(txtFullRandomLengthRangeMin.text, out uint lengthRangeMin)
+                && uint.TryParse(txtFullRandomLengthRangeMax.text, out uint lengthRangeMax)
+                && uint.TryParse(txtFullRandomWidthRangeMin.text, out uint widthRangeMin)
+                && uint.TryParse(txtFullRandomWidthRangeMax.text, out uint widthRangeMax))
+                {
+                    TestGenerateFullRandom(new FullRandomData
+                    {
+                        roomCount = roomCount,
+                        lengthRangeMin = lengthRangeMin,
+                        lengthRangeMax = lengthRangeMax,
+                        widthRangeMax = widthRangeMax,
+                        widthRangeMin = widthRangeMin,
+                    });
+                }
+            });
+
+            Transform RoomBorderGroupNode = GameObject.Find("RoomBorderGroupNode")?.transform;
+            if (RoomBorderGroupNode == null)
+            {
+                RoomBorderGroupNode = new GameObject("RoomBorderGroupNode").transform;
+            }
+            GenerateRoomBorderModel.GetInstance.RoomGroup = RoomBorderGroupNode;
+        });
     }
 
 
@@ -162,7 +168,7 @@ public class TestGenerateRoom : MonoBehaviour
                 GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
                 GenerateRoomItemModel.GetInstance.GenerateRoomItem(k);
             }
-            
+
         });
     }
 
