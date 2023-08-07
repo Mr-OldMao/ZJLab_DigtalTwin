@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: RoomBorder
+  m_EditorClassIdentifier: 
+  m_GroupName: RoomBorder
+  m_Data:
+    m_SerializedData: []
+  m_GUID: fe4526e47d9b61c42ae3fe6f745dae67
+  m_SerializeEntries:
+  - m_GUID: 905a52fed825fd444a4a05b8bbe0e535
+    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallX.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RoomBorderLable
+  - m_GUID: f1455f6b87b0ddf46a4233f901e772f4
+    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallY.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RoomBorderLable
+  - m_GUID: 0bced528cb33967439891443073b85d7
+    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/DoorX.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RoomBorderLable
+  - m_GUID: e7adab90a09158e4d8829d2015188e23
+    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/DoorY.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RoomBorderLable
+  - m_GUID: d38dc5a1a49e2314cbc12116c2eafc4a
+    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/Floor.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RoomBorderLable
+  - m_GUID: 1c0591807fc5cb84ea03375045b26154
+    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallSmallX.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RoomBorderLable
+  - m_GUID: 46e75d9fca0bc834aa006f7f7f8f9702
+    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallSmallY.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RoomBorderLable
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 13b3a089d6d69ce499381abb142d0bfb, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 4b6aa196a94125a44baeb0e9e85199ef, type: 2}
+    - {fileID: 11400000, guid: 57eb302896cdacc44904b1d9deff8794, type: 2}

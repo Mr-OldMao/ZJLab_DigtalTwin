@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using static GenerateRoomData;
 using static GenerateRoomBorderModel;
 using static UnityEditor.Progress;
+using MFramework;
 
 /// <summary>
 /// 标题：测试动态生成场景房间
@@ -40,7 +41,9 @@ public class TestGenerateRoom : MonoBehaviour
         ////固定生成
         //btnFixedGenerate?.onClick.AddListener(() => { TestGenerateFixed(); });
 
-        ResourcesLoad.GetInstance.AsyncLoadResources(() =>
+        ResourcesLoad.GetInstance.AsyncLoadAllResources();
+
+        MsgEvent.RegisterMsgEvent(MsgEventName.AsyncLoadedComplete, () =>
         {
             //半随机，需要指定各个房间大小以及邻接方位,系统自动随机所在位置
             btnHalfRandomGenerate?.onClick.AddListener(() =>

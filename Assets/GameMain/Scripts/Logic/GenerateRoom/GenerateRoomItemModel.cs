@@ -271,9 +271,9 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         var res = new List<GameObject>();
         for (int i = 0; i < itemModelTypes?.Length; i++)
         {
-            if (ResourcesLoad.GetInstance.dicCacheEntityRes.ContainsKey(itemModelTypes[i].ToString()))
+            GameObject go = ResourcesLoad.GetInstance.GetEntityRes(itemModelTypes[i].ToString());
+            if (go != null)
             {
-                GameObject go = ResourcesLoad.GetInstance.dicCacheEntityRes[itemModelTypes[i].ToString()];
                 res.Add(go);
             }
             else
