@@ -29,7 +29,7 @@ public class TestGenerateRoom : MonoBehaviour
 
     private void Awake()
     {
-        txtFullRandomCount.text = "4";
+        txtFullRandomCount.text = "5";
         txtFullRandomLengthRangeMin.text = "4";
         txtFullRandomLengthRangeMax.text = "7";
         txtFullRandomWidthRangeMin.text = "4";

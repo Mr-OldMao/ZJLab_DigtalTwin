@@ -75,6 +75,24 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         /// 电脑桌椅
         /// </summary>
         ItemComputerDeskChair,
+
+        /*厨房*/
+        /// <summary>
+        /// 橱柜1
+        /// </summary>
+        ItemKitchenCase1,
+        /// <summary>
+        /// 橱柜2
+        /// </summary>
+        ItemKitchenCase2,
+        /// <summary>
+        /// 冰箱1
+        /// </summary>
+        ItemRefrigerator1,
+        /// <summary>
+        /// 冰箱2
+        /// </summary>
+        ItemRefrigerator2,
     }
 
     private void Awake()
@@ -248,6 +266,9 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     itemModels.Add(ItemModelType.ItemBin);
                     break;
                 case RoomType.KitChenRoom:
+                    itemModels.Add(ItemModelType.ItemKitchenCase1); //TODO 后面随机取ItemKitchenCase1，ItemKitchenCase2
+                    itemModels.Add(ItemModelType.ItemRefrigerator1);//TODO 后面随机取ItemRefrigerator1,ItemRefrigerator2
+                    itemModels.Add(ItemModelType.ItemBin);
                     break;
                 case RoomType.StudyRoom:
                     break;

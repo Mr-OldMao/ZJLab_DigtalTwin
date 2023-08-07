@@ -78,10 +78,24 @@ MonoBehaviour:
     - Item
     - ItemLable
   - m_GUID: 4bd29552909c8ad43803d8e594cc8f73
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemWardrobexxx.prefab
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemKitchenCase1.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
-    - Item
+    - ItemLable
+  - m_GUID: c8cefd58149f6d1459f54cd02dac2dde
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemKitchenCase2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: c5746813887c3214498e757d91e42b50
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemRefrigerator1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: 78c89c57d82296c48b7ce5913d938f57
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemRefrigerator2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
     - ItemLable
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 13b3a089d6d69ce499381abb142d0bfb, type: 2}
