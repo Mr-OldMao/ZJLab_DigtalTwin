@@ -43,6 +43,8 @@ MonoBehaviour:
   m_GroupAssets:
   - {fileID: 11400000, guid: d4c518117bfd4604e9813745546f8bfa, type: 2}
   - {fileID: 11400000, guid: 148fbf525aff26f46a93a620f4c6cfbc, type: 2}
+  - {fileID: 11400000, guid: b9fec1686447deb4e9c1efe04f726a98, type: 2}
+  - {fileID: 11400000, guid: cf92bcd894c1e2a4383deebf549af2e7, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1
@@ -84,6 +86,8 @@ MonoBehaviour:
   m_LabelTable:
     m_LabelNames:
     - default
+    - ItemLable
+    - RoomBorderLable
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 78e4de535c270f5408e7bcde4ef7309a, type: 2}

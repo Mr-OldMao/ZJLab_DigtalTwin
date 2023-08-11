@@ -28,6 +28,16 @@ public class TestJsonDataSendRecv : MonoBehaviour
             ChacheNodeInfo(jsonEntityThingGraph);
             Debug.Log("recv callback jsonStr:" + jsonStr + ",jsonEntityThingGraph:" + jsonEntityThingGraph + ",m_DicNodeInfo:" + m_DicNodeInfo);
         });
+
+        string url2 = "http://10.101.80.71:8099/robot/feature/getFeature";
+        MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, url2, new Dictionary<string, string> 
+        {
+            { "robotId","iben_a03_3"},
+            { "featureId","people_perception"}
+        }, (string jsonStr) =>
+        {
+            Debug.Log(jsonStr);
+        });
     }
 
     private void ChacheNodeInfo(JsonEntityThingGraph jsonEntityThingGraph)
