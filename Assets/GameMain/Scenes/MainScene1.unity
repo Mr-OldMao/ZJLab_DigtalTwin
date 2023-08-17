@@ -3331,6 +3331,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1300582244}
+  - component: {fileID: 1300582245}
   m_Layer: 0
   m_Name: ItemGroup
   m_TagString: Untagged
@@ -3367,6 +3368,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1300582245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300582243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 877bb968a2167c34fb8dd2715799921b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ip: 127.0.0.1
+  port: 1883
+  username: admin
+  password: g7020176
+  clientId: Unity Mqtt Client
+  topic1: Robot1_command
 --- !u!1 &1313109304
 GameObject:
   m_ObjectHideFlags: 0
