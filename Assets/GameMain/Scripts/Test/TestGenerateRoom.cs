@@ -92,13 +92,13 @@ public class TestGenerateRoom : MonoBehaviour
                  roomSize = new uint[]{ 4,6 },
                  targetRoomsDirRelation = new List<RoomsDirRelation>()
                  {
-                     new RoomsDirRelation{ targetRoomType = RoomType.FirstBedRoom , locationRelation = DirEnum.Right , isCommonWall = true},
+                     new RoomsDirRelation{ targetRoomType = RoomType.BedRoom , locationRelation = DirEnum.Right , isCommonWall = true},
                      new RoomsDirRelation{ targetRoomType = RoomType.KitChenRoom , locationRelation = DirEnum.Down  , isCommonWall = true},
                  }
             },
             new RoomBaseInfo
             {
-                 curRoomType = RoomType.FirstBedRoom,
+                 curRoomType = RoomType.BedRoom,
                  roomSize = new uint[]{ 3,5 },
                  //targetRoomsDirRelation = new List<RoomsDirRelation>()
                  //{
@@ -116,7 +116,7 @@ public class TestGenerateRoom : MonoBehaviour
             },
             new RoomBaseInfo
             {
-                 curRoomType = RoomType.RestRoom,
+                 curRoomType = RoomType.BathRoom,
                  roomSize = new uint[]{3,4 },
                  targetRoomsDirRelation = new List<RoomsDirRelation>()
                  {
@@ -129,34 +129,34 @@ public class TestGenerateRoom : MonoBehaviour
                  roomSize = new uint[]{2,3 },
                  targetRoomsDirRelation = new List<RoomsDirRelation>()
                  {
-                     new RoomsDirRelation{ targetRoomType = RoomType.RestRoom , locationRelation = DirEnum.Right , isCommonWall = true},
+                     new RoomsDirRelation{ targetRoomType = RoomType.BathRoom , locationRelation = DirEnum.Right , isCommonWall = true},
                  }
             },
-            new RoomBaseInfo
-            {
-                 curRoomType = RoomType.BalconyRoom,
-                 roomSize = new uint[]{2,5 },
-                 targetRoomsDirRelation = new List<RoomsDirRelation>()
-                 {
-                     new RoomsDirRelation{ targetRoomType = RoomType.FirstBedRoom , locationRelation = DirEnum.Up , isCommonWall = true},
-                 }
-            },
-            new RoomBaseInfo
-            {
-                 curRoomType = RoomType.SecondBedRoom,
-                 roomSize = new uint[]{4,5 },
-                 targetRoomsDirRelation = new List<RoomsDirRelation>()
-                 {
-                     new RoomsDirRelation{ targetRoomType = RoomType.LivingRoom , locationRelation = DirEnum.Down , isCommonWall = true},
-                 }
-            },
+            //new RoomBaseInfo
+            //{
+            //     curRoomType = RoomType.BalconyRoom,
+            //     roomSize = new uint[]{2,5 },
+            //     targetRoomsDirRelation = new List<RoomsDirRelation>()
+            //     {
+            //         new RoomsDirRelation{ targetRoomType = RoomType.BedRoom , locationRelation = DirEnum.Up , isCommonWall = true},
+            //     }
+            //},
+            //new RoomBaseInfo
+            //{
+            //     curRoomType = RoomType.SecondBedRoom,
+            //     roomSize = new uint[]{4,5 },
+            //     targetRoomsDirRelation = new List<RoomsDirRelation>()
+            //     {
+            //         new RoomsDirRelation{ targetRoomType = RoomType.LivingRoom , locationRelation = DirEnum.Down , isCommonWall = true},
+            //     }
+            //},
               new RoomBaseInfo
             {
                  curRoomType = RoomType.StorageRoom,
                  roomSize = new uint[]{3,2 },
                  targetRoomsDirRelation = new List<RoomsDirRelation>()
                  {
-                     new RoomsDirRelation{ targetRoomType = RoomType.SecondBedRoom , locationRelation = DirEnum.Right , isCommonWall = true},
+                     new RoomsDirRelation{ targetRoomType = RoomType.StudyRoom , locationRelation = DirEnum.Right , isCommonWall = true},
                  }
             },
         };

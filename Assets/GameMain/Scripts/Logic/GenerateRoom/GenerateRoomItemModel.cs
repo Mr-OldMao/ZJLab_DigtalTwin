@@ -251,20 +251,20 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     itemModels.Add(ItemModelType.ItemBin);
                     itemModels.Add(ItemModelType.ItemBin);
                     break;
-                case RoomType.RestRoom:
+                case RoomType.BathRoom:
                     itemModels.Add(ItemModelType.ItemPool);
                     itemModels.Add(ItemModelType.ItemBin);
                     break;
-                case RoomType.FirstBedRoom:
+                case RoomType.BedRoom:
                     itemModels.Add(ItemModelType.ItemBed);
                     itemModels.Add(ItemModelType.ItemComputerDeskChair);
                     itemModels.Add(ItemModelType.ItemWardrobe);
                     itemModels.Add(ItemModelType.ItemBin);
                     break;
-                case RoomType.SecondBedRoom:
-                    itemModels.Add(ItemModelType.ItemBed);
-                    itemModels.Add(ItemModelType.ItemBin);
-                    break;
+                //case RoomType.SecondBedRoom:
+                //    itemModels.Add(ItemModelType.ItemBed);
+                //    itemModels.Add(ItemModelType.ItemBin);
+                //    break;
                 case RoomType.KitChenRoom:
                     itemModels.Add(ItemModelType.ItemKitchenCase1); //TODO 后面随机取ItemKitchenCase1，ItemKitchenCase2
                     itemModels.Add(ItemModelType.ItemRefrigerator1);//TODO 后面随机取ItemRefrigerator1,ItemRefrigerator2
@@ -272,8 +272,8 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     break;
                 case RoomType.StudyRoom:
                     break;
-                case RoomType.BalconyRoom:
-                    break;
+                //case RoomType.BalconyRoom:
+                //    break;
                 case RoomType.StorageRoom:
                     break;
             }

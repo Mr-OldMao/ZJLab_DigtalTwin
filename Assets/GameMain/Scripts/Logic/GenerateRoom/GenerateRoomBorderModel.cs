@@ -178,15 +178,15 @@ public enum RoomType
     /// <summary>
     /// 浴室
     /// </summary>
-    RestRoom,
+    BathRoom,
     /// <summary>
     /// 主卧
     /// </summary>
-    FirstBedRoom,
-    /// <summary>
-    /// 侧卧
-    /// </summary>
-    SecondBedRoom,
+    BedRoom,
+    ///// <summary>
+    ///// 侧卧
+    ///// </summary>
+    //SecondBedRoom,
     /// <summary>
     /// 厨房
     /// </summary>
@@ -195,10 +195,10 @@ public enum RoomType
     /// 书房
     /// </summary>
     StudyRoom,
-    /// <summary>
-    /// 阳台
-    /// </summary>
-    BalconyRoom,
+    ///// <summary>
+    ///// 阳台
+    ///// </summary>
+    //BalconyRoom,
     /// <summary>
     /// 储藏室
     /// </summary>
