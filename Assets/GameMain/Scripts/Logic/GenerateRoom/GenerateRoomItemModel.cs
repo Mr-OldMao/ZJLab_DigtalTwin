@@ -36,64 +36,9 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         /// <summary>
         /// 当前坐标放置的物体,Null则表示当前当前位置未放置物体
         /// </summary>
-        public ItemModelType itemModelType;
+        public string itemModelType;
     }
 
-    /// <summary>
-    /// 室内物体模型
-    /// </summary>
-    public enum ItemModelType
-    {
-        Null = 0,
-
-        /*common*/
-        ItemSofaSmall1,
-        ItemSofaSmall2,
-        ItemBin,
-
-        /*客厅*/
-        /// <summary>
-        /// 沙发茶几组
-        /// </summary>
-        ItemSofaBig1,
-        ItemSofaBig2,
-        ItemSofaBig3,
-
-        /*浴室*/
-        /// <summary>
-        /// 浴池
-        /// </summary>
-        ItemPool,
-
-        /*主卧*/
-        ItemBed,
-        /// <summary>
-        /// 衣柜
-        /// </summary>
-        ItemWardrobe,
-        /// <summary>
-        /// 电脑桌椅
-        /// </summary>
-        ItemComputerDeskChair,
-
-        /*厨房*/
-        /// <summary>
-        /// 橱柜1
-        /// </summary>
-        ItemKitchenCase1,
-        /// <summary>
-        /// 橱柜2
-        /// </summary>
-        ItemKitchenCase2,
-        /// <summary>
-        /// 冰箱1
-        /// </summary>
-        ItemRefrigerator1,
-        /// <summary>
-        /// 冰箱2
-        /// </summary>
-        ItemRefrigerator2,
-    }
 
     private void Awake()
     {
@@ -153,7 +98,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     ItemModelInfo itemModelInfo = new ItemModelInfo
                     {
                         pos = targetPos,
-                        itemModelType = ItemModelType.Null,
+                        itemModelType = string.Empty,
                         posDir = GetPosDir(targetPos, centerPos)
                     };
                     m_DicItemModelInfo[roomInfos[i].roomType].Add(itemModelInfo);
@@ -234,41 +179,43 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     }
 
 
-    //获取各个房间内部所有物体实体
-    private Dictionary<RoomType, List<GameObject>> GetRoomInsideItemEntity(List<RoomInfo> roomInfos)
+    /// <summary>
+    /// 获取各个房间内部所有物体实体
+    /// </summary>
+    /// <param name="roomInfos"></param>
+    /// <param name="obj">TODO 根据接口数据配置各个房间物品</param>
+    /// <returns></returns>
+    private Dictionary<RoomType, List<GameObject>> GetRoomInsideItemEntity(List<RoomInfo> roomInfos,object obj = null)
     {
         var res = new Dictionary<RoomType, List<GameObject>>();
         for (int i = 0; i < roomInfos.Count; i++)
         {
-            List<ItemModelType> itemModels = new List<ItemModelType>();
+            List<string> itemModels = new List<string>();
             switch (roomInfos[i].roomType)
             {
                 case RoomType.LivingRoom://Add原则 尽量占地面积大的物品放在前列，后续随机放置物品时会按此顺序顺次放置
                     //TODO 后面需要随机取 ItemSofaBig1，ItemSofaBig2，ItemSofaBig3
-                    itemModels.Add(ItemModelType.ItemSofaBig1);
-                    itemModels.Add(ItemModelType.ItemComputerDeskChair);
-                    itemModels.Add(ItemModelType.ItemBin);
-                    itemModels.Add(ItemModelType.ItemBin);
-                    itemModels.Add(ItemModelType.ItemBin);
+                    itemModels.Add("SofaBig");
+                    itemModels.Add("ItemComputerDeskChair");
+                    itemModels.Add("Bin");
+                    itemModels.Add("Bin");
+                    itemModels.Add("Bin");
                     break;
                 case RoomType.BathRoom:
-                    itemModels.Add(ItemModelType.ItemPool);
-                    itemModels.Add(ItemModelType.ItemBin);
+                    itemModels.Add("Bin");
+                    itemModels.Add("Bin");
                     break;
                 case RoomType.BedRoom:
-                    itemModels.Add(ItemModelType.ItemBed);
-                    itemModels.Add(ItemModelType.ItemComputerDeskChair);
-                    itemModels.Add(ItemModelType.ItemWardrobe);
-                    itemModels.Add(ItemModelType.ItemBin);
+                    itemModels.Add("Bin");
                     break;
                 //case RoomType.SecondBedRoom:
                 //    itemModels.Add(ItemModelType.ItemBed);
                 //    itemModels.Add(ItemModelType.ItemBin);
                 //    break;
                 case RoomType.KitChenRoom:
-                    itemModels.Add(ItemModelType.ItemKitchenCase1); //TODO 后面随机取ItemKitchenCase1，ItemKitchenCase2
-                    itemModels.Add(ItemModelType.ItemRefrigerator1);//TODO 后面随机取ItemRefrigerator1,ItemRefrigerator2
-                    itemModels.Add(ItemModelType.ItemBin);
+                    itemModels.Add("ItemKitchenCase1"); //TODO 后面随机取ItemKitchenCase1，ItemKitchenCase2
+                    itemModels.Add("ItemRefrigerator1");//TODO 后面随机取ItemRefrigerator1,ItemRefrigerator2
+                    itemModels.Add("Bin");
                     break;
                 case RoomType.StudyRoom:
                     break;
@@ -287,7 +234,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     /// </summary>
     /// <param name="itemModelTypes"></param>
     /// <returns></returns>
-    private List<GameObject> GetItemEntity(params ItemModelType[] itemModelTypes)
+    private List<GameObject> GetItemEntity(params string[] itemModelTypes)
     {
         var res = new List<GameObject>();
         for (int i = 0; i < itemModelTypes?.Length; i++)
@@ -333,7 +280,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 bool canUse = true;
                 foreach (ItemModelInfo itemInfo in itemModelInfos)
                 {
-                    if (itemInfo.itemModelType != ItemModelType.Null)
+                    if (itemInfo.itemModelType != string.Empty)
                     {
                         continue;
                     }
@@ -425,7 +372,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                             List<ItemModelInfo> needItemModelInfoArr = new List<ItemModelInfo>();
                             foreach (Vector2 needPos in itemPosArr)
                             {
-                                ItemModelInfo needItemModelInfo = itemModelInfos.Find((p) => { return p.pos == needPos && p.itemModelType == ItemModelType.Null; });
+                                ItemModelInfo needItemModelInfo = itemModelInfos.Find((p) => { return p.pos == needPos && p.itemModelType == string.Empty; });
                                 if (needItemModelInfo == null)
                                 {
                                     canUse = false;
@@ -471,14 +418,14 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     }
 
     //获取实体对象对应的枚举
-    private ItemModelType GetItemModelType(string itemName)
+    private string GetItemModelType(string itemName)
     {
-        ItemModelType res = ItemModelType.Null;
-        if (Enum.TryParse(typeof(ItemModelType), itemName, out object p))
-        {
-            res = (ItemModelType)p;
-        }
-        return res;
+        //@string res = @string.Null;
+        //if (Enum.TryParse(typeof(@string), itemName, out object p))
+        //{
+        //    res = (@string)p;
+        //}
+        return itemName;
     }
 
     private void Update()
