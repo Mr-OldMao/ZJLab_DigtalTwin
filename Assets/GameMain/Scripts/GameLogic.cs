@@ -15,7 +15,6 @@ using System;
 public class GameLogic : SingletonByMono<GameLogic>
 {
     private bool m_IsLoadedAssets = false;
-    private bool m_IsCompleteHttp = false;
     public void Init()
     {
         Debug.Log("Init GameLogic");
@@ -35,7 +34,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         NetworkMQTT();
 
         //等待ab资源加载完毕，以及http接口获取的场景数据，解析生成场景实体
-        UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() => { return m_IsLoadedAssets && m_IsCompleteHttp; }, () =>
+        UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() => { return m_IsLoadedAssets && MainData.getEnvGraph != null && MainData.getThingGraph != null; }, () =>
         {
             GenerateEntity(() =>
             {
@@ -49,46 +48,15 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     private void NetworkHTTP()
     {
-        //string url3 = "http://10.11.81.241:4006/simulator/getThingGraph";
-        //MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, url3, new Dictionary<string, string>(), (string jsonStr) =>
-        //{
-        //    //JsonEntityThingGraph jsonEntityThingGraph = JsonTool.GetInstance.JsonToObjectByLitJson<JsonEntityThingGraph>(jsonStr);
-        //    //ChacheNodeInfo(jsonEntityThingGraph);
-        //    Debug.Log("recv callback jsonStr:" + jsonStr);
-        //}, null, "{\"id\":\"test\"}");
-
-        //string url4 = "http://10.11.81.241:4006/simulator/getEnvGraph";
-        //MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, url4, new Dictionary<string, string>(), (string jsonStr) =>
-        //{
-        //    //JsonEntityThingGraph jsonEntityThingGraph = JsonTool.GetInstance.JsonToObjectByLitJson<JsonEntityThingGraph>(jsonStr);
-        //    //ChacheNodeInfo(jsonEntityThingGraph);
-        //    Debug.Log("recv callback jsonStr:" + jsonStr);
-        //}, null, "{\"id\":\"test\"}");
-
-        string url = "http://10.11.81.241:4006/brain/show/thingGraph";
-        MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, url, new Dictionary<string, string> { }, (string jsonStr) =>
-        {
-            Debug.Log("recv callback jsonStr:" + jsonStr);
-
-            m_IsCompleteHttp = true;
-        });
+        InterfaceDataCenter.GetInstance.CacheGetThingGraph("test");
+        InterfaceDataCenter.GetInstance.CacheGetEnvGraph("test");
     }
+
     private void NetworkMQTT()
     {
-        //初始化并订阅主题
-        NetworkMqtt.GetInstance.Init(new MqttConfig()).Subscribe(MqttTopicName.TopicTest);
-        //监听消息回调
-        NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgPublishEventArgs e) =>
-        {
-            Debug.Log($"通过代理收到消息：{Encoding.UTF8.GetString(e.Message)}");
-        });
-        NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgSubscribedEventArgs e) =>
-        {
-            Debug.Log($"客户端订阅消息成功回调 ，sender：{sender}");
-        });
-        //订阅多个主题
-        NetworkMqtt.GetInstance.Subscribe("TopicTest1", "TopicTest2");
+        InterfaceDataCenter.GetInstance.InitMQTT();
     }
+
     private void RegisterMsgEvent()
     {
         MsgEvent.RegisterMsgEvent(MsgEventName.AsyncLoadedComplete, () =>
