@@ -68,7 +68,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         /// </summary>
         public DirEnum locationRelation;
         /// <summary>
-        /// 当前房间与目标房间共用一面墙
+        /// 当前房间与目标房间共用一面墙（字段未使用暂时保留）
         /// </summary>
         public bool isCommonWall;
     }
@@ -78,9 +78,9 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     /// </summary>
     public enum DirEnum
     {
-        Up = 0,
+        Top = 0,
         Left,
-        Down,
+        Bottom,
         Right
     }
 
@@ -362,7 +362,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             {
                 switch (roomBaseInfo.targetRoomsDirRelation[i].locationRelation)
                 {
-                    case DirEnum.Up:
+                    case DirEnum.Top:
                         posLeftUpArr.Add(new Vector2(otherRoomInfo.roomPosMin.x, otherRoomInfo.roomPosMax.y));
                         posRightUpArr.Add(new Vector2(otherRoomInfo.roomPosMax.x, otherRoomInfo.roomPosMax.y));
                         break;
@@ -370,7 +370,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         posLeftUpArr.Add(new Vector2(otherRoomInfo.roomPosMin.x, otherRoomInfo.roomPosMin.y));
                         posLeftDownArr.Add(new Vector2(otherRoomInfo.roomPosMin.x, otherRoomInfo.roomPosMax.y));
                         break;
-                    case DirEnum.Down:
+                    case DirEnum.Bottom:
                         posLeftDownArr.Add(new Vector2(otherRoomInfo.roomPosMin.x, otherRoomInfo.roomPosMin.y));
                         posRightDownArr.Add(new Vector2(otherRoomInfo.roomPosMax.x, otherRoomInfo.roomPosMin.y));
                         break;

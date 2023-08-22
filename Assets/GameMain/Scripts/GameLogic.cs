@@ -6,6 +6,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 using System.Text;
 using static GenerateRoomData;
 using System;
+using static GetEnvGraph;
 /// <summary>
 /// 标题：程序逻辑入口
 /// 功能：程序主逻辑
@@ -68,64 +69,49 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     private void GenerateEntity(Action generateCompleteCallback)
     {
-        List<RoomBaseInfo> roomBaseInfos = new()
+        //写入各个房间之间的邻接关系
+        List<RoomBaseInfo> roomBaseInfos = new List<RoomBaseInfo>();
+        for (int i = 0; i < MainData.getEnvGraph?.data?.items.Length; i++)
         {
-            new RoomBaseInfo
+            GetEnvGraph_data_items roomRelation = MainData.getEnvGraph?.data?.items[i];
+            RoomBaseInfo roomBaseInfo = new RoomBaseInfo();
+            roomBaseInfos.Add(roomBaseInfo);
+
+            roomBaseInfo.curRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.name);
+            roomBaseInfo.roomSize = new uint[] { (uint)UnityEngine.Random.Range(4, 8), (uint)UnityEngine.Random.Range(4, 8) };
+            roomBaseInfo.targetRoomsDirRelation = new List<RoomsDirRelation>();
+            //当前房间与其他房间邻接关系
+            for (int j = 0; j < roomRelation.relatedThing?.Length; j++)
             {
-                 curRoomType = RoomType.LivingRoom,
-                 roomSize = new uint[]{ 4,6 },
-                 targetRoomsDirRelation = new List<RoomsDirRelation>()
-                 {
-                     new RoomsDirRelation{ targetRoomType = RoomType.BedRoom , locationRelation = DirEnum.Right , isCommonWall = true},
-                     new RoomsDirRelation{ targetRoomType = RoomType.KitChenRoom , locationRelation = DirEnum.Down  , isCommonWall = true},
-                 }
-            },
-            new RoomBaseInfo
+                RoomType targetRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.relatedThing[j].target.name);
+                roomBaseInfo.targetRoomsDirRelation.Add(new RoomsDirRelation
+                {
+                    targetRoomType = targetRoomType,
+                    locationRelation = (DirEnum)Enum.Parse(typeof(DirEnum), roomRelation.relatedThing[j].relationship),
+                    isCommonWall = true
+                });
+              
+
+            }
+           
+        }
+        //补充各个房间之间的邻接关系
+        for (int i = 0; i < MainData.getEnvGraph?.data?.items.Length; i++)
+        {
+            GetEnvGraph_data_items roomRelation = MainData.getEnvGraph?.data?.items[i];
+            for (int j = 0; j < roomRelation.relatedThing?.Length; j++)
             {
-                 curRoomType = RoomType.BedRoom,
-                 roomSize = new uint[]{ 3,5 },
-                 //targetRoomsDirRelation = new List<RoomsDirRelation>()
-                 //{
-                 //    new RoomsDirRelation{ targetRoomType = RoomType.LivingRoom , locationRelation = DirEnum.Left },
-                 //}
-            },
-            new RoomBaseInfo
-            {
-                 curRoomType = RoomType.KitChenRoom,
-                 roomSize = new uint[]{ 2,4 },
-                 //targetRoomsDirRelation = new List<RoomsDirRelation>()
-                 //{
-                 //    new RoomsDirRelation{ targetRoomType = RoomType.LivingRoom , locationRelation = DirEnum.Up },
-                 //}
-            },
-            new RoomBaseInfo
-            {
-                 curRoomType = RoomType.BathRoom,
-                 roomSize = new uint[]{3,4 },
-                 targetRoomsDirRelation = new List<RoomsDirRelation>()
-                 {
-                     new RoomsDirRelation{ targetRoomType = RoomType.LivingRoom , locationRelation = DirEnum.Right , isCommonWall = true},
-                 }
-            },
-              new RoomBaseInfo
-            {
-                 curRoomType = RoomType.StudyRoom,
-                 roomSize = new uint[]{2,3 },
-                 targetRoomsDirRelation = new List<RoomsDirRelation>()
-                 {
-                     new RoomsDirRelation{ targetRoomType = RoomType.BathRoom , locationRelation = DirEnum.Right , isCommonWall = true},
-                 }
-            },
-              new RoomBaseInfo
-            {
-                 curRoomType = RoomType.StorageRoom,
-                 roomSize = new uint[]{3,2 },
-                 targetRoomsDirRelation = new List<RoomsDirRelation>()
-                 {
-                     new RoomsDirRelation{ targetRoomType = RoomType.StudyRoom , locationRelation = DirEnum.Right , isCommonWall = true},
-                 }
-            },
-        };
+                RoomType targetRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.relatedThing[j].target.name);
+                if (roomBaseInfos.Find((p) => { return p.curRoomType == targetRoomType; }) == null)
+                {
+                    roomBaseInfos.Add(new RoomBaseInfo
+                    {
+                        curRoomType = targetRoomType,
+                        roomSize = new uint[] { (uint)UnityEngine.Random.Range(4, 8), (uint)UnityEngine.Random.Range(4, 8) }
+                    });
+                }
+            }
+        }
         GenerateRoomData.GetInstance.GenerateRandomRoomInfoData(roomBaseInfos, (p, k) =>
         {
             if (p == null || k == null)
@@ -135,7 +121,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             else
             {
                 GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
-                GenerateRoomItemModel.GetInstance.GenerateRoomItem(k);
+                GenerateRoomItemModel.GetInstance.GenerateRoomItem(k,MainData.getThingGraph);
                 generateCompleteCallback?.Invoke();
             }
         });
@@ -144,6 +130,17 @@ public class GameLogic : SingletonByMono<GameLogic>
     private void OnDestroy()
     {
         NetworkMqtt.GetInstance.DisConnect();
+    }
+
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            if (m_IsLoadedAssets && MainData.getEnvGraph != null && MainData.getThingGraph != null)
+            {
+                GenerateEntity(null);
+            }
+        }
     }
 }
 

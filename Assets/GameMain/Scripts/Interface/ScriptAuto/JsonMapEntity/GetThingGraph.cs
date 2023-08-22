@@ -84,9 +84,13 @@ public class GetThingGraph
 		/// 
 		/// </summary>
 		public string name;
-		/// <summary>
-		/// 
-		/// </summary>
-		public bool dynamic;
+        /// <summary>
+        /// 当前房间所有邻接关系
+        /// </summary>
+        public GetThingGraph_data_items_relatedThing[] relatedThing;
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool dynamic;
 	}
 }
