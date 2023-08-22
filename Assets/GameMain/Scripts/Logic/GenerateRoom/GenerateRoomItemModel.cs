@@ -22,7 +22,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     /// </summary>
     private bool m_IsLimitPutPos = false;
 
-    private Transform ItemEntityGroupNode;
+    public Transform ItemEntityGroupNode { get; private set; }
 
     /// <summary>
     /// 坐标点的放置信息
@@ -217,76 +217,6 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         return res;
     }
 
-
-    /// <summary>
-    /// 获取各个房间内部所有物体实体
-    /// </summary>
-    /// <param name="roomInfos"></param>
-    /// <param name="obj">TODO 根据接口数据配置各个房间物品</param>
-    /// <returns></returns>
-    //private Dictionary<RoomType, List<ItemDependInfo>> GetRoomInsideItemEntity(List<RoomInfo> roomInfos, GetThingGraph getThingGraph)
-    //{
-    //    var res = new Dictionary<RoomType, List<ItemDependInfo>>();
-    //    //for (int i = 0; i < roomInfos.Count; i++)
-    //    //{
-    //    //    List<string> itemModels = new List<string>();
-    //    //    switch (roomInfos[i].roomType)
-    //    //    {
-    //    //        case RoomType.LivingRoom://Add原则 尽量占地面积大的物品放在前列，后续随机放置物品时会按此顺序顺次放置
-    //    //            //TODO 后面需要随机取 ItemSofaBig1，ItemSofaBig2，ItemSofaBig3
-    //    //            itemModels.Add("SofaBig");
-    //    //            itemModels.Add("ItemComputerDeskChair");
-    //    //            itemModels.Add("Bin");
-    //    //            itemModels.Add("Bin");
-    //    //            itemModels.Add("Bin");
-    //    //            break;
-    //    //        case RoomType.BathRoom:
-    //    //            itemModels.Add("Bin");
-    //    //            itemModels.Add("Bin");
-    //    //            break;
-    //    //        case RoomType.BedRoom:
-    //    //            itemModels.Add("Bin");
-    //    //            break;
-    //    //        //case RoomType.SecondBedRoom:
-    //    //        //    itemModels.Add(ItemModelType.ItemBed);
-    //    //        //    itemModels.Add(ItemModelType.ItemBin);
-    //    //        //    break;
-    //    //        case RoomType.kitchenRoom:
-    //    //            itemModels.Add("ItemKitchenCase1"); //TODO 后面随机取ItemKitchenCase1，ItemKitchenCase2
-    //    //            itemModels.Add("ItemRefrigerator1");//TODO 后面随机取ItemRefrigerator1,ItemRefrigerator2
-    //    //            itemModels.Add("Bin");
-    //    //            break;
-    //    //        case RoomType.StudyRoom:
-    //    //            break;
-    //    //        //case RoomType.BalconyRoom:
-    //    //        //    break;
-    //    //        case RoomType.StorageRoom:
-    //    //            break;
-    //    //    }
-    //    //    res.Add(roomInfos[i].roomType, GetItemEntity(itemModels.ToArray()));
-    //    //}
-    //    if (getThingGraph != null && getThingGraph.data?.items?[0] != null)
-    //    {
-    //        var data = getThingGraph.data?.items?[0];
-    //        RoomType roomType = (RoomType)Enum.Parse(typeof(RoomType), data.name);
-    //        List<ItemDependInfo> goodsArr = new List<ItemDependInfo>();
-    //        res.Add(roomType, goodsArr);
-
-    //        for (int i = 0; i < data.relatedThing.Length; i++)
-    //        {
-    //            goodsArr.Add(new ItemDependInfo
-    //            {
-    //                itemName = data.relatedThing[i].,
-    //                itemID = data.id,
-
-    //            });
-    //        }
-
-
-    //    }
-    //    return res;
-    //}
-
     /// <summary>
     /// 获取模型实体
     /// </summary>
@@ -317,16 +247,22 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     private void SetRandomRoomInsideItemEntity(GetThingGraph getThingGraph)
     {
         ClearItemEntity();
-        if (getThingGraph != null && getThingGraph.data?.items?[0] != null)
+
+        if (getThingGraph != null && getThingGraph.data?.items?.Count > 0)
         {
-            var data = getThingGraph.data?.items?[0];
-            RoomType roomType = (RoomType)Enum.Parse(typeof(RoomType), data.name);
-            //为每个实体找位置放置
-            PutItem(roomType, data.relatedThing, new ItemDependInfo
+            for (int i = 0; i < getThingGraph.data?.items?.Count; i++)
             {
-                isDepend = false
-            });
-            Debug.Log("xxx " + data.name);
+                var data = getThingGraph.data?.items?[i];
+                RoomType roomType = (RoomType)Enum.Parse(typeof(RoomType), data.name);
+                //为每个实体找位置放置
+                PutItem(roomType, data.id, data.relatedThing, new ItemDependInfo
+                {
+                    isDepend = false,
+                    dependItemID = data.id,
+                    dependItemName = data.name,
+                });
+                Debug.Log("xxx " + data.name);
+            }
         }
     }
 
@@ -336,9 +272,9 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     /// <param name="roomType">房间名称</param>
     /// <param name="relatedThingArr">当前层级所有物品</param>
     /// <param name="itemDependInfo">当前物品的放置依赖限制</param>
-    private void PutItem(RoomType roomType, GetThingGraph_data_items_relatedThing[] relatedThingArr, ItemDependInfo itemDependInfo)
+    private void PutItem(RoomType roomType, string roomID, List<GetThingGraph_data_items_relatedThing> relatedThingArr, ItemDependInfo itemDependInfo)
     {
-        for (int i = 0; i < relatedThingArr.Length; i++)
+        for (int i = 0; i < relatedThingArr.Count; i++)
         {
             Debug.Log("cur put item:" + relatedThingArr[i].target.name
                 + ",id" + relatedThingArr[i].target.id
@@ -348,13 +284,13 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             //当前实体信息
             string entityName = relatedThingArr[i].target.name;
             GameObject clone = Instantiate(GetItemEntity(entityName)?[0]);
-            Transform parentTrans = ItemEntityGroupNode.transform.Find(roomType.ToString());
+            Transform parentTrans = ItemEntityGroupNode.transform.Find(roomType.ToString() + "_" + roomID);
             if (parentTrans == null)
             {
-                parentTrans = new GameObject(roomType.ToString()).transform;
+                parentTrans = new GameObject(roomType.ToString() + "_" + roomID).transform;
                 parentTrans.SetParent(ItemEntityGroupNode.transform);
             }
-            clone.transform.SetParent(parentTrans, false); //TODO 加载一层房间名称
+            clone.transform.SetParent(parentTrans, false);
             clone.name = entityName + "_" + relatedThingArr[i].target.id;
 
             clone.SetActive(false);
@@ -363,8 +299,19 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             int itemLength;
             int itemWidch;
 
+            //限制放在上一层级物品之上
+            if (itemDependInfo.isDepend)
+            {
+                //寻找所限制的物体区域
+                string parentItemName = itemDependInfo.dependItemName + "_" + itemDependInfo.dependItemID;
+                GameObject parentItem = GameObject.Find(parentItemName).gameObject;
+                Transform putAreaTrans = parentItem.transform.Find("PutArea/" + itemDependInfo.posRelation.ToString());
+                clone.transform.parent = putAreaTrans;
+                clone.transform.position = putAreaTrans.position;
+                clone.gameObject.SetActive(true);
+            }
             //无放置限制
-            if (!itemDependInfo.isDepend)
+            else
             {
                 //找到当前房间所有可放置的位置信息
                 List<ItemModelInfo> itemModelInfos = m_DicItemModelInfo[roomType];
@@ -482,7 +429,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                                 Debug.Log("roomType:" + roomType + ",itemEntity:" + relatedThingArr[i].target.name);
                                 for (int k = 0; k < needItemModelInfoArr.Count; k++)
                                 {
-                                    needItemModelInfoArr[k].itemModelType = GetItemModelType(relatedThingArr[i].target.name);
+                                    needItemModelInfoArr[k].itemModelType =relatedThingArr[i].target.name;
                                     Debug.Log("pos:" + needItemModelInfoArr[k].pos);
                                 }
                                 clone.SetActive(true);
@@ -498,11 +445,9 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     }
                 }
 
-                if (relatedThingArr[i].target.relatedThing?.Length > 0)
+                if (relatedThingArr[i].target.relatedThing?.Count > 0)
                 {
-                    Debug.Log("relatedThingArr[i].target.relatedThing:" + relatedThingArr[i].target.relatedThing + ",name: " + relatedThingArr[i].target.name);
-
-                    PutItem(roomType, relatedThingArr[i].target.relatedThing,
+                    PutItem(roomType, roomID, relatedThingArr[i].target.relatedThing,
                         new ItemDependInfo
                         {
                             isDepend = true,
@@ -511,15 +456,6 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                             posRelation = (PosRelation)Enum.Parse(typeof(PosRelation), relatedThingArr[i].relationship)
                         });
                 }
-            }
-            else //限制放在上一层级物品之上
-            {
-                //寻找所限制的物体区域
-                string parentItemName = itemDependInfo.dependItemName + "_" + itemDependInfo.dependItemID;
-                GameObject parentItem = GameObject.Find(parentItemName).gameObject;
-                Transform pos = parentItem.transform.Find("PutArea");
-                clone.transform.position = pos.position;
-                clone.gameObject.SetActive(true);
             }
         }
     }
@@ -661,7 +597,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                                 Debug.Log("roomType:" + roomType + ",itemEntity:" + itemEntityArr[i].name);
                                 for (int k = 0; k < needItemModelInfoArr.Count; k++)
                                 {
-                                    needItemModelInfoArr[k].itemModelType = GetItemModelType(itemEntityArr[i].name);
+                                    needItemModelInfoArr[k].itemModelType = itemEntityArr[i].name;
                                     Debug.Log("pos:" + needItemModelInfoArr[k].pos);
                                 }
                                 clone.SetActive(true);
@@ -685,33 +621,12 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     {
         for (int i = 0; i < ItemEntityGroupNode?.childCount; i++)
         {
-            Destroy(ItemEntityGroupNode?.GetChild(i).gameObject);
-        }
-    }
-
-    //获取实体对象对应的枚举
-    private string GetItemModelType(string itemName)
-    {
-        //@string res = @string.Null;
-        //if (Enum.TryParse(typeof(@string), itemName, out object p))
-        //{
-        //    res = (@string)p;
-        //}
-        return itemName;
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            //foreach (var roomType in m_DicItemModelInfo.Keys)
-            //{
-            //    Debug.Log("roomType:" + roomType);
-            //    foreach (var item in m_DicItemModelInfo[roomType])
-            //    {
-            //        Debug.Log("pos:" + item.pos + ",itemType:" + item.itemModelType);
-            //    }
-            //}
+            //Debug.Log("DEL " + ItemEntityGroupNode?.GetChild(i));
+            int typeI = i;
+            ItemEntityGroupNode.GetChild(i).gameObject.name = "del_"+ ItemEntityGroupNode.GetChild(i).gameObject.name;
+            ItemEntityGroupNode.GetChild(i).gameObject.SetActive(false);
+            
+            UnityTool.GetInstance.DelayCoroutine(1f,()=> Destroy(ItemEntityGroupNode.GetChild(typeI).gameObject));
         }
     }
 }

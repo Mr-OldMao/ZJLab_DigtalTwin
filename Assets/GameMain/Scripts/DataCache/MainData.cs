@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static GetThingGraph;
 
 /// <summary>
 /// 标题：核心数据缓存
@@ -20,8 +21,14 @@ public class MainData
     public static GetEnvGraph getEnvGraph { get; set; }
 
     /// <summary>
+    /// 缓存生成的物品实体信息，发松到服务端
+    /// </summary>
+    public static PostThingGraph CacheItemsInfo { get; set; }
+    /// <summary>
     /// 指令控制数据
     /// </summary>
     public static List<ControlCommit> controlCommit { get; set; } = new List<ControlCommit>();
+
+
 
 }

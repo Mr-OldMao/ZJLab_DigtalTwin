@@ -18,8 +18,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 {
     private const string URL_SUBROOT = "http://10.11.81.241:4006/";
 
-    //获取/提交场景图，物体与房间的邻接关系
+    //获取场景图，物体与房间的邻接关系
     private const string URL_GET_THING_GRAPH = URL_SUBROOT + "simulator/getThingGraph";
+
+    //提交场景图，物体与房间的邻接关系
+    private const string URL_POST_THING_GRAPH = URL_SUBROOT + "simulator/postThingGraph";
 
     //获取环境场景图,房间与房间的邻接关系
     private const string URL_GET_ENV_GRAPH = URL_SUBROOT + "simulator/getEnvGraph";
@@ -55,13 +58,14 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// <summary>
     /// 提交场景图，物体与房间的邻接关系
     /// </summary>
-    /// <param name="getThingGraph"></param>
-    public void CommitGetThingGraph(GetThingGraph getThingGraph)
+    /// <param name="items"></param>
+    public void CommitGetThingGraph(PostThingGraph items)
     {
-        string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(getThingGraph);
-        MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_GET_THING_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
+        string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
+        Debug.Log("提交场景图，物体与房间的邻接关系 jsonStr:"+jsonStr);
+        MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_POST_THING_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
         {
-            Debug.Log("提交场景图，物体与房间关系 jsonStr:" + jsonStr);
+            Debug.Log("提交场景图，物体与房间关系回调 jsonStr:" + jsonStr);
         }, null, jsonStr);
     }
 

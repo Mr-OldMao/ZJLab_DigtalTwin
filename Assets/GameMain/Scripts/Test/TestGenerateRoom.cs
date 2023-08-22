@@ -93,7 +93,7 @@ public class TestGenerateRoom : MonoBehaviour
                  targetRoomsDirRelation = new List<RoomsDirRelation>()
                  {
                      new RoomsDirRelation{ targetRoomType = RoomType.BedRoom , locationRelation = DirEnum.Right , isCommonWall = true},
-                     new RoomsDirRelation{ targetRoomType = RoomType.kitchenRoom , locationRelation = DirEnum.Bottom  , isCommonWall = true},
+                     new RoomsDirRelation{ targetRoomType = RoomType.KitchenRoom , locationRelation = DirEnum.Bottom  , isCommonWall = true},
                  }
             },
             new RoomBaseInfo
@@ -107,7 +107,7 @@ public class TestGenerateRoom : MonoBehaviour
             },
             new RoomBaseInfo
             {
-                 curRoomType = RoomType.kitchenRoom,
+                 curRoomType = RoomType.KitchenRoom,
                  roomSize = new uint[]{ 2,4 },
                  //targetRoomsDirRelation = new List<RoomsDirRelation>()
                  //{

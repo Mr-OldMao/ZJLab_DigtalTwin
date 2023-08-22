@@ -190,7 +190,7 @@ public enum RoomType
     /// <summary>
     /// 厨房
     /// </summary>
-    kitchenRoom,
+    KitchenRoom,
     /// <summary>
     /// 书房
     /// </summary>

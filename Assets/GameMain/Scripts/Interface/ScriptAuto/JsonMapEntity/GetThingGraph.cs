@@ -1,4 +1,6 @@
-﻿/// <summary>
+﻿using System.Collections.Generic;
+using static GetThingGraph;
+/// <summary>
 /// Json映射的实体类 以下代码自动生成
 /// 接口地址：
 /// 创建时间：2023/8/21 10:43:35
@@ -26,7 +28,7 @@ public class GetThingGraph
 		/// <summary>
 		/// 
 		/// </summary>
-		public GetThingGraph_data_items[] items;
+		public List<GetThingGraph_data_items> items;
 	}
 	public class GetThingGraph_data_items
 	{
@@ -49,7 +51,7 @@ public class GetThingGraph
         /// <summary>
         /// 当前房间所有邻接关系
         /// </summary>
-        public GetThingGraph_data_items_relatedThing[] relatedThing;
+        public List<GetThingGraph_data_items_relatedThing> relatedThing;
         /// <summary>
         /// 当前物体是否是动态的
         /// </summary>
@@ -87,10 +89,15 @@ public class GetThingGraph
         /// <summary>
         /// 当前房间所有邻接关系
         /// </summary>
-        public GetThingGraph_data_items_relatedThing[] relatedThing;
+        public List<GetThingGraph_data_items_relatedThing> relatedThing;
         /// <summary>
         /// 
         /// </summary>
         public bool dynamic;
 	}
+}
+public class PostThingGraph
+{
+    public List<GetThingGraph_data_items> items;
+	public string id;
 }

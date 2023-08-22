@@ -7,6 +7,11 @@ using System.Text;
 using static GenerateRoomData;
 using System;
 using static GetEnvGraph;
+using static GenerateRoomItemModel;
+using static GetThingGraph;
+using UnityEngine.UIElements;
+using static UnityEngine.GraphicsBuffer;
+using static UnityEditor.Progress;
 /// <summary>
 /// 标题：程序逻辑入口
 /// 功能：程序主逻辑
@@ -35,12 +40,20 @@ public class GameLogic : SingletonByMono<GameLogic>
         NetworkMQTT();
 
         //等待ab资源加载完毕，以及http接口获取的场景数据，解析生成场景实体
-        UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() => { return m_IsLoadedAssets && MainData.getEnvGraph != null && MainData.getThingGraph != null; }, () =>
+        UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() =>
         {
+
+            return m_IsLoadedAssets && MainData.getEnvGraph != null && MainData.getThingGraph != null;
+        }, () =>
+        {
+            //生成场景中所有房间和物品
             GenerateEntity(() =>
             {
-                //场景实体生成完成后，通过mqtt协议上传场景实体数据到服务器，等待服务器决策指令
-                Debug.Log("TODO 场景实体生成完成后，通过mqtt协议上传场景实体数据到服务器，等待服务器决策指令");
+                //缓存所有实体物品数据信息
+                CacheItemDataInfo();
+
+                //提交场景图，物体与房间的邻接关系
+                InterfaceDataCenter.GetInstance.CommitGetThingGraph(MainData.CacheItemsInfo);
 
                 //根据服务器决策指令，控制机器人的行为
             });
@@ -90,10 +103,10 @@ public class GameLogic : SingletonByMono<GameLogic>
                     locationRelation = (DirEnum)Enum.Parse(typeof(DirEnum), roomRelation.relatedThing[j].relationship),
                     isCommonWall = true
                 });
-              
+
 
             }
-           
+
         }
         //补充各个房间之间的邻接关系
         for (int i = 0; i < MainData.getEnvGraph?.data?.items.Length; i++)
@@ -121,11 +134,98 @@ public class GameLogic : SingletonByMono<GameLogic>
             else
             {
                 GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
-                GenerateRoomItemModel.GetInstance.GenerateRoomItem(k,MainData.getThingGraph);
+                GenerateRoomItemModel.GetInstance.GenerateRoomItem(k, MainData.getThingGraph);
                 generateCompleteCallback?.Invoke();
             }
         });
     }
+
+    #region 缓存房间内实体信息
+    //缓存房间内实体信息
+    private void CacheItemDataInfo()
+    {
+        //清理实体缓存信息
+        List<GetThingGraph_data_items> items = new List<GetThingGraph_data_items>();
+        MainData.CacheItemsInfo = new PostThingGraph
+        {
+            items = items,
+            id = "test",
+        };
+        Transform ItemEntityGroupNode = GenerateRoomItemModel.GetInstance.ItemEntityGroupNode;
+        //遍历所有房间
+        for (int i = 0; i < ItemEntityGroupNode.childCount; i++)
+        {
+            if (!ItemEntityGroupNode.GetChild(i).gameObject.activeSelf)
+            {
+                continue;
+            }
+            string roomName = ItemEntityGroupNode.GetChild(i).name.Split('_')?[0];
+            string roomID = ItemEntityGroupNode.GetChild(i).name.Split('_')?[1];
+            GetThingGraph_data_items item = new GetThingGraph_data_items()
+            {
+                id = roomID,
+                name = roomName,
+                position = new float[] { 0, 0, 0 },
+                rotation = new float[] { 0, 0, 0 },
+                relatedThing = new List<GetThingGraph_data_items_relatedThing>(),
+                dynamic = false,
+            };
+            //遍历第一层物体
+            for (int j = 0; j < ItemEntityGroupNode.GetChild(i).childCount; j++)
+            {
+                Transform curNode = ItemEntityGroupNode.GetChild(i).GetChild(j);
+                GetThingGraph_data_items_relatedThing_target target = null;
+                CacheItemDataInfo(curNode, ref target);
+                item.relatedThing.Add(new GetThingGraph_data_items_relatedThing
+                {
+                    target = target,
+                    relationship = "In"
+                });
+            }
+            MainData.CacheItemsInfo.items.Add(item);
+        }
+    }
+    //缓存数据 递归遍历
+    private void CacheItemDataInfo(Transform curNode, ref GetThingGraph_data_items_relatedThing_target curTarget)
+    {
+        string itemName = curNode.name.Split('_')?[0];
+        string itemID = curNode.name.Split('_')?[1];
+        curTarget = new GetThingGraph_data_items_relatedThing_target
+        {
+            position = new float[] { curNode.position.x, curNode.position.y, curNode.position.z },
+            rotation = new float[] { curNode.rotation.eulerAngles.x, curNode.rotation.eulerAngles.y, curNode.rotation.eulerAngles.z },
+            id = itemID,
+            name = itemName,
+            relatedThing = new List<GetThingGraph_data_items_relatedThing>(),
+            dynamic = !curNode.gameObject.isStatic
+        };
+        //判断是否有下一次节点
+        Transform putAreaTrans = curNode.Find("PutArea");
+        if (putAreaTrans != null)
+        {
+            for (int k = 0; k < putAreaTrans.childCount; k++)
+            {
+                //节点关系对象 In On Below Above
+                Transform nodeRelation = putAreaTrans.GetChild(k);
+                for (int m = 0; m < nodeRelation.childCount; m++)
+                {
+                    Transform curNode2 = nodeRelation.GetChild(m);
+                    GetThingGraph_data_items_relatedThing_target nextTarget = null;
+
+                    CacheItemDataInfo(curNode2, ref nextTarget);
+                    curTarget.relatedThing.Add(new GetThingGraph_data_items_relatedThing
+                    {
+                        relationship = nodeRelation.name,
+                        target = nextTarget
+                    });
+                }
+            }
+        }
+    }
+    #endregion
+
+
+
 
     private void OnDestroy()
     {

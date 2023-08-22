@@ -18,97 +18,97 @@ MonoBehaviour:
   m_GUID: 21a9655f9954e4a48bcf91dd225fff2b
   m_SerializeEntries:
   - m_GUID: 4dd206cebfd38704e90fc5963efa1b7a
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/SofaBig_3.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: c4f5ab08e997d9545a48db6ee0608288
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemPool.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: 5ad89f9a2ff38da438ea4ab6b2f14357
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/SofaBig_1.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: c5746813887c3214498e757d91e42b50
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemRefrigerator1.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: c8cefd58149f6d1459f54cd02dac2dde
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemKitchenCase2.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: 63aad37250e880c4abf78c1f781db7b8
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemSofaSmall1.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: 216a812ad8dce69439b2acf87ebe16c8
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemWardrobe.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: c8d61de7cb2ab8a4780e1ccd4fc22d77
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemSofaSmall2.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: 4bd29552909c8ad43803d8e594cc8f73
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemKitchenCase1.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: b49f8136cdcc9a14fb015f93b615f696
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemComputerDeskChair.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: 78c89c57d82296c48b7ce5913d938f57
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/ItemRefrigerator2.prefab
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/SofaBig_3.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable
   - m_GUID: e9202a7cd3fbc0942a078ce455586bdd
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/SofaBig_2.prefab
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/SofaBig_2.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable
-  - m_GUID: 5e1ce7ceeb1e0e346807e33c6ff54f5d
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/Bin_2.prefab
+  - m_GUID: 63aad37250e880c4abf78c1f781db7b8
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemSofaSmall1.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable
-  - m_GUID: b3fd92e7d5e2e5841a791372b1233a28
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/Bed.prefab
+  - m_GUID: 78c89c57d82296c48b7ce5913d938f57
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemRefrigerator2.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable
-  - m_GUID: e2d214b9ebdde0245b48e41b0a7207aa
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/BadRoom/Bin_1.prefab
+  - m_GUID: b49f8136cdcc9a14fb015f93b615f696
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemComputerDeskChair.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable
-  - m_GUID: 6834433d7982c794c8c3fe49cdf49bea
-    m_Address: Assets/3rd/low_poly_interior_12/Prefabs/bin/Pot_1.prefab
+  - m_GUID: 5ad89f9a2ff38da438ea4ab6b2f14357
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/SofaBig_1.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable
   - m_GUID: 27541a6cc55615b43b5c711a42923cc5
-    m_Address: Assets/3rd/low_poly_interior_12/Prefabs/bin/Pot_2.prefab
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Pot_2.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable
   - m_GUID: cbba57d68d2020443b91d82124921c26
-    m_Address: Assets/3rd/low_poly_interior_12/Prefabs/bin/Food_1.prefab
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Food_1.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable
   - m_GUID: 990bd355d73e20846872b5ae6db8029a
-    m_Address: Assets/3rd/low_poly_interior_12/Prefabs/bin/Food_2.prefab
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Food_2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: c8cefd58149f6d1459f54cd02dac2dde
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemKitchenCase2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: c5746813887c3214498e757d91e42b50
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemRefrigerator1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: c4f5ab08e997d9545a48db6ee0608288
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemPool.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: e2d214b9ebdde0245b48e41b0a7207aa
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Bin_1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: 6834433d7982c794c8c3fe49cdf49bea
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Pot_1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: 5e1ce7ceeb1e0e346807e33c6ff54f5d
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Bin_2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: b3fd92e7d5e2e5841a791372b1233a28
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Bed.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: 216a812ad8dce69439b2acf87ebe16c8
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemWardrobe.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: c8d61de7cb2ab8a4780e1ccd4fc22d77
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemSofaSmall2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: 4bd29552909c8ad43803d8e594cc8f73
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemKitchenCase1.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable

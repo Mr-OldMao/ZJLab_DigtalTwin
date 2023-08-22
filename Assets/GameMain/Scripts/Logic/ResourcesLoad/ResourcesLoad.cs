@@ -34,7 +34,7 @@ public class ResourcesLoad : SingletonByMono<ResourcesLoad>
     /// <summary>
     /// 所有实体个数  "ItemLable"+"RoomBorderLable"
     /// </summary>
-    public const uint AllEntityResCount = 14 + 7;
+    public const uint AllEntityResCount = 19 + 7;
     private uint m_CurLoadedCount;
 
     private List<string> m_AddressableLable = new List<string> { "ItemLable", "RoomBorderLable" };
