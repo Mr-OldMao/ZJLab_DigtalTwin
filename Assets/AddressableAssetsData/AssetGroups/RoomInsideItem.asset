@@ -92,6 +92,26 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable
+  - m_GUID: 6834433d7982c794c8c3fe49cdf49bea
+    m_Address: Assets/3rd/low_poly_interior_12/Prefabs/bin/Pot_1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: 27541a6cc55615b43b5c711a42923cc5
+    m_Address: Assets/3rd/low_poly_interior_12/Prefabs/bin/Pot_2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: cbba57d68d2020443b91d82124921c26
+    m_Address: Assets/3rd/low_poly_interior_12/Prefabs/bin/Food_1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: 990bd355d73e20846872b5ae6db8029a
+    m_Address: Assets/3rd/low_poly_interior_12/Prefabs/bin/Food_2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 13b3a089d6d69ce499381abb142d0bfb, type: 2}
   m_SchemaSet:
