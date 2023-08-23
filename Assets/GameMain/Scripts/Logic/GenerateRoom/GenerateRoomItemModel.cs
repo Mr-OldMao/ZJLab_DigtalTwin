@@ -89,6 +89,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         {
             ItemEntityGroupNode = new GameObject("ItemEntityGroupNode").transform;
         }
+        ItemEntityGroupNode.parent = GameLogic.GetInstance.staticModelRootNode?.transform;
     }
 
     /// <summary>

@@ -1,17 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MFramework;
-using uPLibrary.Networking.M2Mqtt.Messages;
-using System.Text;
 using static GenerateRoomData;
 using System;
 using static GetEnvGraph;
-using static GenerateRoomItemModel;
 using static GetThingGraph;
+using static GenerateRoomBorderModel;
 using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
-using static UnityEditor.Progress;
 /// <summary>
 /// 标题：程序逻辑入口
 /// 功能：程序主逻辑
@@ -21,6 +16,7 @@ using static UnityEditor.Progress;
 public class GameLogic : SingletonByMono<GameLogic>
 {
     private bool m_IsLoadedAssets = false;
+    public GameObject staticModelRootNode = null;
     public void Init()
     {
         Debug.Log("Init GameLogic");
@@ -29,6 +25,8 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     private void EnterMainScene()
     {
+        CreateRootNode();
+
         //注册消息事件
         RegisterMsgEvent();
 
@@ -49,6 +47,10 @@ public class GameLogic : SingletonByMono<GameLogic>
             //生成场景中所有房间和物品
             GenerateEntity(() =>
             {
+                //原点偏移至场景左下角
+                Vector2 originOffset = GetOriginOffset();
+                staticModelRootNode.transform.position = new Vector3(originOffset.x, 0, originOffset.y);
+
                 //缓存所有实体物品数据信息
                 CacheItemDataInfo();
 
@@ -58,6 +60,11 @@ public class GameLogic : SingletonByMono<GameLogic>
                 //根据服务器决策指令，控制机器人的行为
             });
         });
+    }
+
+    private void CreateRootNode()
+    {
+        staticModelRootNode = new GameObject("StaticModelRootNode");
     }
 
     private void NetworkHTTP()
@@ -133,7 +140,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             }
             else
             {
-                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
+                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder();
                 GenerateRoomItemModel.GetInstance.GenerateRoomItem(k, MainData.getThingGraph);
                 generateCompleteCallback?.Invoke();
             }
@@ -182,6 +189,24 @@ public class GameLogic : SingletonByMono<GameLogic>
                     relationship = "In"
                 });
             }
+            //手动添加该房间的实体门信息
+            List<BorderEntityData> doorDataArr = GenerateRoomData.GetInstance.GetDoorInfoByRoomType((RoomType)Enum.Parse(typeof(RoomType), roomName));
+            foreach (BorderEntityData doorData in doorDataArr)
+            {
+                item.relatedThing.Add(new GetThingGraph_data_items_relatedThing
+                {
+                    target = new GetThingGraph_data_items_relatedThing_target
+                    {
+                        id = doorData.entity?.name,
+                        name = roomName+"Door",
+                        relatedThing = null,
+                        dynamic = true,
+                        position = new float[] { doorData.entity.transform.position.x, doorData.entity.transform.position.y, doorData.entity.transform.position.z },
+                        rotation = new float[] { doorData.entity.transform.rotation.eulerAngles.x, doorData.entity.transform.rotation.eulerAngles.y, doorData.entity.transform.rotation.eulerAngles.z },
+                    },
+                    relationship = "In"
+                });
+            }
             MainData.CacheItemsInfo.items.Add(item);
         }
     }
@@ -190,10 +215,11 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         string itemName = curNode.name.Split('_')?[0];
         string itemID = curNode.name.Split('_')?[1];
+        Transform curModelEntityNoded = curNode.Find("Model");
         curTarget = new GetThingGraph_data_items_relatedThing_target
         {
-            position = new float[] { curNode.position.x, curNode.position.y, curNode.position.z },
-            rotation = new float[] { curNode.rotation.eulerAngles.x, curNode.rotation.eulerAngles.y, curNode.rotation.eulerAngles.z },
+            position = new float[] { curModelEntityNoded.position.x, curModelEntityNoded.position.y, curModelEntityNoded.position.z },
+            rotation = new float[] { curModelEntityNoded.rotation.eulerAngles.x, curModelEntityNoded.rotation.eulerAngles.y, curModelEntityNoded.rotation.eulerAngles.z },
             id = itemID,
             name = itemName,
             relatedThing = new List<GetThingGraph_data_items_relatedThing>(),
@@ -221,6 +247,29 @@ public class GameLogic : SingletonByMono<GameLogic>
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 原点偏移量，老原点位置在客厅的左下角，新原点需要在全局房间的左下角位置
+    /// </summary>
+    /// <returns></returns>
+    private Vector2 GetOriginOffset()
+    {
+        //找到新原点  所有房间的minX和minY作为新原点
+        int offsetX = 0, offsetY = 0;
+        List<RoomInfo> roomData = GenerateRoomData.GetInstance.m_ListRoomInfo;
+        foreach (RoomInfo ri in roomData)
+        {
+            if (ri.roomPosMin.x < offsetX)
+            {
+                offsetX = (int)ri.roomPosMin.x;
+            }
+            if (ri.roomPosMin.y < offsetY)
+            {
+                offsetY = (int)ri.roomPosMin.y;
+            }
+        }
+        return new Vector3(-offsetX, -offsetY);
     }
     #endregion
 

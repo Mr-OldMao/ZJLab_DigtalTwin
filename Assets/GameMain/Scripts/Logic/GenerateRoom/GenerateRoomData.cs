@@ -94,7 +94,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     {
         if (roomBaseInfos == null || roomBaseInfos.Count == 0)
         {
-            callback(null,null);
+            callback(null, null);
             return;
         }
 
@@ -908,6 +908,11 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         }
     }
     #endregion
+
+    public List<BorderEntityData> GetDoorInfoByRoomType(RoomType roomType)
+    {
+        return listRoomBuilderInfo.FindAll((p) => { return p.entityModelType == EntityModelType.Door && p.listRoomType.Contains(roomType); });
+    }
 
     private void Update()
     {

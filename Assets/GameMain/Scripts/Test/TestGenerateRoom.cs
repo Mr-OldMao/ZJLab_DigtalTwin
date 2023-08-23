@@ -168,7 +168,7 @@ public class TestGenerateRoom : MonoBehaviour
             }
             else
             {
-                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
+                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder();
                 GenerateRoomItemModel.GetInstance.GenerateRoomItem(k);
             }
 
@@ -224,7 +224,7 @@ public class TestGenerateRoom : MonoBehaviour
             }
             else
             {
-                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder(p);
+                GenerateRoomBorderModel.GetInstance.GenerateRoomBorder();
                 GenerateRoomItemModel.GetInstance.GenerateRoomItem(k);
             }
         });

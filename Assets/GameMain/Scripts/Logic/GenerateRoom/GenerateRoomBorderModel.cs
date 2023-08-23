@@ -9,7 +9,7 @@ using MFramework;
 /// 时间：2023.07.18-2023.07.20
 /// </summary>
 public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
-{ 
+{
 
     private Transform m_RoomRootNode;
     public Transform RoomGroup
@@ -28,6 +28,8 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
     /// 缓存所有房间实体    k-房间类型 v-实体
     /// </summary>
     private Dictionary<RoomType, GameObject> m_DicRoomEntity;
+
+
     public class RoomInfo
     {
         public RoomType roomType;
@@ -69,6 +71,7 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
     /// </summary>
     public class BorderEntityData
     {
+        public GameObject entity = null;
         public Vector2 pos;
         public EntityModelType entityModelType;
         /// <summary>
@@ -85,13 +88,14 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
     {
         m_DicBorderItemInfo = new Dictionary<Vector2, BorderInfo>();
         m_DicRoomEntity = new Dictionary<RoomType, GameObject>();
+        m_RoomRootNode = GameLogic.GetInstance.staticModelRootNode?.transform;
     }
     /// <summary>
     /// 生成房间边界模型，对外接口
     /// </summary>
     /// <param name="roomInfo">需要传入房间的详细信息</param>
     /// <param name="borderEntityDatas">房间所有边界(墙、门、地板)数据</param>
-    public void GenerateRoomBorder(List<BorderEntityData> borderEntityDatas)
+    public void GenerateRoomBorder()
     {
         ClearRoom();
 
@@ -120,12 +124,14 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
                 GameObject clone = Instantiate(entityModel, new Vector3(borderEntityData.pos.x, 0, borderEntityData.pos.y), Quaternion.identity);
                 clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
                 clone.transform.parent = GetRoomRootNode(borderEntityData.listRoomType[0]).transform; //TODO listRoomType[0]
+                borderEntityData.entity = clone;
             }
             if (borderEntityData.entityModelType == EntityModelType.Wall || borderEntityData.entityModelType == EntityModelType.Door)
             {
                 GameObject modelWallSmall = borderEntityData.entityAxis == 0 ? ResourcesLoad.GetInstance.GetEntityRes("WallSmallX") : ResourcesLoad.GetInstance.GetEntityRes("WallSmallY");
                 GameObject clone = Instantiate(modelWallSmall, new Vector3(borderEntityData.pos.x, 0, borderEntityData.pos.y), Quaternion.identity);
-                clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
+                //clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
+                clone.name = modelWallSmall.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
                 clone.transform.parent = GetRoomRootNode(borderEntityData.listRoomType[0]).transform; //TODO listRoomType[0]
             }
         }
