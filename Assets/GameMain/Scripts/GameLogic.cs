@@ -198,7 +198,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                     target = new GetThingGraph_data_items_relatedThing_target
                     {
                         id = doorData.entity?.name,
-                        name = roomName+"Door",
+                        name = roomName + "Door",
                         relatedThing = null,
                         dynamic = true,
                         position = new float[] { doorData.entity.transform.position.x, doorData.entity.transform.position.y, doorData.entity.transform.position.z },
@@ -289,6 +289,11 @@ public class GameLogic : SingletonByMono<GameLogic>
             {
                 GenerateEntity(null);
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
         }
     }
 }

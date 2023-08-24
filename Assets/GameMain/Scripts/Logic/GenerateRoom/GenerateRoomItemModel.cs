@@ -284,6 +284,11 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 + ",dependItemID:" + itemDependInfo?.dependItemID);
             //当前实体信息
             string entityName = relatedThingArr[i].target.name;
+            //剔除Door信息
+            if (entityName.EndsWith("Door"))
+            {
+                continue;
+            }
             GameObject clone = Instantiate(GetItemEntity(entityName)?[0]);
             Transform parentTrans = ItemEntityGroupNode.transform.Find(roomType.ToString() + "_" + roomID);
             if (parentTrans == null)
