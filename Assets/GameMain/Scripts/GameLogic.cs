@@ -43,10 +43,11 @@ public class GameLogic : SingletonByMono<GameLogic>
             return m_IsLoadedAssets && MainData.getEnvGraph != null && MainData.getThingGraph != null;
         }, () =>
         {
-            //生成场景中所有房间和物品
-            BeginGenerate();
             //生成机器人实体
             GenerateRobot();
+            //生成场景中所有房间和物品
+            BeginGenerate();
+
         });
     }
 
@@ -168,9 +169,8 @@ public class GameLogic : SingletonByMono<GameLogic>
         if (robotEntity == null)
         {
             GameObject robotRes = ResourcesLoad.GetInstance.GetEntityRes("RobotEntity", 0);
-            robotEntity = Instantiate(robotRes);
+            robotEntity = Instantiate(robotRes, new Vector3(3, 0, 3), Quaternion.identity);
         }
-        robotEntity.transform.position = new Vector3(3, 0, 3);
     }
     #endregion
 
