@@ -45,12 +45,18 @@ public class GameLogic : SingletonByMono<GameLogic>
         {
             //生成场景中所有房间和物品
             BeginGenerate();
+            //生成机器人实体
+            GenerateRobot();
         });
     }
 
     private void CreateRootNode()
     {
-        staticModelRootNode = new GameObject("StaticModelRootNode");
+        staticModelRootNode = GameObject.Find("StaticModelRootNode");
+        if (staticModelRootNode == null)
+        {
+            staticModelRootNode = new GameObject("StaticModelRootNode");
+        }
     }
 
     private void NetworkHTTP()
@@ -153,6 +159,18 @@ public class GameLogic : SingletonByMono<GameLogic>
                 InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
             });
         });
+    }
+
+
+    private void GenerateRobot()
+    {
+        GameObject robotEntity = GameObject.FindWithTag("Player");
+        if (robotEntity == null)
+        {
+            GameObject robotRes = ResourcesLoad.GetInstance.GetEntityRes("RobotEntity", 0);
+            robotEntity = Instantiate(robotRes);
+        }
+        robotEntity.transform.position = new Vector3(3, 0, 3);
     }
     #endregion
 

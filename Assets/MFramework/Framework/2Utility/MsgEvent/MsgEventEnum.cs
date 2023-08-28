@@ -21,5 +21,18 @@ public enum MsgEventName
     HttpRequestFail,
 
     AsyncLoadedComplete,
+
+    /// <summary>
+    /// 开始移动
+    /// </summary>
+    RobotMoveBegin,
+    /// <summary>
+    /// 正在移动
+    /// </summary>
+    RobotMoveStay,
+    /// <summary>
+    /// 结束移动
+    /// </summary>
+    RobotMoveEnd,
 }
 

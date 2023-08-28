@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: RobotEntity
+  m_EditorClassIdentifier: 
+  m_GroupName: RobotEntity
+  m_Data:
+    m_SerializedData: []
+  m_GUID: e11a153d9ffd11f48ad5259e4b19d153
+  m_SerializeEntries:
+  - m_GUID: 42da70486a442c54f8e54388d735b41f
+    m_Address: Assets/GameMain/AB/Prefab/Entity/Robot/RobotEntity.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RobotEntity
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 13b3a089d6d69ce499381abb142d0bfb, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: ae9acda2474817c4c9b171ed971473a5, type: 2}
+    - {fileID: 11400000, guid: 69270c69a1b004940b292ff0c12573c4, type: 2}

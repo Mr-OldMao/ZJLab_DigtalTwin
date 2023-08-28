@@ -310,11 +310,18 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             {
                 //寻找所限制的物体区域
                 string parentItemName = itemDependInfo.dependItemName + "_" + itemDependInfo.dependItemID;
-                GameObject parentItem = GameObject.Find(parentItemName).gameObject;
-                Transform putAreaTrans = parentItem.transform.Find("PutArea/" + itemDependInfo.posRelation.ToString());
-                clone.transform.parent = putAreaTrans;
-                clone.transform.position = putAreaTrans.position;
-                clone.gameObject.SetActive(true);
+                GameObject parentItem = GameObject.Find(parentItemName)?.gameObject;
+                if (parentItem != null)
+                {
+                    Transform putAreaTrans = parentItem.transform.Find("PutArea/" + itemDependInfo.posRelation.ToString());
+                    clone.transform.parent = putAreaTrans;
+                    clone.transform.position = putAreaTrans.position;
+                    clone.gameObject.SetActive(true);
+                }
+                else
+                {
+                    Debug.LogError("item is null ,itemName : " + parentItemName);
+                }
             }
             //无放置限制
             else
