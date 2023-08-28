@@ -1,8 +1,10 @@
 using MFramework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using static GetThingGraph;
 using static System.Net.WebRequestMethods;
@@ -35,10 +37,10 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     private const string TOPIC_GLOBAL = "/simulator/thingGraph/global";
     //更新相机视⻆场景图
     private const string TOPIC_CAMERA = "/simulator/thingGraph/camera";
-    //控制指令
-    private const string TOPIC_SEND = "/simulator/thingGraph/send";
-    //控制结果
-    private const string TOPIC_RECV = "/simulator/thingGraph/recv";
+    //接收服务器控制指令
+    private const string TOPIC_SEND = "simulator/send";
+    //发控制结果给服务器
+    public const string TOPIC_RECV = "simulator/recv";
 
     #region HTTP
     /// <summary>
@@ -59,13 +61,14 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// 提交场景图，物体与房间的邻接关系
     /// </summary>
     /// <param name="items"></param>
-    public void CommitGetThingGraph(PostThingGraph items)
+    public void CommitGetThingGraph(PostThingGraph items, Action callback)
     {
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
-        Debug.Log("提交场景图，物体与房间的邻接关系 jsonStr:"+jsonStr);
+        Debug.Log("提交场景图，物体与房间的邻接关系 jsonStr:" + jsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_POST_THING_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
         {
             Debug.Log("提交场景图，物体与房间关系回调 jsonStr:" + jsonStr);
+            callback?.Invoke();
         }, null, jsonStr);
     }
 
@@ -93,8 +96,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         string rawJsonStr = "{  \"id\":\"" + id + "\"  ,\"state\":\"" + state.ToString() + "\" }";
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_CHANGE_SIMULATOR_STATE, new Dictionary<string, string>(), (string jsonStr) =>
         {
-            GetEnvGraph jsonData = JsonTool.GetInstance.JsonToObjectByLitJson<GetEnvGraph>(jsonStr);
-            Debug.Log("缓存环境场景图,房间与房间的邻接关系 jsonStr:" + jsonData);
+            Debug.Log("改变仿真引擎状态 jsonStr:" + jsonStr);
         }, null, rawJsonStr);
     }
     #endregion
@@ -112,17 +114,26 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //监听消息回调
         NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgPublishEventArgs e) =>
         {
+            MqttClient mqttClient = sender as MqttClient;
             string jsonStr = Encoding.UTF8.GetString(e.Message);
-            Debug.Log($"通过代理收到消息：{jsonStr}");
-            ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(jsonStr);
-            if (controlCommit != null)
+            Debug.Log($"recv mqtt callback. topic：{e.Topic}， msg：{jsonStr}，ClientId：{mqttClient.ClientId}");
+            switch (e.Topic)
             {
-                MainData.controlCommit.Add(controlCommit);
-                Debug.Log("TODO" + controlCommit);
-            }
-            else
-            {
-                Debug.LogError("controlCommit is null");
+                case TOPIC_SEND:
+                    ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(jsonStr);
+                    if (controlCommit != null)
+                    {
+                        MainData.controlCommit.Add(controlCommit);
+                        Debug.Log("TODO 解析指令，根据服务器决策指令，控制机器人的行为 " + controlCommit);
+                    }
+                    else
+                    {
+                        Debug.LogError("controlCommit is null");
+                    }
+                    break;
+                default:
+                    Debug.LogError($"Other Topoc :{e.Topic}，msg:{jsonStr} ");
+                    break;
             }
         });
         NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgSubscribedEventArgs e) =>
@@ -160,7 +171,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public void SendMQTTControlResult(ControlResult controlResult)
     {
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(controlResult);
-        NetworkMqtt.GetInstance.Publish(TOPIC_CAMERA, jsonStr);
+        NetworkMqtt.GetInstance.Publish(TOPIC_RECV, jsonStr);
     }
 }
 

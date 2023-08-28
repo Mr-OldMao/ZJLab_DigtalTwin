@@ -40,25 +40,11 @@ public class GameLogic : SingletonByMono<GameLogic>
         //等待ab资源加载完毕，以及http接口获取的场景数据，解析生成场景实体
         UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() =>
         {
-
             return m_IsLoadedAssets && MainData.getEnvGraph != null && MainData.getThingGraph != null;
         }, () =>
         {
             //生成场景中所有房间和物品
-            GenerateEntity(() =>
-            {
-                //原点偏移至场景左下角
-                Vector2 originOffset = GetOriginOffset();
-                staticModelRootNode.transform.position = new Vector3(originOffset.x, 0, originOffset.y);
-
-                //缓存所有实体物品数据信息
-                CacheItemDataInfo();
-
-                //提交场景图，物体与房间的邻接关系
-                InterfaceDataCenter.GetInstance.CommitGetThingGraph(MainData.CacheItemsInfo);
-
-                //根据服务器决策指令，控制机器人的行为
-            });
+            BeginGenerate();
         });
     }
 
@@ -87,6 +73,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         });
     }
 
+    #region Generate
     private void GenerateEntity(Action generateCompleteCallback)
     {
         //写入各个房间之间的邻接关系
@@ -146,6 +133,28 @@ public class GameLogic : SingletonByMono<GameLogic>
             }
         });
     }
+
+    private void BeginGenerate()
+    {
+        //生成场景中所有房间和物品
+        GenerateEntity(() =>
+        {
+            //原点偏移至场景左下角
+            Vector2 originOffset = GetOriginOffset();
+            staticModelRootNode.transform.position = new Vector3(originOffset.x, 0, originOffset.y);
+
+            //缓存所有实体物品数据信息
+            CacheItemDataInfo();
+
+            //提交场景图，物体与房间的邻接关系
+            InterfaceDataCenter.GetInstance.CommitGetThingGraph(MainData.CacheItemsInfo, () =>
+            {
+                //更新仿真引擎状态，从而获取服务器指令
+                InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
+            });
+        });
+    }
+    #endregion
 
     #region 缓存房间内实体信息
     //缓存房间内实体信息
@@ -285,15 +294,17 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         if (Input.GetKeyDown(KeyCode.F5))
         {
-            if (m_IsLoadedAssets && MainData.getEnvGraph != null && MainData.getThingGraph != null)
-            {
-                GenerateEntity(null);
-            }
+            BeginGenerate();
         }
 
-        if (Input.GetKeyDown(KeyCode.F1))
+        if (Input.GetKeyDown(KeyCode.F2))
         {
             InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
+        }
+
+        if (Input.GetKeyDown(KeyCode.F4))
+        {
+            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_RECV, "msg from unity " + System.DateTime.Now);
         }
     }
 }
