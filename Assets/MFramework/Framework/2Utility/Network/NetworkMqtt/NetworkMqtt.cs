@@ -30,7 +30,7 @@ namespace MFramework
             {
                 return this;
             }
-            base.Init(clientIP, clientPort, clientId, null, null);
+            base.Init(clientIP, clientPort, clientId, username, password);
             m_IsInited = true;
             return this;
         }

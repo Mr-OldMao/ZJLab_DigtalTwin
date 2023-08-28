@@ -10,6 +10,7 @@ using Unity.VisualScripting;
 using static uPLibrary.Networking.M2Mqtt.MqttClient;
 using System;
 using Codice.CM.SEIDInfo;
+using System.Net;
 
 namespace MFramework
 {
@@ -29,7 +30,7 @@ namespace MFramework
 
         public virtual void Init(string clientIP, int clientPort, string clientId, string username, string password)
         {
-            mqttClient = new MqttClient(clientIP, clientPort, false, null);
+            mqttClient = new MqttClient(IPAddress.Parse(clientIP), clientPort, false, null);
             listSubscribedTopics = new List<string>();
             Connect(clientId, username, password);
         }
