@@ -34,5 +34,14 @@ public enum MsgEventName
     /// 结束移动
     /// </summary>
     RobotMoveEnd,
+
+    /// <summary>
+    /// 门动画播放开始
+    /// </summary>
+    DoorAnimBegin,
+    /// <summary>
+    /// 门动画播放结束
+    /// </summary>
+    DoorAnimEnd,
 }
 

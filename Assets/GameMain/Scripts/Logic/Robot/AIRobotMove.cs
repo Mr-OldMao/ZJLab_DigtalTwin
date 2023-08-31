@@ -85,24 +85,35 @@ public class AIRobotMove : MonoBehaviour
     {
         MsgEvent.RegisterMsgEvent(MsgEventName.RobotMoveBegin, () =>
         {
-            Debug.Log("Robot RobotMoveBegin");
+            //Debug.Log("Robot RobotMoveBegin");
             curRobotState = RobotBaseState.Moving;
-            m_RobotAnimator?.SetBool("isMoving", true);
+            m_RobotAnimator?.SetBool("IsMoving", true);
         });
         MsgEvent.RegisterMsgEvent(MsgEventName.RobotMoveStay, () =>
         {
-            Debug.Log("Robot RobotMoveStay");
+            //Debug.Log("Robot RobotMoveStay");
             //更新导航路线
             DrawNavMeshAgentLine();
 
         });
         MsgEvent.RegisterMsgEvent(MsgEventName.RobotMoveEnd, () =>
         {
-            Debug.Log("Robot RobotMoveEnd");
+            //Debug.Log("Robot RobotMoveEnd");
             m_NavMeshAgent.isStopped = true;
             curRobotState = RobotBaseState.Idel;
             //curRobotActionState = RobotActionState.Idle;
-            m_RobotAnimator?.SetBool("isMoving", false);
+            m_RobotAnimator?.SetBool("IsMoving", false);
+        });
+
+        MsgEvent.RegisterMsgEvent(MsgEventName.DoorAnimBegin, () =>
+        {
+            MsgEvent.SendMsg(MsgEventName.RobotMoveEnd);
+            m_RobotAnimator?.SetTrigger("OpenDoor");
+        });
+
+        MsgEvent.RegisterMsgEvent(MsgEventName.DoorAnimEnd, () =>
+        {
+            Move(targetPoint);
         });
     }
 

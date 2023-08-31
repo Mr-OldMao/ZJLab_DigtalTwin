@@ -18,7 +18,7 @@ using static UnityEditor.VersionControl.Asset;
 /// </summary>
 public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 {
-    private const string URL_SUBROOT = "http://10.11.81.241:4006/";
+    private const string URL_SUBROOT = "http://10.101.80.21:4006/";
 
     //获取场景图，物体与房间的邻接关系
     private const string URL_GET_THING_GRAPH = URL_SUBROOT + "simulator/getThingGraph";
@@ -108,7 +108,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //初始化并订阅主题tcp://10.5.24.28:1883
         NetworkMqtt.GetInstance.Init(new MqttConfig()
         {
-            clientIP = "10.5.24.28",
+            clientIP = "10.5.24.27",
             clientPort = 1883
         }).Subscribe(TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_SEND, TOPIC_RECV);
         //监听消息回调
