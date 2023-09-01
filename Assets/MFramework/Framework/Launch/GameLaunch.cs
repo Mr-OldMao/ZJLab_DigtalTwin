@@ -12,7 +12,7 @@ namespace MFramework
     public class GameLaunch : SingletonByMono<GameLaunch>
     {
         [SerializeField]
-        private LaunchModel m_LaunchModel = LaunchModel.BuilderModel;
+        private LaunchModel m_LaunchModel ;
         /// <summary>
         /// 项目运行模式
         /// </summary>

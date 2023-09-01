@@ -201,6 +201,7 @@ namespace MFramework.Editor
                 AutoCreateScriptTemplate.rootTrans = autoCreateScriptStructInfo.root.transform;
                 UnityComponent unityComponent = new UnityComponent();
                 unityComponent.SaveAllUIComponentContainerOnly(autoCreateScriptStructInfo.root.transform, autoCreateScriptStructInfo.isCreateHideObj);
+                bool useTMProNamespace = false;
                 //场景对象实例集合
                 List<object> listContainer = unityComponent.GetListComponentContainer();
                 foreach (var dic in listContainer)
@@ -283,6 +284,7 @@ namespace MFramework.Editor
                         Dictionary<string, TMP_InputField> dicChild = dic as Dictionary<string, TMP_InputField>;
                         foreach (var item in dicChild)
                         {
+                            useTMProNamespace = true;
                             SpliceStr(item.Key, "TMP_InputField");
                         }
                         continue;
@@ -292,6 +294,7 @@ namespace MFramework.Editor
                         Dictionary<string, TextMeshProUGUI> dicChild = dic as Dictionary<string, TextMeshProUGUI>;
                         foreach (var item in dicChild)
                         {
+                            useTMProNamespace = true;
                             SpliceStr(item.Key, "TextMeshProUGUI");
                         }
                         continue;
@@ -309,11 +312,13 @@ namespace MFramework.Editor
                 fieldMapContent += "}";
 
                 string classInfo = AutoCreateScriptTemplate.classTemplate;
+                classInfo = classInfo.Replace("{命名空间}", useTMProNamespace ? "using TMPro;\n" : string.Empty);
+                classInfo = classInfo.Replace("{头注释}", "以下代码都是通过脚本自动生成的\n/// 时间:" + System.DateTime.Now.ToString("yyyy.MM.dd"));
                 classInfo = classInfo.Replace("{类名}", scriptName);
                 classInfo = classInfo.Replace("{: 基类}", string.IsNullOrEmpty(autoCreateScriptStructInfo.baseClassName) ? "" : ": " + autoCreateScriptStructInfo.baseClassName);
                 classInfo = classInfo.Replace("{字段}", fieldContent);
                 classInfo = classInfo.Replace("{属性}", propertyContent);
-                classInfo = classInfo.Replace("{初始化}", autoCreateScriptStructInfo.baseClassName== "UIFormBase"? AutoCreateScriptTemplate.awakeOverMethodTemplate : AutoCreateScriptTemplate.awakeMethodTemplate);
+                classInfo = classInfo.Replace("{初始化}", autoCreateScriptStructInfo.baseClassName == "UIFormBase" ? AutoCreateScriptTemplate.awakeOverMethodTemplate : AutoCreateScriptTemplate.awakeMethodTemplate);
                 classInfo = classInfo.Replace("{方法}", fieldMapContent);
 
                 //写入本地
@@ -379,8 +384,9 @@ namespace MFramework.Editor
     @"using UnityEngine;
 using UnityEngine.UI;
 using MFramework;
+{命名空间}
 /// <summary>
-/// 以下代码都是通过脚本自动生成的
+/// {头注释}
 /// </summary>
 public class {类名} {: 基类}
 {

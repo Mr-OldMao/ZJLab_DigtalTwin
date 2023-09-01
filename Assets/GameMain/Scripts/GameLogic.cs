@@ -47,6 +47,8 @@ public class GameLogic : SingletonByMono<GameLogic>
             GenerateRobot();
             //初始化相机
             CameraControl.GetInstance.Init();
+            //加载UI窗体
+            UIManager.GetInstance.Show<UIFormMain>();
             //生成场景中所有房间和物品
             BeginGenerate();
 

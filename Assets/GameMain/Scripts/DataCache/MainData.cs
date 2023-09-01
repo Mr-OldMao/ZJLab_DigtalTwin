@@ -12,6 +12,11 @@ using static GetThingGraph;
 public class MainData
 {
     /// <summary>
+    /// 接口参数ID
+    /// </summary>
+    public const string ID = "test";
+
+    /// <summary>
     /// 物体与房间的邻接关系数据
     /// </summary>
     public static GetThingGraph getThingGraph { get; set; }

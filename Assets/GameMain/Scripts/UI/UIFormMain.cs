@@ -46,4 +46,25 @@ public class UIFormMain : UIFormBase
 		imgBg = transform.Find<Image>("imgBg");
 		rectProgramStateGroup = transform.Find<Image>("rectProgramStateGroup");
 	}
+
+    protected override void RegisterUIEvnet()
+    {
+        base.RegisterUIEvnet();
+		BtnStart.onClick.AddListenerCustom(() =>
+		{
+            InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.start);
+        });
+        btnStop.onClick.AddListenerCustom(() =>
+        {
+            InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.stop);
+        });
+        btnPause.onClick.AddListenerCustom(() =>
+        {
+            InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.pause);
+        });
+        btnResume.onClick.AddListenerCustom(() =>
+        {
+            InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.resume);
+        });
+    }
 }

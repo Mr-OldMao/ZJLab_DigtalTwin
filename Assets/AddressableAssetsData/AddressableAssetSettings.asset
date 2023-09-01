@@ -46,6 +46,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b9fec1686447deb4e9c1efe04f726a98, type: 2}
   - {fileID: 11400000, guid: cf92bcd894c1e2a4383deebf549af2e7, type: 2}
   - {fileID: 11400000, guid: 2e58654712a88294b8d0e03728ae8750, type: 2}
+  - {fileID: 11400000, guid: 451ffb7f47c910e4691f8889229c5f61, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1
@@ -90,6 +91,7 @@ MonoBehaviour:
     - ItemLable
     - RoomBorderLable
     - RobotEntity
+    - UIForm
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 78e4de535c270f5408e7bcde4ef7309a, type: 2}

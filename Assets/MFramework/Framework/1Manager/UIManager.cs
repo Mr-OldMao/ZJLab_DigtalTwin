@@ -20,7 +20,7 @@ namespace MFramework
         /// 缓存加载后的面板  key-面板名称（唯一标识） value-UI窗体数据
         /// </summary>
         private Dictionary<string, UIFormInfo> m_DicUIPanelInfoContainer = new Dictionary<string, UIFormInfo>();
-       
+
 
         class UIFormInfo
         {
@@ -105,7 +105,7 @@ namespace MFramework
             }
             if (!uiFormName.EndsWith(".prefab"))
             {
-                Debugger.LogError("UIFormName Not Exist .prefab ，Path：" +  uiFormName);
+                Debugger.LogError("UIFormName Not Exist .prefab ，Path：" + uiFormName);
                 return default;
             }
             T UIFormLogicScript = GetUIFormLogicScript<T>();
@@ -113,11 +113,14 @@ namespace MFramework
             {
                 //根据当前项目运行模式 获取UI窗体资源实体
                 LoadMode resType = GameLaunch.GetInstance.LaunchModel == LaunchModel.EditorModel ? LoadMode.ResEditor : LoadMode.ResAssetBundleAsset;
-                GameObject UIForm = ResManager.LoadSync<GameObject>(uiFormName, resType);
+                Debug.Log("resType " + resType + "," + GameLaunch.GetInstance.LaunchModel + "," + LaunchModel.EditorModel + "," + (GameLaunch.GetInstance.LaunchModel == LaunchModel.EditorModel));
+                //GameObject UIForm = ResManager.LoadSync<GameObject>(uiFormName, resType);
+                string[] uiFormNameSplit = uiFormName.Split(new char[] { '/', '.' });
+                string assetName = uiFormNameSplit[uiFormNameSplit.Length - 2];
+                GameObject UIForm = Instantiate(ResourcesLoad.GetInstance.GetEntityRes(assetName));
+
                 //修改UI窗体名称
-                string[] UIFormNameArr = uiFormName.Split('/', '.');
-                string name = UIFormNameArr[UIFormNameArr.Length - 2];
-                UIForm.name = name;
+                UIForm.name = assetName;
                 //设置UI窗体位置
                 RectTransform cloneRect = UIForm.GetComponent<RectTransform>();
                 Transform parent = UIRoot.transform.Find(uILayerType.ToString());
@@ -131,7 +134,7 @@ namespace MFramework
                 //为UI窗体添加指定UIFormBase的派生类
                 UIFormLogicScript = UIForm.AddComponent<T>();
                 //缓存至资源池
-                m_DicUIPanelInfoContainer.Add(name, new UIFormInfo(UIForm, UIFormLogicScript));
+                m_DicUIPanelInfoContainer.Add(assetName, new UIFormInfo(UIForm, UIFormLogicScript));
             }
             UIFormLogicScript.Show();
             return UIFormLogicScript;

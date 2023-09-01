@@ -51,6 +51,7 @@ namespace MFramework
         public void RegisterUIForm()
         {
             //Add<UIFormTest>(new UIEntityConfigInfo(m_UIFormsPath + "Main/UIFormTest.prefab", UILayerType.Common));
+            Add<UIFormMain>(new UIEntityConfigInfo(m_UIFormsPath + "UIFormMain.prefab", UILayerType.Common));
         }
 
         /// <summary>

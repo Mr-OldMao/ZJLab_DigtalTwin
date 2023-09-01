@@ -36,11 +36,11 @@ public class UIFormBase : MonoBehaviour, IUIFormBase
     }
     protected virtual void Awake()
     {
-
+       
     }
     protected virtual void Start()
     {
-
+        RegisterUIEvnet();
     }
     protected virtual void Update()
     {
@@ -66,4 +66,8 @@ public class UIFormBase : MonoBehaviour, IUIFormBase
 
     }
 
+    protected virtual void RegisterUIEvnet()
+    {
+
+    }
 }

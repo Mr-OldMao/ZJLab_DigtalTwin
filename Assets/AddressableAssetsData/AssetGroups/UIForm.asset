@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: UIForm
+  m_EditorClassIdentifier: 
+  m_GroupName: UIForm
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 9579131611a2e0643b16564e38e4aa6c
+  m_SerializeEntries:
+  - m_GUID: db167dc570050124cbf6b42f571bd69e
+    m_Address: Assets/GameMain/AB/Prefab/UI/UIForms/UIFormMain.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - UIForm
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 13b3a089d6d69ce499381abb142d0bfb, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: bc177635598d765478ccd1634696300f, type: 2}
+    - {fileID: 11400000, guid: 4498d7de6e6f7d743b77fd49f381dae5, type: 2}

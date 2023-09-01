@@ -37,7 +37,7 @@ public class ResourcesLoad : SingletonByMono<ResourcesLoad>
     public const uint AllEntityResCount = 19 + 7-1;
     private uint m_CurLoadedCount;
 
-    private List<string> m_AddressableLable = new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity" };
+    private List<string> m_AddressableLable = new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity" ,"UIForm"};
     public void DicIndex()
     {
         List<ResInfo> resInfos = new List<ResInfo>();
