@@ -19,9 +19,6 @@ public enum MsgEventName
     /// HTTP请求失败
     /// </summary>
     HttpRequestFail,
-
-    AsyncLoadedComplete,
-
     /// <summary>
     /// 开始移动
     /// </summary>

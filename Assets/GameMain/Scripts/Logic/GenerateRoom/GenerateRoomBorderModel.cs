@@ -108,13 +108,13 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
                 case EntityModelType.Null:
                     break;
                 case EntityModelType.Wall:
-                    entityModel = borderEntityData.entityAxis == 0 ? ResourcesLoad.GetInstance.GetEntityRes("WallX") : ResourcesLoad.GetInstance.GetEntityRes("WallY");
+                    entityModel = borderEntityData.entityAxis == 0 ? LoadAssetsByAddressable.GetInstance.GetEntityRes("WallX") : LoadAssetsByAddressable.GetInstance.GetEntityRes("WallY");
                     break;
                 case EntityModelType.Door:
-                    entityModel = borderEntityData.entityAxis == 0 ? ResourcesLoad.GetInstance.GetEntityRes("DoorX") : ResourcesLoad.GetInstance.GetEntityRes("DoorY");
+                    entityModel = borderEntityData.entityAxis == 0 ? LoadAssetsByAddressable.GetInstance.GetEntityRes("DoorX") : LoadAssetsByAddressable.GetInstance.GetEntityRes("DoorY");
                     break;
                 case EntityModelType.Floor:
-                    entityModel = ResourcesLoad.GetInstance.GetEntityRes("Floor");
+                    entityModel = LoadAssetsByAddressable.GetInstance.GetEntityRes("Floor");
                     break;
                 default:
                     break;
@@ -128,7 +128,7 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
             }
             if (borderEntityData.entityModelType == EntityModelType.Wall || borderEntityData.entityModelType == EntityModelType.Door)
             {
-                GameObject modelWallSmall = borderEntityData.entityAxis == 0 ? ResourcesLoad.GetInstance.GetEntityRes("WallSmallX") : ResourcesLoad.GetInstance.GetEntityRes("WallSmallY");
+                GameObject modelWallSmall = borderEntityData.entityAxis == 0 ? LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallX") : LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallY");
                 GameObject clone = Instantiate(modelWallSmall, new Vector3(borderEntityData.pos.x, 0, borderEntityData.pos.y), Quaternion.identity);
                 //clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
                 clone.name = modelWallSmall.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;

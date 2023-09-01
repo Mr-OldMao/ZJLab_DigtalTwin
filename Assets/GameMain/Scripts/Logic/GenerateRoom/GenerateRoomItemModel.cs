@@ -230,7 +230,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         {
             //改为大驼峰原则
             string itemName = itemModelTypes[i].ToString().Substring(0, 1).ToUpper() + itemModelTypes[i].ToString().Substring(1, itemModelTypes[i].ToString().Length - 1).ToLower();
-            GameObject go = ResourcesLoad.GetInstance.GetEntityRes(itemName);
+            GameObject go = LoadAssetsByAddressable.GetInstance.GetEntityRes(itemName);
             if (go != null)
             {
                 res.Add(go);

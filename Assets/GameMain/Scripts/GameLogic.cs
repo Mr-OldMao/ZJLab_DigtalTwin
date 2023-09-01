@@ -6,7 +6,6 @@ using System;
 using static GetEnvGraph;
 using static GetThingGraph;
 using static GenerateRoomBorderModel;
-using UnityEngine.UIElements;
 /// <summary>
 /// 标题：程序逻辑入口
 /// 功能：程序主逻辑
@@ -28,10 +27,14 @@ public class GameLogic : SingletonByMono<GameLogic>
         CreateRootNode();
 
         //注册消息事件
-        RegisterMsgEvent();
+        //RegisterMsgEvent();
 
         //异步加载ab资源
-        ResourcesLoad.GetInstance.AsyncLoadAllResources();
+        LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity", "UIForm" }, () =>
+        {
+            Debug.Log("ab资源加载完毕回调");
+            m_IsLoadedAssets = true;
+        });
 
         //接入网络通信
         NetworkHTTP();
@@ -73,15 +76,6 @@ public class GameLogic : SingletonByMono<GameLogic>
     private void NetworkMQTT()
     {
         InterfaceDataCenter.GetInstance.InitMQTT();
-    }
-
-    private void RegisterMsgEvent()
-    {
-        MsgEvent.RegisterMsgEvent(MsgEventName.AsyncLoadedComplete, () =>
-        {
-            Debug.Log("ab资源加载完毕回调");
-            m_IsLoadedAssets = true;
-        });
     }
 
     #region Generate
@@ -172,7 +166,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         GameObject robotEntity = GameObject.FindWithTag("Player");
         if (robotEntity == null)
         {
-            GameObject robotRes = ResourcesLoad.GetInstance.GetEntityRes("RobotEntity", 0);
+            GameObject robotRes = LoadAssetsByAddressable.GetInstance.GetEntityRes("RobotEntity", 0);
             robotEntity = Instantiate(robotRes, new Vector3(3, 0, 3), Quaternion.identity);
         }
     }

@@ -41,9 +41,7 @@ public class TestGenerateRoom : MonoBehaviour
         ////固定生成
         //btnFixedGenerate?.onClick.AddListener(() => { TestGenerateFixed(); });
 
-        ResourcesLoad.GetInstance.AsyncLoadAllResources();
-
-        MsgEvent.RegisterMsgEvent(MsgEventName.AsyncLoadedComplete, () =>
+        LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity", "UIForm" }, () =>
         {
             //半随机，需要指定各个房间大小以及邻接方位,系统自动随机所在位置
             btnHalfRandomGenerate?.onClick.AddListener(() =>

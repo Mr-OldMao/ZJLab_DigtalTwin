@@ -117,7 +117,7 @@ namespace MFramework
                 //GameObject UIForm = ResManager.LoadSync<GameObject>(uiFormName, resType);
                 string[] uiFormNameSplit = uiFormName.Split(new char[] { '/', '.' });
                 string assetName = uiFormNameSplit[uiFormNameSplit.Length - 2];
-                GameObject UIForm = Instantiate(ResourcesLoad.GetInstance.GetEntityRes(assetName));
+                GameObject UIForm = Instantiate(LoadAssetsByAddressable.GetInstance.GetEntityRes(assetName));
 
                 //修改UI窗体名称
                 UIForm.name = assetName;
