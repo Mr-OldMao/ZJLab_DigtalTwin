@@ -8,6 +8,17 @@ using MFramework;
 /// </summary>
 public class UIFormMain : UIFormBase
 {
+    public override UILayerType GetUIFormLayer
+    {
+        get => UILayerType.Common;
+        protected set => _ = UILayerType.Common;
+    }
+    public override string AssetPath
+    {
+        get => AssetPathRootDir + "/Main/UIFormMain.prefab";
+        protected set => _ = AssetPathRootDir + "/Main/UIFormMain.prefab";
+    }
+
     [SerializeField]
     private Button btnStart;
     [SerializeField]
@@ -34,11 +45,10 @@ public class UIFormMain : UIFormBase
     protected override void Awake()
     {
         base.Awake();
-        InitMapField();
     }
 
 
-    public void InitMapField()
+    public override void InitMapField()
     {
         btnStart = transform.Find<Button>("btnStart");
         btnStop = transform.Find<Button>("btnStop");
@@ -47,12 +57,10 @@ public class UIFormMain : UIFormBase
         imgBg = transform.Find<Image>("imgBg");
         rectProgramStateGroup = transform.Find<Image>("rectProgramStateGroup");
         btnCameraFree = transform.Find<Button>("btnCameraFree");
-
     }
 
     protected override void RegisterUIEvnet()
     {
-        base.RegisterUIEvnet();
         BtnStart.onClick.AddListenerCustom(() =>
         {
             InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.start);

@@ -8,7 +8,7 @@ using UnityEngine;
 /// 作者：毛俊峰
 /// 时间：2022.12.29
 /// </summary>
-public class UIFormBase : MonoBehaviour, IUIFormBase
+public abstract class UIFormBase : MonoBehaviour, IUIFormBase
 {
     /// <summary>
     /// 当前窗体是否正在显示
@@ -17,7 +17,18 @@ public class UIFormBase : MonoBehaviour, IUIFormBase
     /// <summary>
     /// 获取UI窗体层级
     /// </summary>
-    public UILayerType GetUIFormLayer { get; protected set; }
+    public abstract UILayerType GetUIFormLayer { get; protected set; }
+
+    protected string AssetPathRootDir = UIFormConfig.UIFormRootDir;
+
+    /// <summary>
+    /// UI窗体预制体实体位置
+    /// </summary>
+    public abstract string AssetPath
+    {
+        get;
+        protected set;
+    }
 
     public virtual void Show()
     {
@@ -30,17 +41,29 @@ public class UIFormBase : MonoBehaviour, IUIFormBase
         gameObject.SetActive(false);
         IsShow = false;
     }
+
+    /// <summary>
+    /// 初始化字段映射
+    /// </summary>
+    public abstract void InitMapField();
+
+    /// <summary>
+    /// 注册UI事件
+    /// </summary>
+    protected abstract void RegisterUIEvnet();
+
     protected virtual void OnEnable()
     {
 
     }
     protected virtual void Awake()
     {
-       
+        InitMapField();
+        RegisterUIEvnet();
     }
     protected virtual void Start()
     {
-        RegisterUIEvnet();
+
     }
     protected virtual void Update()
     {
@@ -65,9 +88,6 @@ public class UIFormBase : MonoBehaviour, IUIFormBase
     {
 
     }
+   
 
-    protected virtual void RegisterUIEvnet()
-    {
-
-    }
 }
