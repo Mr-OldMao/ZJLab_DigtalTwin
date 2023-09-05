@@ -45,7 +45,7 @@ public abstract class UIFormBase : MonoBehaviour, IUIFormBase
     /// <summary>
     /// 初始化字段映射
     /// </summary>
-    public abstract void InitMapField();
+    protected abstract void InitMapField();
 
     /// <summary>
     /// 注册UI事件

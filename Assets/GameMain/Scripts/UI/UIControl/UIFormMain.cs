@@ -8,16 +8,8 @@ using MFramework;
 /// </summary>
 public class UIFormMain : UIFormBase
 {
-    public override UILayerType GetUIFormLayer
-    {
-        get => UILayerType.Common;
-        protected set => _ = UILayerType.Common;
-    }
-    public override string AssetPath
-    {
-        get => AssetPathRootDir + "/Main/UIFormMain.prefab";
-        protected set => _ = AssetPathRootDir + "/Main/UIFormMain.prefab";
-    }
+    public override UILayerType GetUIFormLayer { get => UILayerType.Common; protected set => _ = UILayerType.Common; }
+    public override string AssetPath { get => AssetPathRootDir + "/Main/UIFormMain.prefab"; protected set => _ = AssetPathRootDir + "/Main/UIFormMain.prefab"; }
 
     [SerializeField]
     private Button btnStart;
@@ -48,7 +40,7 @@ public class UIFormMain : UIFormBase
     }
 
 
-    public override void InitMapField()
+    protected override void InitMapField()
     {
         btnStart = transform.Find<Button>("btnStart");
         btnStop = transform.Find<Button>("btnStop");
