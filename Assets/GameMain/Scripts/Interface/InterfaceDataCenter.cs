@@ -37,7 +37,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     private const string TOPIC_SEND = "simulator/send";
     //发控制结果给服务器
     public const string TOPIC_RECV = "simulator/recv";
-
+    //发送房间信息
+    public const string TOPIC_ROOMINFODATA = "simulator/roomInfoData";
     #region HTTP
     /// <summary>
     /// 缓存场景图，物体与房间的邻接关系
@@ -106,7 +107,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         {
             clientIP = "10.5.24.27",
             clientPort = 1883
-        }).Subscribe(TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_SEND, TOPIC_RECV);
+        }).Subscribe(TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_SEND, TOPIC_RECV, TOPIC_ROOMINFODATA);
         //监听消息回调
         NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgPublishEventArgs e) =>
         {
@@ -168,6 +169,16 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     {
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(controlResult);
         NetworkMqtt.GetInstance.Publish(TOPIC_RECV, jsonStr);
+    }
+
+    /// <summary>
+    /// 发送控制结果
+    /// </summary>
+    /// <param name="controlResult"></param>
+    public void SendMQTTRoomInfoData(RoomInfoData  roomInfoData)
+    {
+        string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(roomInfoData);
+        NetworkMqtt.GetInstance.Publish(TOPIC_ROOMINFODATA, jsonStr);
     }
 }
 

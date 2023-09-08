@@ -322,6 +322,30 @@ public class GameLogic : SingletonByMono<GameLogic>
         {
             NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_RECV, "msg from unity " + System.DateTime.Now);
         }
+
+        if (Input.GetKeyDown(KeyCode.F6))
+        {
+            InterfaceDataCenter.GetInstance.SendMQTTRoomInfoData(new RoomInfoData
+            {
+                roomInfos = new RoomInfoData.RoomInfoData_roomInfos[]
+                 {
+                     new RoomInfoData.RoomInfoData_roomInfos()
+                     {
+                            id = 1,
+                            roomType = "LivingRoom",
+                            minPos = new int[] { 1,2},
+                            maxPos = new int[] { 5,7}
+                     },
+                       new RoomInfoData.RoomInfoData_roomInfos()
+                     {
+                            id = 2,
+                            roomType = "BedRoom",
+                            minPos = new int[] { 6,5},
+                            maxPos = new int[] { 9,8}
+                     },
+                 }
+            });
+        }
     }
 }
 
