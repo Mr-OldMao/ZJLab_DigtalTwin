@@ -33,6 +33,7 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
     public class RoomInfo
     {
         public RoomType roomType;
+        public string roomID;
         /// <summary>
         /// 房间长宽，单位米(正整数)  PS：暂时没用上，后面考虑删除此字段
         /// </summary>
@@ -78,10 +79,15 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
         /// 边界实体轴向，0-横向 1-纵向
         /// </summary>
         public int entityAxis;
+
         /// <summary>
         /// 当前实体所属房间类型，一个边界实体最多可属于两个房间，listRoomType.count<=2
         /// </summary>
         public List<RoomType> listRoomType;
+        /// <summary>
+        /// 当前实体所属房间类型ID,可代替listRoomType使用，一个边界实体最多可属于两个房间，listRoomType.count<=2
+        /// </summary>
+        public List<string> listRoomTypeID;
     }
 
     private void Awake()

@@ -92,6 +92,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             roomBaseInfo.curRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.name);
             roomBaseInfo.roomSize = new uint[] { (uint)UnityEngine.Random.Range(4, 8), (uint)UnityEngine.Random.Range(4, 8) };
             roomBaseInfo.targetRoomsDirRelation = new List<RoomsDirRelation>();
+            roomBaseInfo.curRoomID = roomRelation.id;
             //当前房间与其他房间邻接关系
             for (int j = 0; j < roomRelation.relatedThing?.Length; j++)
             {
@@ -100,7 +101,8 @@ public class GameLogic : SingletonByMono<GameLogic>
                 {
                     targetRoomType = targetRoomType,
                     locationRelation = (DirEnum)Enum.Parse(typeof(DirEnum), roomRelation.relatedThing[j].relationship),
-                    isCommonWall = true
+                    isCommonWall = true,
+                    targetRoomID = roomRelation.relatedThing[j].target.id
                 });
 
 
@@ -114,11 +116,13 @@ public class GameLogic : SingletonByMono<GameLogic>
             for (int j = 0; j < roomRelation.relatedThing?.Length; j++)
             {
                 RoomType targetRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.relatedThing[j].target.name);
-                if (roomBaseInfos.Find((p) => { return p.curRoomType == targetRoomType; }) == null)
+                string curRoomID = roomRelation.relatedThing[j].target.id;
+                if (roomBaseInfos.Find((p) => { return p.curRoomType == targetRoomType && p.curRoomID == curRoomID; }) == null)
                 {
                     roomBaseInfos.Add(new RoomBaseInfo
                     {
                         curRoomType = targetRoomType,
+                        curRoomID = curRoomID,
                         roomSize = new uint[] { (uint)UnityEngine.Random.Range(4, 8), (uint)UnityEngine.Random.Range(4, 8) }
                     });
                 }
@@ -128,7 +132,8 @@ public class GameLogic : SingletonByMono<GameLogic>
         {
             if (p == null || k == null)
             {
-                Debug.LogError("helf random is fail");
+                Debug.LogError("generage fail , again generate...");
+                GenerateScene();
             }
             else
             {
@@ -138,6 +143,24 @@ public class GameLogic : SingletonByMono<GameLogic>
             }
         });
     }
+
+    //private void Generate(List<RoomBaseInfo> roomBaseInfos, Action generateCompleteCallback)
+    //{
+    //    GenerateRoomData.GetInstance.GenerateRandomRoomInfoData(roomBaseInfos, (p, k) =>
+    //    {
+    //        if (p == null || k == null)
+    //        {
+    //            Debug.LogError("generage fail , again generate...");
+    //            GenerateScene();
+    //        }
+    //        else
+    //        {
+    //            GenerateRoomBorderModel.GetInstance.GenerateRoomBorder();
+    //            GenerateRoomItemModel.GetInstance.GenerateRoomItem(k, MainData.getThingGraph);
+    //            generateCompleteCallback?.Invoke();
+    //        }
+    //    });
+    //}
 
     private void GenerateScene()
     {
