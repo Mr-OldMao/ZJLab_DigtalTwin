@@ -262,7 +262,6 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     dependItemID = data.id,
                     dependItemName = data.name,
                 });
-                Debug.Log("xxx " + data.name);
             }
         }
     }
@@ -277,11 +276,11 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     {
         for (int i = 0; i < relatedThingArr.Count; i++)
         {
-            Debug.Log("cur put item:" + relatedThingArr[i].target.name
-                + ",id" + relatedThingArr[i].target.id
-                + ", isDepend :" + itemDependInfo.isDepend
-                + ",dependItemName:" + itemDependInfo?.dependItemName
-                + ",dependItemID:" + itemDependInfo?.dependItemID);
+            //Debug.Log("cur put item:" + relatedThingArr[i].target.name
+            //    + ",id" + relatedThingArr[i].target.id
+            //    + ", isDepend :" + itemDependInfo.isDepend
+            //    + ",dependItemName:" + itemDependInfo?.dependItemName
+            //    + ",dependItemID:" + itemDependInfo?.dependItemID);
             //当前实体信息
             string entityName = relatedThingArr[i].target.name;
             //剔除Door信息
@@ -443,7 +442,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                                 for (int k = 0; k < needItemModelInfoArr.Count; k++)
                                 {
                                     needItemModelInfoArr[k].itemModelType =relatedThingArr[i].target.name;
-                                    Debug.Log("pos:" + needItemModelInfoArr[k].pos);
+                                    //Debug.Log("pos:" + needItemModelInfoArr[k].pos);
                                 }
                                 clone.SetActive(true);
                                 break;

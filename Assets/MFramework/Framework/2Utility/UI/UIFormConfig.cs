@@ -88,7 +88,7 @@ namespace MFramework
                 {
                     UIFormBase uIForm = System.Activator.CreateInstance(type) as UIFormBase;
                     Add(type, new UIEntityConfigInfo(uIForm.AssetPath, uIForm.GetUIFormLayer));
-                    Debug.Log("Auto Bind UIForm，Name：" + type.Name);
+                //    Debug.Log("Auto Bind UIForm，Name：" + type.Name);
                 }
             }
         }

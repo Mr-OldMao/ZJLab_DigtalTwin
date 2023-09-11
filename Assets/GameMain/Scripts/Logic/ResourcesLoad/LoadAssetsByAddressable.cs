@@ -82,7 +82,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         {
             AddEntityRes(p.name, p);
             m_CurLoadedCount++;
-            GetLoadProgress(AllAssetsCount);
+            //GetLoadProgress(AllAssetsCount);
         }, MergeMode.Union, true).Completed += (UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle<IList<GameObject>> obj) =>
         {
             Debug.Log("Loading Assets Complete");

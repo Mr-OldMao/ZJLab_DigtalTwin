@@ -180,7 +180,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 //i++;
                 continue;
             }
-            Debug.Log(" Cur Generate RoomType:" + roomBaseInfos[i].curRoomType);
+            //Debug.Log(" Cur Generate RoomType:" + roomBaseInfos[i].curRoomType);
             //根据房间邻接的边界信息，给出roomPosMin，roomPosMax
             List<Vector2> pos = GetRandomRoomPosByDirRelaateion(roomBaseInfos[i], (p) =>
             {
@@ -464,7 +464,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         //根据边界信息 生成合理的随机数
         //根据上述2~4个点位信息，生成连续的1~3条线作为边界
 
-        Debug.Log("otherPosCount：" + otherPosCount);
+        //Debug.Log("otherPosCount：" + otherPosCount);
         int randomMin;
         int randomMax;
 
@@ -732,7 +732,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             }
             int doorRandomIndex = UnityEngine.Random.Range(0, listDoorRandomPosInfo.Count);
             BorderEntityData doorData = listDoorRandomPosInfo[doorRandomIndex];
-            Debug.Log("curRoomType:" + roomBaseInfos[i].curRoomType + ",doorPos：" + doorData.pos + ",entityAxis:" + doorData.entityAxis);
+            //Debug.Log("curRoomType:" + roomBaseInfos[i].curRoomType + ",doorPos：" + doorData.pos + ",entityAxis:" + doorData.entityAxis);
 
             //替换边界信息 wall=》door
             BorderEntityData doorBorderEntityData = new BorderEntityData

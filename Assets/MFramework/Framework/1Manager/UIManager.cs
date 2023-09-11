@@ -113,7 +113,7 @@ namespace MFramework
             {
                 //根据当前项目运行模式 获取UI窗体资源实体
                 LoadMode resType = GameLaunch.GetInstance.LaunchModel == LaunchModel.EditorModel ? LoadMode.ResEditor : LoadMode.ResAssetBundleAsset;
-                Debug.Log("resType " + resType + "," + GameLaunch.GetInstance.LaunchModel + "," + LaunchModel.EditorModel + "," + (GameLaunch.GetInstance.LaunchModel == LaunchModel.EditorModel));
+                //Debug.Log("resType " + resType + "," + GameLaunch.GetInstance.LaunchModel + "," + LaunchModel.EditorModel + "," + (GameLaunch.GetInstance.LaunchModel == LaunchModel.EditorModel));
                 //GameObject UIForm = ResManager.LoadSync<GameObject>(uiFormName, resType);
                 string[] uiFormNameSplit = uiFormName.Split(new char[] { '/', '.' });
                 string assetName = uiFormNameSplit[uiFormNameSplit.Length - 2];

@@ -31,7 +31,7 @@ public class TopCameraConfig : MonoBehaviour
             float cameraSize = roomSize.x / 2.5f > roomSize.y / 1.5f ? roomSize.x / 2.5f : roomSize.y / 1.5f;
             m_CameraTop.orthographicSize = cameraSize;
             m_CameraTop.transform.position = new Vector3(roomSize.x/2, 50f, roomSize.y/2);
-            Debug.Log("RoomSize：" + GetAllRoomSize() + "，cameraSize：" + cameraSize);
+         //   Debug.Log("RoomSize：" + GetAllRoomSize() + "，cameraSize：" + cameraSize);
         });
     }
 
