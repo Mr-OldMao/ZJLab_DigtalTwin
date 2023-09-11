@@ -53,7 +53,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             //加载UI窗体
             UIManager.GetInstance.Show<UIFormMain>();
             //生成场景中所有房间和物品
-            BeginGenerate();
+            GenerateScene();
 
         });
     }
@@ -139,8 +139,9 @@ public class GameLogic : SingletonByMono<GameLogic>
         });
     }
 
-    private void BeginGenerate()
+    private void GenerateScene()
     {
+        staticModelRootNode.transform.position = Vector3.zero;
         //生成场景中所有房间和物品
         GenerateEntity(() =>
         {
@@ -310,7 +311,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         if (Input.GetKeyDown(KeyCode.F5))
         {
-            BeginGenerate();
+            GenerateScene();
         }
 
         if (Input.GetKeyDown(KeyCode.F2))
