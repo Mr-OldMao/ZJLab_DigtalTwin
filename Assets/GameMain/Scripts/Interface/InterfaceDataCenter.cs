@@ -172,7 +172,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     }
 
     /// <summary>
-    /// 发送控制结果
+    /// 发送房间坐标位置信息
     /// </summary>
     /// <param name="controlResult"></param>
     public void SendMQTTRoomInfoData(RoomInfoData  roomInfoData)

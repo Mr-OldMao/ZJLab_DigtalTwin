@@ -6,6 +6,7 @@ using System;
 using static GetEnvGraph;
 using static GetThingGraph;
 using static GenerateRoomBorderModel;
+using Unity.VisualScripting;
 /// <summary>
 /// 标题：程序逻辑入口
 /// 功能：程序主逻辑
@@ -181,6 +182,9 @@ public class GameLogic : SingletonByMono<GameLogic>
                 //更新仿真引擎状态，从而获取服务器指令
                 InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
             });
+
+            //提交场景图布局，房间与房间位置关系
+            SendRoomInfoData(originOffset);
         });
     }
 
@@ -322,6 +326,30 @@ public class GameLogic : SingletonByMono<GameLogic>
     }
     #endregion
 
+    #region SendMsgGenerateInfo
+
+    /// <summary>
+    /// 提交场景图布局，房间与房间位置关系
+    /// </summary>
+    private void SendRoomInfoData(Vector2 originOffset)
+    {
+        RoomInfoData roomInfoData = new RoomInfoData
+        {
+            roomInfos = new List<RoomInfoData.RoomInfoData_roomInfos>()
+        };
+        for (int i = 0; i < GenerateRoomData.GetInstance.m_ListRoomInfo.Count; i++)
+        {
+            roomInfoData.roomInfos.Add(new RoomInfoData.RoomInfoData_roomInfos
+            {
+                roomType = GenerateRoomData.GetInstance.m_ListRoomInfo[i].roomType.ToString(),
+                id = GenerateRoomData.GetInstance.m_ListRoomInfo[i].roomID,
+                minPos = new int[] { (int)GenerateRoomData.GetInstance.m_ListRoomInfo[i].roomPosMin.x + (int)originOffset.x, (int)GenerateRoomData.GetInstance.m_ListRoomInfo[i].roomPosMin.y + (int)originOffset.y },
+                maxPos = new int[] { (int)GenerateRoomData.GetInstance.m_ListRoomInfo[i].roomPosMax.x + (int)originOffset.x, (int)GenerateRoomData.GetInstance.m_ListRoomInfo[i].roomPosMax.y + (int)originOffset.y }
+            });
+        }
+        InterfaceDataCenter.GetInstance.SendMQTTRoomInfoData(roomInfoData);
+    }
+    #endregion
 
 
 
@@ -351,18 +379,18 @@ public class GameLogic : SingletonByMono<GameLogic>
         {
             InterfaceDataCenter.GetInstance.SendMQTTRoomInfoData(new RoomInfoData
             {
-                roomInfos = new RoomInfoData.RoomInfoData_roomInfos[]
+                roomInfos = new List<RoomInfoData.RoomInfoData_roomInfos>
                  {
                      new RoomInfoData.RoomInfoData_roomInfos()
                      {
-                            id = 1,
+                            id = "1",
                             roomType = "LivingRoom",
                             minPos = new int[] { 1,2},
                             maxPos = new int[] { 5,7}
                      },
                        new RoomInfoData.RoomInfoData_roomInfos()
                      {
-                            id = 2,
+                            id = "2",
                             roomType = "BedRoom",
                             minPos = new int[] { 6,5},
                             maxPos = new int[] { 9,8}
