@@ -1,5 +1,6 @@
 using MFramework;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -36,7 +37,7 @@ public class CameraControl : SingletonByMono<CameraControl>
         m_CameraFirst = GameObject.Find("CameraFirst")?.GetComponent<Camera>();
         m_CameraThree = GameObject.Find("CameraThree")?.GetComponent<Camera>();
         m_CameraFree = GameObject.Find("CameraFree")?.GetComponent<Camera>();
-        
+
     }
 
     private void Start()
@@ -46,6 +47,11 @@ public class CameraControl : SingletonByMono<CameraControl>
         m_CameraTop.depth = 0;
         m_CameraFirst.depth = 2;
         m_CameraThree.depth = 2;
+
+        if (m_CameraTop.gameObject.GetComponent<TopCameraConfig>() == null)
+        {
+            m_CameraTop.gameObject.AddComponent<TopCameraConfig>();
+        }
     }
 
     public void Init()

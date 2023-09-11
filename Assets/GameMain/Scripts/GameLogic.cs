@@ -28,7 +28,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         CreateRootNode();
 
         //注册消息事件
-        //RegisterMsgEvent();
+        RegisterMsgEvent();
 
         //异步加载ab资源
         LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity", "UIForm" }, () =>
@@ -55,7 +55,6 @@ public class GameLogic : SingletonByMono<GameLogic>
             UIManager.GetInstance.Show<UIFormMain>();
             //生成场景中所有房间和物品
             GenerateScene();
-
         });
     }
 
@@ -79,6 +78,28 @@ public class GameLogic : SingletonByMono<GameLogic>
         InterfaceDataCenter.GetInstance.InitMQTT();
     }
 
+    private void RegisterMsgEvent()
+    {
+        MsgEvent.RegisterMsgEvent(MsgEventName.GenerateSceneComplete, () =>
+        {
+            //原点偏移至场景左下角
+            Vector2 originOffset = GetOriginOffset();
+            staticModelRootNode.transform.position = new Vector3(originOffset.x, 0, originOffset.y);
+
+            //缓存所有实体物品数据信息
+            CacheItemDataInfo();
+
+            //提交场景图，物体与房间的邻接关系
+            InterfaceDataCenter.GetInstance.CommitGetThingGraph(MainData.CacheItemsInfo, () =>
+            {
+                //更新仿真引擎状态，从而获取服务器指令
+                InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
+            });
+
+            //提交场景图布局，房间与房间位置关系
+            SendRoomInfoData(originOffset);
+        });
+    }
     #region Generate
     private void GenerateEntity(Action generateCompleteCallback)
     {
@@ -169,22 +190,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         //生成场景中所有房间和物品
         GenerateEntity(() =>
         {
-            //原点偏移至场景左下角
-            Vector2 originOffset = GetOriginOffset();
-            staticModelRootNode.transform.position = new Vector3(originOffset.x, 0, originOffset.y);
-
-            //缓存所有实体物品数据信息
-            CacheItemDataInfo();
-
-            //提交场景图，物体与房间的邻接关系
-            InterfaceDataCenter.GetInstance.CommitGetThingGraph(MainData.CacheItemsInfo, () =>
-            {
-                //更新仿真引擎状态，从而获取服务器指令
-                InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
-            });
-
-            //提交场景图布局，房间与房间位置关系
-            SendRoomInfoData(originOffset);
+            MsgEvent.SendMsg(MsgEventName.GenerateSceneComplete);
         });
     }
 

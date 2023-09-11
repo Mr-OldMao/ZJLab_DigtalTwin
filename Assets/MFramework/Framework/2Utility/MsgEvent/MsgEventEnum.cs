@@ -12,6 +12,11 @@ public enum MsgEventName
 {
     Test,
     /// <summary>
+    /// 所有的房间、物体生成完毕
+    /// </summary>
+    GenerateSceneComplete,
+
+    /// <summary>
     /// HTTP请求成功
     /// </summary>
     HttpRequestSucceed,
