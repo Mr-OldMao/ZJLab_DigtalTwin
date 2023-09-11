@@ -1,5 +1,6 @@
 using MFramework;
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -54,13 +55,21 @@ public class AIRobotMove : MonoBehaviour
     void Start()
     {
         m_NavMeshAgent = GetComponent<NavMeshAgent>();
-        curRobotState = RobotBaseState.Idel;
         m_PathLineRenderer = this.GetComponent<LineRenderer>();
         m_RobotAnimator = transform.Find<Animator>("Mesh1");
         targetPoint = GameObject.Find("TargetPoint")?.transform;
         RegisterMsgEvent();
+        InitRobotAnimParam();
     }
 
+    private void InitRobotAnimParam()
+    {
+        curRobotState = RobotBaseState.Idel;
+        m_RobotAnimator?.SetBool("IsMoving", false);
+        m_RobotAnimator?.SetBool("CloseDoor", false);
+        m_RobotAnimator?.SetBool("OpenDoor", false);
+        m_RobotAnimator?.SetBool("GrabItem", false);
+    }
 
     // Update is called once per frame
     void Update()
@@ -114,6 +123,11 @@ public class AIRobotMove : MonoBehaviour
         MsgEvent.RegisterMsgEvent(MsgEventName.DoorAnimEnd, () =>
         {
             Move(targetPoint);
+        });
+
+        MsgEvent.RegisterMsgEvent(MsgEventName.GenerateSceneComplete, () =>
+        {
+            InitRobotAnimParam();
         });
     }
 

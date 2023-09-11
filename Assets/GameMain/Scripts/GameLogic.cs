@@ -7,6 +7,7 @@ using static GetEnvGraph;
 using static GetThingGraph;
 using static GenerateRoomBorderModel;
 using Unity.VisualScripting;
+using UnityEngine.AI;
 /// <summary>
 /// 标题：程序逻辑入口
 /// 功能：程序主逻辑
@@ -47,10 +48,6 @@ public class GameLogic : SingletonByMono<GameLogic>
             return m_IsLoadedAssets && MainData.getEnvGraph != null && MainData.getThingGraph != null;
         }, () =>
         {
-            //生成机器人实体
-            GenerateRobot();
-            //初始化相机
-            CameraControl.GetInstance.Init();
             //加载UI窗体
             UIManager.GetInstance.Show<UIFormMain>();
             //生成场景中所有房间和物品
@@ -78,6 +75,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         InterfaceDataCenter.GetInstance.InitMQTT();
     }
 
+    #region Event
     private void RegisterMsgEvent()
     {
         MsgEvent.RegisterMsgEvent(MsgEventName.GenerateSceneComplete, () =>
@@ -85,6 +83,15 @@ public class GameLogic : SingletonByMono<GameLogic>
             //原点偏移至场景左下角
             Vector2 originOffset = GetOriginOffset();
             staticModelRootNode.transform.position = new Vector3(originOffset.x, 0, originOffset.y);
+
+            //生成机器人实体
+            GenerateRobot();
+
+            //监听“门”碰撞事件
+            ListenerDoorCollEvent();
+
+            //初始化相机
+            CameraControl.GetInstance.Init();
 
             //缓存所有实体物品数据信息
             CacheItemDataInfo();
@@ -100,6 +107,16 @@ public class GameLogic : SingletonByMono<GameLogic>
             SendRoomInfoData(originOffset);
         });
     }
+
+    private void ListenerDoorCollEvent()
+    {
+        foreach (var item in GameObject.FindObjectsOfType<AnimDoor>())
+        {
+            item.CanListenerDoorColl = true;
+        }
+    } 
+    #endregion
+
     #region Generate
     private void GenerateEntity(Action generateCompleteCallback)
     {
@@ -165,24 +182,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             }
         });
     }
-
-    //private void Generate(List<RoomBaseInfo> roomBaseInfos, Action generateCompleteCallback)
-    //{
-    //    GenerateRoomData.GetInstance.GenerateRandomRoomInfoData(roomBaseInfos, (p, k) =>
-    //    {
-    //        if (p == null || k == null)
-    //        {
-    //            Debug.LogError("generage fail , again generate...");
-    //            GenerateScene();
-    //        }
-    //        else
-    //        {
-    //            GenerateRoomBorderModel.GetInstance.GenerateRoomBorder();
-    //            GenerateRoomItemModel.GetInstance.GenerateRoomItem(k, MainData.getThingGraph);
-    //            generateCompleteCallback?.Invoke();
-    //        }
-    //    });
-    //}
+    
 
     private void GenerateScene()
     {
@@ -195,15 +195,43 @@ public class GameLogic : SingletonByMono<GameLogic>
     }
 
 
+    #region Robot
     private void GenerateRobot()
     {
         GameObject robotEntity = GameObject.FindWithTag("Player");
+
         if (robotEntity == null)
         {
             GameObject robotRes = LoadAssetsByAddressable.GetInstance.GetEntityRes("RobotEntity", 0);
-            robotEntity = Instantiate(robotRes, new Vector3(3, 0, 3), Quaternion.identity);
+            robotEntity = Instantiate(robotRes);
         }
+        SetRobotPos(robotEntity);
     }
+
+    private void SetRobotPos(GameObject robot)
+    {
+        Vector3 targetPos = Vector3.zero;
+        List<BorderEntityData> livingRoomFloorPosArr = GenerateRoomData.GetInstance.listRoomBuilderInfo.FindAll((p) =>
+        {
+            return p.entityModelType == EntityModelType.Floor && p.listRoomType.Contains(RoomType.LivingRoom);
+        });
+        if (livingRoomFloorPosArr != null)
+        {
+            int randomValue = UnityEngine.Random.Range(0, livingRoomFloorPosArr.Count);
+            BorderEntityData livingRoomFloorPos = livingRoomFloorPosArr[randomValue];
+            if (livingRoomFloorPos != null)
+            {
+                Vector2 originOffset = GetOriginOffset();
+                targetPos = new Vector3(livingRoomFloorPos.pos.x + originOffset.x, 0, livingRoomFloorPos.pos.y + originOffset.y);
+            }
+        }
+        robot.GetComponent<NavMeshAgent>().enabled = false;
+        robot.transform.position = targetPos;
+        robot.GetComponent<NavMeshAgent>().enabled = true;
+    }
+    #endregion
+
+
     #endregion
 
     #region 缓存房间内实体信息

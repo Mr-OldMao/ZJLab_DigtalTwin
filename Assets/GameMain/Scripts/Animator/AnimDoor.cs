@@ -17,6 +17,13 @@ public class AnimDoor : MonoBehaviour
     private List<ListenerCollider> m_ListenerCollider1Arr = new List<ListenerCollider>();
 
     private NavMeshObstacle m_NavMeshObstacle;
+
+    public bool CanListenerDoorColl
+    {
+        get;
+        set;
+    } = false;
+
     public DoorState CurDoorState
     {
         get;
@@ -51,40 +58,52 @@ public class AnimDoor : MonoBehaviour
                 case "CollDown":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        Debug.Log("CollDown" + p.gameObject.tag);
-                        if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
+                        if (CanListenerDoorColl)
                         {
-                            PlayDoorAnim("OpenDoorUp", true);
+                            Debug.Log("CollDown" + p.gameObject.tag);
+                            if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
+                            {
+                                PlayDoorAnim("OpenDoorUp", true);
+                            } 
                         }
                     };
                     break;
                 case "CollUp":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        Debug.Log("CollUp" + p.gameObject.tag);
-                        if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
+                        if (CanListenerDoorColl)
                         {
-                            PlayDoorAnim("OpenDoorDown", true);
+                            Debug.Log("CollUp" + p.gameObject.tag);
+                            if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
+                            {
+                                PlayDoorAnim("OpenDoorDown", true);
+                            } 
                         }
                     };
                     break;
                 case "CollLeft":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        Debug.Log("CollLeft" + p.gameObject.tag);
-                        if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
+                        if (CanListenerDoorColl)
                         {
-                            PlayDoorAnim("OpenDoorRight", true);
+                            Debug.Log("CollLeft" + p.gameObject.tag);
+                            if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
+                            {
+                                PlayDoorAnim("OpenDoorRight", true);
+                            } 
                         }
                     };
                     break;
                 case "CollRight":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        Debug.Log("CollRight" + p.gameObject.tag);
-                        if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
+                        if (CanListenerDoorColl)
                         {
-                            PlayDoorAnim("OpenDoorLeft", true);
+                            Debug.Log("CollRight" + p.gameObject.tag);
+                            if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
+                            {
+                                PlayDoorAnim("OpenDoorLeft", true);
+                            } 
                         }
                     };
                     break;
