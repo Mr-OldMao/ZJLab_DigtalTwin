@@ -95,5 +95,8 @@ public class CameraControl : SingletonByMono<CameraControl>
     public void ClickCameraFree()
     {
         m_CameraFree?.gameObject.SetActive(!m_CameraFree.gameObject.activeSelf);
+
+        string des = m_CameraFree.gameObject.activeSelf ? "切换上帝视角" : "切换自由视角";
+        UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().TxtCameraFree.text = des;
     }
 }

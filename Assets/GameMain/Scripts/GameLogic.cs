@@ -184,7 +184,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     }
     
 
-    private void GenerateScene()
+    public void GenerateScene()
     {
         staticModelRootNode.transform.position = Vector3.zero;
         //生成场景中所有房间和物品
@@ -196,7 +196,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
 
     #region Robot
-    private void GenerateRobot()
+    public void GenerateRobot()
     {
         GameObject robotEntity = GameObject.FindWithTag("Player");
 

@@ -25,6 +25,12 @@ public class UIFormMain : UIFormBase
     private Image rectProgramStateGroup;
     [SerializeField]
     private Button btnCameraFree;
+    [SerializeField]
+    private Text txtCameraFree;
+    [SerializeField]
+    private Button btnRobotRelocation;
+    [SerializeField]
+    private Button btnRegenerateScene;
 
     public Button BtnStart { get => btnStart; set => btnStart = value; }
     public Button BtnStop { get => btnStop; set => btnStop = value; }
@@ -33,12 +39,21 @@ public class UIFormMain : UIFormBase
     public Image ImgBg { get => imgBg; set => imgBg = value; }
     public Image RectProgramStateGroup { get => rectProgramStateGroup; set => rectProgramStateGroup = value; }
     public Button BtnCameraFree { get => btnCameraFree; set => btnCameraFree = value; }
+    public Text TxtCameraFree { get => txtCameraFree; set => txtCameraFree = value; }
+    public Button BtnRobotRelocation { get => btnRobotRelocation; set => btnRobotRelocation = value; }
+    public Button BtnRegenerateScene { get => btnRegenerateScene; set => btnRegenerateScene = value; }
+
 
     protected override void Awake()
     {
         base.Awake();
     }
 
+    protected override void Start()
+    {
+        base.Start();
+        txtCameraFree.text = "切换自由视角";
+    }
 
     protected override void InitMapField()
     {
@@ -49,6 +64,9 @@ public class UIFormMain : UIFormBase
         imgBg = transform.Find<Image>("imgBg");
         rectProgramStateGroup = transform.Find<Image>("rectProgramStateGroup");
         btnCameraFree = transform.Find<Button>("btnCameraFree");
+        txtCameraFree = transform.Find<Text>("txtCameraFree");
+        btnRobotRelocation = transform.Find<Button>("btnRobotRelocation");
+        btnRegenerateScene = transform.Find<Button>("btnRegenerateScene");
     }
 
     protected override void RegisterUIEvnet()
@@ -72,6 +90,14 @@ public class UIFormMain : UIFormBase
         btnCameraFree.onClick.AddListenerCustom(() =>
         {
             CameraControl.GetInstance.ClickCameraFree();
+        });
+        btnRobotRelocation.onClick.AddListenerCustom(() =>
+        {
+            GameLogic.GetInstance.GenerateRobot();
+        });
+        btnRegenerateScene.onClick.AddListenerCustom(() =>
+        {
+            GameLogic.GetInstance.GenerateScene(); 
         });
     }
 }
