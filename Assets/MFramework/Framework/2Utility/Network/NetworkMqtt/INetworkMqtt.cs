@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace MFramework
 {
     /// <summary>
@@ -12,8 +8,8 @@ namespace MFramework
     /// </summary>
     public interface INetworkMqtt
     {
-        void Connect(string clientId);
-        void Connect(string clientId, string username, string password);
+        void Connect(string clientIP, int clientPort, string clientId);
+        void Connect(string clientIP, int clientPort, string clientId, string username, string password);
 
         void Subscribe(params string[] topics);
         void Subscribe(string[] topics, byte[] qosLevels);

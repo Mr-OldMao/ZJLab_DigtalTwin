@@ -3,11 +3,12 @@ using UnityEngine;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using uPLibrary.Networking.M2Mqtt;
 using System.Text;
-using static uPLibrary.Networking.M2Mqtt.MqttClient;
 using System.Net;
 
 namespace MFramework
 {
+    public delegate void MqttRecvMsgCallback(string topic, string msg);
+    public delegate void ConnSucCallback();
     /// <summary>
     /// 标题：Mqtt网络通信协议
     /// 功能：封装Mqtt常用功能，与代理连接、断开，发布消息，订阅主题，收发消息事件回调
@@ -22,18 +23,29 @@ namespace MFramework
         /// </summary>
         public List<string> listSubscribedTopics;
 
+        /// <summary>
+        /// 是否为webgl平台，web包真机打包需要为true，测试阶段可以选择false
+        /// </summary>
+        public bool IsWebgl
+        {
+            get; set;
+        } = false;
+
         public virtual void Init(string clientIP, int clientPort, string clientId, string username, string password)
         {
-            mqttClient = new MqttClient(IPAddress.Parse(clientIP), clientPort, false, null);
+            if (!IsWebgl)
+            {
+                mqttClient = new MqttClient(IPAddress.Parse(clientIP), clientPort, false, null);
+            }
             listSubscribedTopics = new List<string>();
-            Connect(clientId, username, password);
+            Connect(clientIP, clientPort, clientId, username, password);
         }
 
         #region 与代理连接
 
-        public void Connect(string clientId)
+        public void Connect(string clientIP, int clientPort, string clientId)
         {
-            Connect(clientId, null, null);
+            Connect(clientIP, clientPort, clientId, null, null);
         }
 
         /// <summary>
@@ -42,19 +54,25 @@ namespace MFramework
         /// <param name="clientId"></param>
         /// <param name="username"></param>
         /// <param name="password"></param>
-        public void Connect(string clientId, string username, string password)
+        public void Connect(string clientIP, int clientPort, string clientId, string username, string password)
         {
-            if (mqttClient == null)
+            if (IsWebgl)
             {
-                Debug.LogError("MQTT mqttClient is null");
-                return;
+                MqttWebglCenter.GetInstance.Connect(clientIP, clientPort, clientId, username, password);
             }
-            if (mqttClient.IsConnected)
+            else
             {
-                Debug.LogError("MQTT isConnected");
-                return;
+                if (mqttClient == null)
+                {
+                    return;
+                }
+                if (mqttClient.IsConnected)
+                {
+                    return;
+                }
+                mqttClient.Connect(clientId, username, password);
+                ConnSucCallbackHandle?.Invoke();
             }
-            mqttClient.Connect(clientId, username, password);
         }
 
         public virtual void DisConnect()
@@ -90,16 +108,24 @@ namespace MFramework
         /// <param name="msg"></param>
         public void Publish(string topic, byte[] msg)
         {
-            if (mqttClient == null)
-            {
-                Debug.LogError("MQTT mqttClient is null");
-                return;
-            }
             if (string.IsNullOrEmpty(topic))
             {
                 Debug.LogError("MQTT topic is null");
             }
-            mqttClient.Publish(topic, msg);
+            string msgStr = Encoding.UTF8.GetString(msg);
+            if (IsWebgl)
+            {
+                MqttWebglCenter.GetInstance.Publish(topic, msgStr);
+            }
+            else
+            {
+                if (mqttClient == null)
+                {
+                    Debug.LogError("MQTT mqttClient is null");
+                    return;
+                }
+                mqttClient.Publish(topic, msg);
+            }
         }
         #endregion
 
@@ -132,11 +158,6 @@ namespace MFramework
         /// <param name="qosLevels"></param>
         public void Subscribe(string[] topics, byte[] qosLevels)
         {
-            if (mqttClient == null)
-            {
-                Debug.LogError("MQTT mqttClient is null");
-                return;
-            }
             if (topics != null && topics.Length == 0)
             {
                 Debug.LogError("MQTT topics is null");
@@ -146,7 +167,20 @@ namespace MFramework
             {
                 if (!listSubscribedTopics.Contains(topic))
                 {
-                    mqttClient.Subscribe(new string[] { topic }, qosLevels);
+                    if (IsWebgl)
+                    {
+                        MqttWebglCenter.GetInstance.Subscribe(new string[] { topic });
+                    }
+                    else
+                    {
+                        if (mqttClient == null)
+                        {
+                            Debug.LogError("MQTT mqttClient is null");
+                            return;
+                        }
+                        mqttClient.Subscribe(new string[] { topic }, qosLevels);
+                    }
+                    listSubscribedTopics.Add(topic);
                 }
                 else
                 {
@@ -170,7 +204,15 @@ namespace MFramework
             {
                 if (!listSubscribedTopics.Contains(topic))
                 {
-                    mqttClient.Unsubscribe(new string[] { topic });
+                    if (IsWebgl)
+                    {
+                        MqttWebglCenter.GetInstance.Unsubscribe(new string[] { topic });
+                    }
+                    else
+                    {
+                        mqttClient.Unsubscribe(new string[] { topic });
+                    }
+                    listSubscribedTopics.Remove(topic);
                 }
                 else
                 {
@@ -187,66 +229,118 @@ namespace MFramework
         {
             return listSubscribedTopics;
         }
+
+        public ConnSucCallback ConnSucCallbackHandle;
+        public void AddConnectedSucEvent(ConnSucCallback connSucCallback)
+        {
+            ConnSucCallbackHandle += connSucCallback;
+        }
         #endregion
 
 
         #region 事件回调注册、注销
+
+        private MqttRecvMsgCallback m_RecvMsgCallback;
+
         /// <summary>
         /// 注册监听 收到消息回调
         /// </summary>
         /// <param name="handle"></param>
-        public void AddListener(MqttMsgPublishEventHandler handle)
+        public void AddListenerSubscribe(MqttRecvMsgCallback mqttRecvMsgCallback)
         {
-            mqttClient.MqttMsgPublishReceived += handle;
-        }
-        /// <summary>
-        /// 注销收到消息回调
-        /// </summary>
-        public void RemoveListener(MqttMsgPublishEventHandler handle)
-        {
-            mqttClient.MqttMsgPublishReceived -= handle;
-        }
-        /// <summary>
-        /// 注册监听 客户端订阅消息成功回调
-        /// </summary>
-        /// <param name="handle"></param>
-        public void AddListener(MqttMsgSubscribedEventHandler handle)
-        {
-            mqttClient.MqttMsgSubscribed += handle;
-        }
-        /// <summary>
-        /// 注销客户端订阅消息成功监听回调
-        /// </summary>
-        /// <param name="handle"></param>
-        public void RemoveListener(MqttMsgSubscribedEventHandler handle)
-        {
-            mqttClient.MqttMsgSubscribed -= handle;
+            if (IsWebgl)
+            {
+                MqttWebglCenter.GetInstance.AddListenerSubscribe(mqttRecvMsgCallback);
+            }
+            else
+            {
+                m_RecvMsgCallback += mqttRecvMsgCallback;
+                mqttClient.MqttMsgPublishReceived += (object sender, MqttMsgPublishEventArgs e) =>
+                {
+                    //Debug.Log("mqtt recv, topic:" + e.Topic + ",msg:" + Encoding.UTF8.GetString(e.Message));
+                    m_RecvMsgCallback?.Invoke(e.Topic, Encoding.UTF8.GetString(e.Message));
+                };
+            }
         }
 
-        public void AddListener(MqttMsgPublishedEventHandler handle)
+        /// <summary>
+        /// 注册监听 收到消息回调
+        /// </summary>
+        /// <param name="handle"></param>
+        public void RemoveListenerSubscribe(MqttRecvMsgCallback mqttRecvMsgCallback)
         {
-            mqttClient.MqttMsgPublished += handle;
+            if (IsWebgl)
+            {
+                MqttWebglCenter.GetInstance.RemoveListenerSubscribe(mqttRecvMsgCallback);
+            }
+            else
+            {
+                m_RecvMsgCallback -= mqttRecvMsgCallback;
+            }
         }
-        public void RemoveListener(MqttMsgPublishedEventHandler handle)
-        {
-            mqttClient.MqttMsgPublished -= handle;
-        }
-        public void AddListener(MqttMsgUnsubscribedEventHandler handle)
-        {
-            mqttClient.MqttMsgUnsubscribed += handle;
-        }
-        public void RemoveListener(MqttMsgUnsubscribedEventHandler handle)
-        {
-            mqttClient.MqttMsgUnsubscribed -= handle;
-        }
-        public void AddListener(MqttMsgDisconnectEventHandler handle)
-        {
-            mqttClient.MqttMsgDisconnected += handle;
-        }
-        public void RemoveListener(MqttMsgDisconnectEventHandler handle)
-        {
-            mqttClient.MqttMsgDisconnected -= handle;
-        }
+
+        ///// <summary>
+        ///// 注册监听 收到消息回调
+        ///// </summary>
+        ///// <param name="handle"></param>
+        //public void AddListener(MqttMsgPublishEventHandler handle)
+        //{
+        //    mqttClient.MqttMsgPublishReceived += handle;
+        //}
+
+
+
+        ///// <summary>
+        ///// 注销收到消息回调
+        ///// </summary>
+        //public void RemoveListener(MqttMsgPublishEventHandler handle)
+        //{
+        //    mqttClient.MqttMsgPublishReceived -= handle;
+        //}
+
+        ///// <summary>
+        ///// 注册监听 客户端订阅消息成功回调
+        ///// </summary>
+        ///// <param name="handle"></param>
+        //public void AddListener(MqttMsgSubscribedEventHandler handle)
+        //{
+        //    mqttClient.MqttMsgSubscribed += handle;
+        //}
+
+
+        ///// <summary>
+        ///// 注销客户端订阅消息成功监听回调
+        ///// </summary>
+        ///// <param name="handle"></param>
+        //public void RemoveListener(MqttMsgSubscribedEventHandler handle)
+        //{
+        //    mqttClient.MqttMsgSubscribed -= handle;
+        //}
+
+        //public void AddListener(MqttMsgPublishedEventHandler handle)
+        //{
+        //    mqttClient.MqttMsgPublished += handle;
+        //}
+        //public void RemoveListener(MqttMsgPublishedEventHandler handle)
+        //{
+        //    mqttClient.MqttMsgPublished -= handle;
+        //}
+        //public void AddListener(MqttMsgUnsubscribedEventHandler handle)
+        //{
+        //    mqttClient.MqttMsgUnsubscribed += handle;
+        //}
+        //public void RemoveListener(MqttMsgUnsubscribedEventHandler handle)
+        //{
+        //    mqttClient.MqttMsgUnsubscribed -= handle;
+        //}
+        //public void AddListener(MqttMsgDisconnectEventHandler handle)
+        //{
+        //    mqttClient.MqttMsgDisconnected += handle;
+        //}
+        //public void RemoveListener(MqttMsgDisconnectEventHandler handle)
+        //{
+        //    mqttClient.MqttMsgDisconnected -= handle;
+        //}
         #endregion
     }
 }

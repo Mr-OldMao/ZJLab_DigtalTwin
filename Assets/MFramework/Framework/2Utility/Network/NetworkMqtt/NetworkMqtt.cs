@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MFramework
@@ -13,7 +11,6 @@ namespace MFramework
     public class NetworkMqtt : AbNetworkMqtt<NetworkMqtt>
     {
         private bool m_IsInited = false;
-
         public NetworkMqtt Init(string clientIP, int clientPort, string clientId)
         {
             return Init(clientIP, clientPort, clientId, null, null);
@@ -30,7 +27,15 @@ namespace MFramework
             {
                 return this;
             }
-            base.Init(clientIP, clientPort, clientId, username, password);
+            Debug.Log("Init Mqtt , IsWebgl:" + IsWebgl);
+            if (IsWebgl)
+            {
+                MqttWebglCenter.GetInstance.Connect(clientIP, clientPort, clientId, username, password);
+            }
+            else
+            {
+                base.Init(clientIP, clientPort, clientId, username, password);
+            }
             m_IsInited = true;
             return this;
         }
@@ -40,7 +45,14 @@ namespace MFramework
         /// </summary>
         public override void DisConnect()
         {
-            base.DisConnect();
+            if (IsWebgl)
+            {
+                MqttWebglCenter.GetInstance.DisConnect();
+            }
+            else
+            {
+                base.DisConnect();
+            }
             m_IsInited = false;
         }
     }
