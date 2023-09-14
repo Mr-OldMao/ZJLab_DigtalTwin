@@ -34,8 +34,12 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     private const string TOPIC_SEND = "simulator/send";
     //发控制结果给服务器
     public const string TOPIC_RECV = "simulator/recv";
+
     //发送房间信息
     public const string TOPIC_ROOMINFODATA = "simulator/roomInfoData";
+    //引擎状态
+    public const string TOPIC_CHANGESTATE = "simulator/changeState";
+
     #region HTTP
     /// <summary>
     /// 缓存场景图，物体与房间的邻接关系
@@ -84,13 +88,19 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// </summary>
     /// <param name="id">仿真引擎实例的id号码</param>    
     /// <param name="state">仿真引擎状态标识</param>
-    public void ChangeProgramState(string id, ProgramState state)
+    public void ChangeProgramState(string id, ProgramState state, Action calllbackSuc = null, Action callbackFail = null)
     {
         string rawJsonStr = "{  \"id\":\"" + id + "\"  ,\"state\":\"" + state.ToString() + "\" }";
+        Debug.Log("改变仿真引擎状态 rawJsonStr:" + rawJsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_CHANGE_SIMULATOR_STATE, new Dictionary<string, string>(), (string jsonStr) =>
         {
             Debug.Log("改变仿真引擎状态 jsonStr:" + jsonStr);
-        }, null, rawJsonStr);
+            calllbackSuc?.Invoke();
+        }, null, rawJsonStr, (m, n) =>
+        {
+            Debug.Log("改变仿真引擎状态接口调用失败 m:" + m + ",n:" + n);
+            callbackFail?.Invoke();
+        });
     }
     #endregion
 
@@ -98,17 +108,17 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     #region MQTT
     public void InitMQTT()
     {
-        NetworkMqtt.GetInstance.IsWebgl = true;
+        //NetworkMqtt.GetInstance.IsWebgl = false;
 
         NetworkMqtt.GetInstance.AddConnectedSucEvent(() =>
         {
-            NetworkMqtt.GetInstance.Subscribe(TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_SEND, TOPIC_RECV, TOPIC_ROOMINFODATA);
+            NetworkMqtt.GetInstance.Subscribe(TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_SEND, TOPIC_RECV, TOPIC_ROOMINFODATA, TOPIC_CHANGESTATE);
         });
 
         //初始化并订阅主题tcp://10.5.24.28:1883
         NetworkMqtt.GetInstance.Init(new MqttConfig()
         {
-            clientIP = "10.5.24.28",
+            clientIP = "10.5.24.27",
             clientPort = NetworkMqtt.GetInstance.IsWebgl ? 8083 : 1883
         });
 
@@ -130,8 +140,15 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                         Debug.LogError("controlCommit is null");
                     }
                     break;
+
+                case TOPIC_CHANGESTATE:
+                    ChangeStateData changeStateData = JsonTool.GetInstance.JsonToObjectByLitJson<ChangeStateData>(msg);
+                    string id = changeStateData.id;
+                    ProgramState programState = (ProgramState)Enum.Parse(typeof(ProgramState), changeStateData.state);
+                    ChangeProgramState(id, programState);
+                    break;
                 default:
-                    Debug.LogError($"Other Topoc :{topic}，msg:{msg} ");
+                    Debug.Log($"Other Topoc :{topic}，msg:{msg} ");
                     break;
             }
         });
@@ -177,7 +194,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// 发送房间坐标位置信息
     /// </summary>
     /// <param name="controlResult"></param>
-    public void SendMQTTRoomInfoData(RoomInfoData  roomInfoData)
+    public void SendMQTTRoomInfoData(RoomInfoData roomInfoData)
     {
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(roomInfoData);
         NetworkMqtt.GetInstance.Publish(TOPIC_ROOMINFODATA, jsonStr);

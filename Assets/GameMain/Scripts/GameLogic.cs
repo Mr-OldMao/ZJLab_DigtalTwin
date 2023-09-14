@@ -227,9 +227,9 @@ public class GameLogic : SingletonByMono<GameLogic>
                 targetPos = new Vector3(livingRoomFloorPos.pos.x + originOffset.x, 0, livingRoomFloorPos.pos.y + originOffset.y);
             }
         }
-        robot.GetComponent<NavMeshAgent>().enabled = false;
+        robot?.gameObject.SetActive(false);
         robot.transform.position = targetPos;
-        robot.GetComponent<NavMeshAgent>().enabled = true;
+        robot?.gameObject.SetActive(true);
     }
     #endregion
 

@@ -44,6 +44,23 @@ public class GameLaunch : SingletonByMono<GameLaunch>
     }
     private void InitGameLogic()
     {
+       
+        switch (m_LaunchModel)
+        {
+            case LaunchModel.EditorModel:
+                NetworkMqtt.GetInstance.IsWebgl = false;
+                break;
+            case LaunchModel.BuilderModel:
+#if UNITY_WEBGL && !UNITY_EDITOR
+                NetworkMqtt.GetInstance.IsWebgl = true;
+#else
+                NetworkMqtt.GetInstance.IsWebgl = false;
+#endif
+                break;
+            default:
+                break;
+        }
+        Debug.Log("iswebgl:" + NetworkMqtt.GetInstance.IsWebgl);
         GameLogic.GetInstance.Init();
     }
 }
