@@ -1,10 +1,7 @@
 using MFramework;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-using uPLibrary.Networking.M2Mqtt;
-using uPLibrary.Networking.M2Mqtt.Messages;
 using static GetThingGraph;
 /// <summary>
 /// 标题：接口数据管理中心
@@ -101,22 +98,28 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     #region MQTT
     public void InitMQTT()
     {
+        NetworkMqtt.GetInstance.IsWebgl = true;
+
+        NetworkMqtt.GetInstance.AddConnectedSucEvent(() =>
+        {
+            NetworkMqtt.GetInstance.Subscribe(TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_SEND, TOPIC_RECV, TOPIC_ROOMINFODATA);
+        });
+
         //初始化并订阅主题tcp://10.5.24.28:1883
         NetworkMqtt.GetInstance.Init(new MqttConfig()
         {
             clientIP = "10.5.24.28",
-            clientPort = 1883
-        }).Subscribe(TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_SEND, TOPIC_RECV, TOPIC_ROOMINFODATA);
+            clientPort = NetworkMqtt.GetInstance.IsWebgl ? 8083 : 1883
+        });
+
         //监听消息回调
-        NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgPublishEventArgs e) =>
+        NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
         {
-            MqttClient mqttClient = sender as MqttClient;
-            string jsonStr = Encoding.UTF8.GetString(e.Message);
-            Debug.Log($"recv mqtt callback. topic：{e.Topic}， msg：{jsonStr}，ClientId：{mqttClient.ClientId}");
-            switch (e.Topic)
+            Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
+            switch (topic)
             {
                 case TOPIC_SEND:
-                    ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(jsonStr);
+                    ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
                     if (controlCommit != null)
                     {
                         MainData.controlCommit.Add(controlCommit);
@@ -128,14 +131,14 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     }
                     break;
                 default:
-                    Debug.LogError($"Other Topoc :{e.Topic}，msg:{jsonStr} ");
+                    Debug.LogError($"Other Topoc :{topic}，msg:{msg} ");
                     break;
             }
         });
-        NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgSubscribedEventArgs e) =>
-        {
-            Debug.Log($"客户端订阅消息成功回调 ，sender：{sender}");
-        });
+        //NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgSubscribedEventArgs e) =>
+        //{
+        //    Debug.Log($"客户端订阅消息成功回调 ，sender：{sender}");
+        //});
     }
 
     /// <summary>
