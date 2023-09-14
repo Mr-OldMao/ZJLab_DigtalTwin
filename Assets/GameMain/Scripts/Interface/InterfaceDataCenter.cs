@@ -61,7 +61,6 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public void CommitGetThingGraph(PostThingGraph items, Action callback)
     {
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
-        Debug.Log("提交场景图，物体与房间的邻接关系 jsonStr:" + jsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_POST_THING_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
         {
             Debug.Log("提交场景图，物体与房间关系回调 jsonStr:" + jsonStr);
@@ -105,7 +104,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //初始化并订阅主题tcp://10.5.24.28:1883
         NetworkMqtt.GetInstance.Init(new MqttConfig()
         {
-            clientIP = "10.5.24.27",
+            clientIP = "10.5.24.28",
             clientPort = 1883
         }).Subscribe(TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_SEND, TOPIC_RECV, TOPIC_ROOMINFODATA);
         //监听消息回调

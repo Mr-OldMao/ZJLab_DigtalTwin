@@ -60,6 +60,7 @@ namespace MFramework
         {
             //内部代码手动绑定
             //Add<UIFormTest>(new UIEntityConfigInfo(UIFormRootDir + "/Main/UIFormTest.prefab", UILayerType.Common));
+            Add<UIFormMain>(new UIEntityConfigInfo(UIFormRootDir + "/Main/UIFormMain.prefab", UILayerType.Common));
 
             //根据xml配置表手动绑定UI窗体信息
             BindUIFormInfoByXml();
@@ -88,7 +89,7 @@ namespace MFramework
                 {
                     UIFormBase uIForm = System.Activator.CreateInstance(type) as UIFormBase;
                     Add(type, new UIEntityConfigInfo(uIForm.AssetPath, uIForm.GetUIFormLayer));
-                //    Debug.Log("Auto Bind UIForm，Name：" + type.Name);
+                    Debug.Log("Auto Bind UIForm，Name：" + type.Name);
                 }
             }
         }

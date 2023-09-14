@@ -8,6 +8,7 @@ using static GetThingGraph;
 using static GenerateRoomBorderModel;
 using Unity.VisualScripting;
 using UnityEngine.AI;
+using System.Collections;
 /// <summary>
 /// 标题：程序逻辑入口
 /// 功能：程序主逻辑
@@ -41,6 +42,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         //接入网络通信
         NetworkHTTP();
         NetworkMQTT();
+
 
         //等待ab资源加载完毕，以及http接口获取的场景数据，解析生成场景实体
         UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() =>
@@ -114,7 +116,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         {
             item.CanListenerDoorColl = true;
         }
-    } 
+    }
     #endregion
 
     #region Generate
@@ -182,7 +184,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             }
         });
     }
-    
+
 
     public void GenerateScene()
     {
@@ -394,8 +396,9 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F5))
+        if (Input.GetKeyDown(KeyCode.F7))
         {
+            UIManager.GetInstance.Show<UIFormMain>();
             GenerateScene();
         }
 
@@ -406,6 +409,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         if (Input.GetKeyDown(KeyCode.F4))
         {
+            NetworkMqtt.GetInstance.Publish("TopicTest", "msg from unity " + System.DateTime.Now);
             NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_RECV, "msg from unity " + System.DateTime.Now);
         }
 
