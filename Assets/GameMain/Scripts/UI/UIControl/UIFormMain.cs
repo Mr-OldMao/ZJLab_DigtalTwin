@@ -82,10 +82,12 @@ public class UIFormMain : UIFormBase
         btnPause.onClick.AddListenerCustom(() =>
         {
             InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.pause);
+            Time.timeScale = 0;
         });
         btnResume.onClick.AddListenerCustom(() =>
         {
             InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.resume);
+            Time.timeScale = 1;
         });
         btnCameraFree.onClick.AddListenerCustom(() =>
         {
@@ -97,7 +99,7 @@ public class UIFormMain : UIFormBase
         });
         btnRegenerateScene.onClick.AddListenerCustom(() =>
         {
-            GameLogic.GetInstance.GenerateScene(); 
+            GameLogic.GetInstance.GenerateScene();
         });
     }
 }
