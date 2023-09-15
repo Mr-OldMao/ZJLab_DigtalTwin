@@ -90,7 +90,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             GenerateRobot();
 
             //监听“门”碰撞事件
-            ListenerDoorCollEvent();
+            ListenerDoorCollEvent(true);
 
             //初始化相机
             CameraControl.GetInstance.Init();
@@ -107,14 +107,16 @@ public class GameLogic : SingletonByMono<GameLogic>
 
             //提交场景图布局，房间与房间位置关系
             SendRoomInfoData(originOffset);
+
+
         });
     }
 
-    private void ListenerDoorCollEvent()
+    private void ListenerDoorCollEvent(bool canListener)
     {
         foreach (var item in GameObject.FindObjectsOfType<AnimDoor>())
         {
-            item.CanListenerDoorColl = true;
+            item.CanListenerDoorColl = canListener;
         }
     }
     #endregion
@@ -189,6 +191,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     public void GenerateScene()
     {
         staticModelRootNode.transform.position = Vector3.zero;
+        ListenerDoorCollEvent(false);
         //生成场景中所有房间和物品
         GenerateEntity(() =>
         {
@@ -201,6 +204,10 @@ public class GameLogic : SingletonByMono<GameLogic>
     public void GenerateRobot()
     {
         GameObject robotEntity = GameObject.FindWithTag("Player");
+        if (robotEntity != null)
+        {
+            Destroy(robotEntity);
+        }
 
         if (robotEntity == null)
         {
@@ -230,6 +237,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         robot?.gameObject.SetActive(false);
         robot.transform.position = targetPos;
         robot?.gameObject.SetActive(true);
+    
     }
     #endregion
 
@@ -385,6 +393,8 @@ public class GameLogic : SingletonByMono<GameLogic>
         }
         InterfaceDataCenter.GetInstance.SendMQTTRoomInfoData(roomInfoData);
     }
+
+    
     #endregion
 
 

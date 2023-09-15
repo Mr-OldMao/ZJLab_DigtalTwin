@@ -60,9 +60,10 @@ public class AnimDoor : MonoBehaviour
                     {
                         if (CanListenerDoorColl)
                         {
-                            Debug.Log("CollDown" + p.gameObject.tag);
+                            //Debug.Log("CollDown" + p.gameObject.tag);
                             if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
                             {
+                                Debug.Log("CollDown" + p.gameObject.tag);
                                 PlayDoorAnim("OpenDoorUp", true);
                             } 
                         }
@@ -73,11 +74,12 @@ public class AnimDoor : MonoBehaviour
                     {
                         if (CanListenerDoorColl)
                         {
-                            Debug.Log("CollUp" + p.gameObject.tag);
+                            //Debug.Log("CollUp" + p.gameObject.tag);
                             if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
                             {
+                                Debug.Log("CollUp" + p.gameObject.tag);
                                 PlayDoorAnim("OpenDoorDown", true);
-                            } 
+                            }
                         }
                     };
                     break;
@@ -86,11 +88,12 @@ public class AnimDoor : MonoBehaviour
                     {
                         if (CanListenerDoorColl)
                         {
-                            Debug.Log("CollLeft" + p.gameObject.tag);
+                            //Debug.Log("CollLeft" + p.gameObject.tag);
                             if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
                             {
+                                Debug.Log("CollLeft" + p.gameObject.tag);
                                 PlayDoorAnim("OpenDoorRight", true);
-                            } 
+                            }
                         }
                     };
                     break;
@@ -99,9 +102,10 @@ public class AnimDoor : MonoBehaviour
                     {
                         if (CanListenerDoorColl)
                         {
-                            Debug.Log("CollRight" + p.gameObject.tag);
+                            //Debug.Log("CollRight" + p.gameObject.tag);
                             if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
                             {
+                                Debug.Log("CollRight" + p.gameObject.tag);
                                 PlayDoorAnim("OpenDoorLeft", true);
                             } 
                         }
