@@ -11,7 +11,7 @@ using static GetThingGraph;
 /// </summary>
 public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 {
-    private const string URL_SUBROOT = "http://10.101.80.21:4006/";
+    private const string URL_SUBROOT = "http://10.11.81.241:4006/";
 
     //获取场景图，物体与房间的邻接关系
     private const string URL_GET_THING_GRAPH = URL_SUBROOT + "simulator/getThingGraph";
@@ -48,6 +48,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public void CacheGetThingGraph(string id)
     {
         string rawJsonStr = "{\"id\":\"" + id + "\"}";
+        Debug.Log("缓存场景图，物体与房间的邻接关系 " + rawJsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_GET_THING_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
         {
             MainData.getThingGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetThingGraph>(jsonStr);
@@ -61,12 +62,16 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// <param name="items"></param>
     public void CommitGetThingGraph(PostThingGraph items, Action callback)
     {
-        string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
+        string rawJsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
+        Debug.Log("提交场景图，物体与房间的邻接关系 " + rawJsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_POST_THING_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
         {
             Debug.Log("提交场景图，物体与房间关系回调 jsonStr:" + jsonStr);
             callback?.Invoke();
-        }, null, jsonStr);
+        }, null, rawJsonStr, (m, n) =>
+        {
+            Debug.LogError("提交场景图失败，m:" + m + ",n:" + n);
+        });
     }
 
     /// <summary>
@@ -76,6 +81,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public void CacheGetEnvGraph(string id)
     {
         string rawJsonStr = "{\"id\":\"" + id + "\"}";
+        Debug.Log("缓存环境场景图,房间与房间的邻接关系 " + rawJsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_GET_ENV_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
         {
             MainData.getEnvGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetEnvGraph>(jsonStr);
@@ -158,14 +164,27 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //});
     }
 
+
+    ///// <summary>
+    ///// 更新全局场景图
+    ///// </summary>
+    ///// <param name="items"></param>
+    //public void SendMQTTUpdateScenes(List<GetThingGraph_data_items> items)
+    //{
+    //    string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
+    //    NetworkMqtt.GetInstance.Publish(TOPIC_GLOBAL, jsonStr);
+    //    Debug.Log("更新全局场景图 jsonStr:" + jsonStr);
+    //}
+
     /// <summary>
     /// 更新全局场景图
     /// </summary>
     /// <param name="items"></param>
-    public void SendMQTTUpdateScenes(GetThingGraph_data_items[] items)
+    public void SendMQTTUpdateScenes(PostThingGraph items)
     {
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
         NetworkMqtt.GetInstance.Publish(TOPIC_GLOBAL, jsonStr);
+        //Debug.Log("更新全局场景图 jsonStr:" + jsonStr);
     }
 
     /// <summary>

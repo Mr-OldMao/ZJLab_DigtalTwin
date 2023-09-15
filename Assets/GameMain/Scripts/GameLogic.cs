@@ -19,6 +19,8 @@ public class GameLogic : SingletonByMono<GameLogic>
 {
     private bool m_IsLoadedAssets = false;
     public GameObject staticModelRootNode = null;
+    private Coroutine m_CoroutineUpadeteSceneEntityInfo = null;
+
     public void Init()
     {
         Debug.Log("Init GameLogic");
@@ -108,7 +110,13 @@ public class GameLogic : SingletonByMono<GameLogic>
             //提交场景图布局，房间与房间位置关系
             SendRoomInfoData(originOffset);
 
-
+            //提交场景实体信息
+            if (m_CoroutineUpadeteSceneEntityInfo != null)
+            {
+                StopCoroutine(m_CoroutineUpadeteSceneEntityInfo);
+                m_CoroutineUpadeteSceneEntityInfo = null;
+            }
+            m_CoroutineUpadeteSceneEntityInfo = StartCoroutine(UpadeteSceneEntityInfo());
         });
     }
 
@@ -394,7 +402,30 @@ public class GameLogic : SingletonByMono<GameLogic>
         InterfaceDataCenter.GetInstance.SendMQTTRoomInfoData(roomInfoData);
     }
 
-    
+    /// <summary>
+    /// 更新全局场景图实体信息
+    /// </summary>
+    IEnumerator UpadeteSceneEntityInfo()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1f);
+
+            InterfaceDataCenter.GetInstance.SendMQTTUpdateScenes(MainData.CacheItemsInfo);
+        }
+    }
+    /// <summary>
+    /// 更新机器人第一视角相机视野内场景实体信息
+    /// </summary>
+    IEnumerator UpadeteRobotFirstCameraEntityInfo()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1f);
+            GetThingGraph_data_items[] getThingGraph_Data_Items = new GetThingGraph_data_items[] { };
+            InterfaceDataCenter.GetInstance.SendMQTTUpdateCamera(getThingGraph_Data_Items);
+        }
+    }
     #endregion
 
 
