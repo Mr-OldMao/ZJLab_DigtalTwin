@@ -70,5 +70,6 @@ crashlytics-build.properties
 #机器人动画包，包体过大忽略版本控制，需手动添加到项目中
 /Assets/3rd/AmplifyAnimationPack
 
+/_PrivateFolder
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*

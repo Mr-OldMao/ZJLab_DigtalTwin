@@ -131,7 +131,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //监听消息回调
         NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
         {
-            Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
+            //Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
             switch (topic)
             {
                 case TOPIC_SEND:
@@ -152,6 +152,9 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     string id = changeStateData.id;
                     ProgramState programState = (ProgramState)Enum.Parse(typeof(ProgramState), changeStateData.state);
                     ChangeProgramState(id, programState);
+                    break;
+                case TOPIC_GLOBAL:
+                    Debug.Log($"Topoc :{TOPIC_GLOBAL}");
                     break;
                 default:
                     Debug.Log($"Other Topoc :{topic}，msg:{msg} ");
