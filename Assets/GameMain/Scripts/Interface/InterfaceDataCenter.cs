@@ -11,7 +11,7 @@ using static GetThingGraph;
 /// </summary>
 public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 {
-    private const string URL_SUBROOT = "http://10.11.81.241:4006/";
+    private const string URL_SUBROOT = "http://10.11.81.241:4006/";  //服务器10.101.80.21   本机10.11.81.241
 
     //获取场景图，物体与房间的邻接关系
     private const string URL_GET_THING_GRAPH = URL_SUBROOT + "simulator/getThingGraph";
@@ -124,7 +124,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //初始化并订阅主题tcp://10.5.24.28:1883
         NetworkMqtt.GetInstance.Init(new MqttConfig()
         {
-            clientIP = "10.5.24.27",
+            clientIP = "10.5.24.28",
             clientPort = NetworkMqtt.GetInstance.IsWebgl ? 8083 : 1883
         });
 
