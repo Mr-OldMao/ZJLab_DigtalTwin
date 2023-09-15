@@ -60,13 +60,14 @@ namespace MFramework
         {
             //内部代码手动绑定
             //Add<UIFormTest>(new UIEntityConfigInfo(UIFormRootDir + "/Main/UIFormTest.prefab", UILayerType.Common));
-            //Add<UIFormMain>(new UIEntityConfigInfo(UIFormRootDir + "/Main/UIFormMain.prefab", UILayerType.Common));
+            Add<UIFormMain>(new UIEntityConfigInfo(UIFormRootDir + "/Main/UIFormMain.prefab", UILayerType.Common));
+            Add<UIFormCameraHint>(new UIEntityConfigInfo(UIFormRootDir + "/Main/UIFormCameraHint.prefab", UILayerType.Common));
 
             //根据xml配置表手动绑定UI窗体信息
             BindUIFormInfoByXml();
 
-            //自动绑定UI窗体信息
-            AutoBindUIFormInfo();
+            //自动绑定UI窗体信息，实测Webgl平台无法自动绑定Ui窗体信息，需要手动绑定
+            //AutoBindUIFormInfo();
         }
 
         /// <summary>
