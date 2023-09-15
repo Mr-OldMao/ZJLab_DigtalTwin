@@ -211,12 +211,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     #region Robot
     public void GenerateRobot()
     {
-        GameObject robotEntity = GameObject.FindWithTag("Player");
-        if (robotEntity != null)
-        {
-            Destroy(robotEntity);
-        }
-
+        GameObject robotEntity = GameObject.FindObjectOfType<AIRobotMove>()?.gameObject;
         if (robotEntity == null)
         {
             GameObject robotRes = LoadAssetsByAddressable.GetInstance.GetEntityRes("RobotEntity", 0);
@@ -239,13 +234,13 @@ public class GameLogic : SingletonByMono<GameLogic>
             if (livingRoomFloorPos != null)
             {
                 Vector2 originOffset = GetOriginOffset();
-                targetPos = new Vector3(livingRoomFloorPos.pos.x + originOffset.x, 0, livingRoomFloorPos.pos.y + originOffset.y);
+                targetPos = new Vector3(livingRoomFloorPos.pos.x + originOffset.x + 0.5f, 0, livingRoomFloorPos.pos.y + originOffset.y + 0.5f);
             }
         }
         robot?.gameObject.SetActive(false);
         robot.transform.position = targetPos;
+        //robot.transform.Find("MeshContainer").transform.localPosition = Vector3.zero;
         robot?.gameObject.SetActive(true);
-    
     }
     #endregion
 

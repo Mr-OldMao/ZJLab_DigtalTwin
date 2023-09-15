@@ -140,7 +140,7 @@ public class CameraControl : SingletonByMono<CameraControl>
     {
         int res = 0;
         Camera camera = GetCameraEntity(cameraType);
-        if (camera.gameObject.activeSelf)
+        if (camera?.gameObject != null && camera.gameObject.activeSelf)
         {
             Rect cameraRect = camera.rect;
             if (cameraRect.x == 0 && cameraRect.y == 0 && cameraRect.width == 1 && cameraRect.height == 1)
