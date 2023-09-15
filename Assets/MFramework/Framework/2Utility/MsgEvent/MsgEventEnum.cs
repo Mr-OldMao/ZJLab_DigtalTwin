@@ -17,6 +17,11 @@ public enum MsgEventName
     GenerateSceneComplete,
 
     /// <summary>
+    /// 切换相机事件
+    /// </summary>
+    ChangeCamera,
+
+    /// <summary>
     /// HTTP请求成功
     /// </summary>
     HttpRequestSucceed,

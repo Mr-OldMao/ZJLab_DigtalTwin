@@ -20,7 +20,7 @@ namespace MFramework
         /// <summary>
         /// UIForm预设实体根目录
         /// </summary>
-        public const string UIFormRootDir = "Assets/GameMain/UI/UIForms";
+        public const string UIFormRootDir = "Assets/GameMain/AB/Prefab/UI/UIForms";
 
         /// <summary>
         /// UI窗体实体映射表   key-mono脚本名 value-UI实体信息路径
@@ -60,7 +60,7 @@ namespace MFramework
         {
             //内部代码手动绑定
             //Add<UIFormTest>(new UIEntityConfigInfo(UIFormRootDir + "/Main/UIFormTest.prefab", UILayerType.Common));
-            Add<UIFormMain>(new UIEntityConfigInfo(UIFormRootDir + "/Main/UIFormMain.prefab", UILayerType.Common));
+            //Add<UIFormMain>(new UIEntityConfigInfo(UIFormRootDir + "/Main/UIFormMain.prefab", UILayerType.Common));
 
             //根据xml配置表手动绑定UI窗体信息
             BindUIFormInfoByXml();

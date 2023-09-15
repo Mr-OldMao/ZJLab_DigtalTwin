@@ -63,6 +63,8 @@ public class CameraControl : SingletonByMono<CameraControl>
             { CameraType.Three, m_CameraThree},
             { CameraType.Free , m_CameraFree}
         };
+        UIManager.GetInstance.Show<UIFormCameraHint>();
+        MsgEvent.SendMsg(MsgEventName.ChangeCamera);
     }
 
     private void Update()
@@ -89,14 +91,70 @@ public class CameraControl : SingletonByMono<CameraControl>
         m_CameraArr[nextCamera].rect = curCameraRect;
 
         CurMainCamera = nextCamera;
+        MsgEvent.SendMsg(MsgEventName.ChangeCamera);
     }
 
-
+    //缓存切换至自由视角前的主摄像机
+    private CameraType beforeMainCamera;
     public void ClickCameraFree()
     {
+        //if (CurMainCamera != CameraType.Free)
+        //{
+        //    beforeMainCamera = CurMainCamera;
+        //}
         m_CameraFree?.gameObject.SetActive(!m_CameraFree.gameObject.activeSelf);
-
-        string des = m_CameraFree.gameObject.activeSelf ? "切换上帝视角" : "切换自由视角";
+        //CurMainCamera = m_CameraFree.gameObject.activeSelf ? CameraType.Free : beforeMainCamera;
+        string des = m_CameraFree.gameObject.activeSelf ? "隐藏自由视角" : "显示自由视角";
         UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().TxtCameraFree.text = des;
+
+        MsgEvent.SendMsg(MsgEventName.ChangeCamera);
+    }
+
+    public Camera GetCameraEntity(CameraType cameraType)
+    {
+        Camera res = null;
+        switch (cameraType)
+        {
+            case CameraType.First:
+                res = m_CameraFirst;
+                break;
+            case CameraType.Three:
+                res = m_CameraThree;
+
+                break;
+            case CameraType.Top:
+                res = m_CameraTop;
+                break;
+            case CameraType.Free:
+                res = m_CameraFree;
+                break;
+        }
+        return res;
+    }
+
+    /// <summary>
+    /// 获取当前摄像机所在屏幕上的位置
+    /// </summary>
+    /// <returns>0不在屏幕上，1-主屏幕，2-右上角，3-右下角</returns>
+    public int GetCameraLocation(CameraType cameraType)
+    {
+        int res = 0;
+        Camera camera = GetCameraEntity(cameraType);
+        if (camera.gameObject.activeSelf)
+        {
+            Rect cameraRect = camera.rect;
+            if (cameraRect.x == 0 && cameraRect.y == 0 && cameraRect.width == 1 && cameraRect.height == 1)
+            {
+                res = 1;
+            }else if (cameraRect.x == 0.7f && cameraRect.y == 0.7f && cameraRect.width == 1 && cameraRect.height == 1)
+            {
+                res = 2;
+            }
+            else if (cameraRect.x == 0.7f && cameraRect.y == 0 && cameraRect.width == 0.3f && cameraRect.height == 0.3f)
+            {
+                res = 3;
+            }
+        }
+        return res;
     }
 }

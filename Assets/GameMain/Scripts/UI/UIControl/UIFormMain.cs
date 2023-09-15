@@ -9,7 +9,7 @@ using MFramework;
 public class UIFormMain : UIFormBase
 {
     public override UILayerType GetUIFormLayer { get => UILayerType.Common; protected set => _ = UILayerType.Common; }
-    public override string AssetPath { get => AssetPathRootDir + "/Main/UIFormMain.prefab"; protected set => _ = AssetPathRootDir + "/Main/UIFormMain.prefab"; }
+    public override string AssetPath { get => AssetPathRootDir + "/UIFormMain.prefab"; protected set => _ = AssetPathRootDir + "/UIFormMain.prefab"; }
 
     [SerializeField]
     private Button btnStart;
