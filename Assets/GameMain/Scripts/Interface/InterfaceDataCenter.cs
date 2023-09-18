@@ -11,7 +11,7 @@ using static GetThingGraph;
 /// </summary>
 public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 {
-    private const string URL_SUBROOT = "http://10.11.81.241:4006/";  //服务器10.101.80.21   本机10.11.81.241
+    private const string URL_SUBROOT = "http://10.101.80.21:4006/";  //服务器10.101.80.21   本机10.11.81.241
 
     //获取场景图，物体与房间的邻接关系
     private const string URL_GET_THING_GRAPH = URL_SUBROOT + "simulator/getThingGraph";

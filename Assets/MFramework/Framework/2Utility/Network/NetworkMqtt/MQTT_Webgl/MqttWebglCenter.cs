@@ -21,7 +21,6 @@ public class MqttWebglCenter : SingletonByMono<MqttWebglCenter>
     [DllImport("__Internal")]
     private static extern void Jslib_Disconnect();
 
-    //public delegate void MqttRecvMsgCallback(string topic, string msg);
     private MqttRecvMsgCallback m_RecvMsgCallback;
 
     public void Connect(string clientIP, int clientPort, string clientId, string username, string password, string destination = "Unity_Test_Destination")
@@ -103,7 +102,9 @@ public class MqttWebglCenter : SingletonByMono<MqttWebglCenter>
         m_RecvMsgCallback?.Invoke(topic, msg);
     }
 
-   
+    /// <summary>
+    /// mqtt连接成功后回调
+    /// </summary>
     public void ConnSuc()
     {
         Debug.Log("[Unity] ConnSuc");

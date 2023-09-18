@@ -514,7 +514,7 @@ GameObject:
   - component: {fileID: 1181968636}
   - component: {fileID: 1181968637}
   m_Layer: 0
-  m_Name: UnityObjectForWebglMsg
+  m_Name: '[UnityObjectForWebglMsg]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
