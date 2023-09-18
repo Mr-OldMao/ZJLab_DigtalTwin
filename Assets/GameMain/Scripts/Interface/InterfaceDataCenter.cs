@@ -11,19 +11,20 @@ using static GetThingGraph;
 /// </summary>
 public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 {
-    private const string URL_SUBROOT = "http://10.101.80.21:4006/";  //服务器10.101.80.21   本机10.11.81.241
+    //服务器10.101.80.21   本机10.11.81.241
+    private static string URL_SUBROOT = "http://" + MainData.ConfigData?.HttpConfig.IP + ":" + MainData.ConfigData?.HttpConfig.Port + "/";//"http://10.101.80.21:4006/";
 
     //获取场景图，物体与房间的邻接关系
-    private const string URL_GET_THING_GRAPH = URL_SUBROOT + "simulator/getThingGraph";
+    private static string URL_GET_THING_GRAPH = URL_SUBROOT + "simulator/getThingGraph";
 
     //提交场景图，物体与房间的邻接关系
-    private const string URL_POST_THING_GRAPH = URL_SUBROOT + "simulator/postThingGraph";
+    private static string URL_POST_THING_GRAPH = URL_SUBROOT + "simulator/postThingGraph";
 
     //获取环境场景图,房间与房间的邻接关系
-    private const string URL_GET_ENV_GRAPH = URL_SUBROOT + "simulator/getEnvGraph";
+    private static string URL_GET_ENV_GRAPH = URL_SUBROOT + "simulator/getEnvGraph";
 
     //改变仿真引擎状态
-    private const string URL_CHANGE_SIMULATOR_STATE = URL_SUBROOT + "simulator/changeSimulatorState";
+    private static string URL_CHANGE_SIMULATOR_STATE = URL_SUBROOT + "simulator/changeSimulatorState";
 
     /*MQTT*/
     //更新全局场景图
@@ -124,7 +125,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //初始化并订阅主题tcp://10.5.24.28:1883
         NetworkMqtt.GetInstance.Init(new MqttConfig()
         {
-            clientIP = "10.5.24.28",
+            clientIP = MainData.ConfigData ?.MqttConfig.ClientIP, //"10.5.24.28",
             clientPort = NetworkMqtt.GetInstance.IsWebgl ? 8083 : 1883
         });
 

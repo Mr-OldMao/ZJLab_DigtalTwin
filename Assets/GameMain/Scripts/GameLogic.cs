@@ -29,6 +29,8 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     private void EnterMainScene()
     {
+        new ReadConfigFile();
+
         CreateRootNode();
 
         //注册消息事件
