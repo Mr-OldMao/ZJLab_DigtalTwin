@@ -90,7 +90,7 @@ public class MqttWebglCenter : SingletonByMono<MqttWebglCenter>
     }
 
     /// <summary>
-    /// 接收订阅的消息，为外部h5提供api,晚点测试使用private能否调用
+    /// 接收订阅的消息，为外部h5提供api
     /// </summary>
     /// <param name="topic"></param>
     /// <param name="msg"></param>
@@ -98,7 +98,7 @@ public class MqttWebglCenter : SingletonByMono<MqttWebglCenter>
     {
         string topic = jsonStr.Split('|')[0];
         string msg = jsonStr.Split('|')[1];
-        Debug.Log("[Unity] RecvMsg，topic：" + topic + "，msg：" + msg);
+        //Debug.Log("[Unity] RecvMsg，topic：" + topic + "，msg：" + msg);
         m_RecvMsgCallback?.Invoke(topic, msg);
     }
 
@@ -107,7 +107,7 @@ public class MqttWebglCenter : SingletonByMono<MqttWebglCenter>
     /// </summary>
     public void ConnSuc()
     {
-        Debug.Log("[Unity] ConnSuc");
+        //Debug.Log("[Unity] ConnSuc");
         NetworkMqtt.GetInstance. ConnSucCallbackHandle?.Invoke();
     }
 }

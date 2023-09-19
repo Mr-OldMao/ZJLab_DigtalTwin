@@ -1,5 +1,6 @@
 using UnityEngine;
 using MFramework;
+using System;
 /// <summary>
 /// 标题：读取配置文件
 /// 功能：
@@ -8,15 +9,18 @@ using MFramework;
 /// </summary>
 public class ReadConfigFile
 {
-    public ReadConfigFile()
+    public ReadConfigFile(Action actionCompleteCallback)
     {
-        Read();
+        Read(actionCompleteCallback);
     }
 
-    private void Read()
+    private void Read(Action actionCompleteCallback)
     {
         FileIOTxt fileIOTxt = new FileIOTxt(Application.streamingAssetsPath, "Config.json");
-        string configJson = fileIOTxt.Read();
-        MainData.ConfigData = JsonTool.GetInstance.JsonToObjectByLitJson<ConfigData>(configJson);
+        fileIOTxt.ReadWebgl<string>((configJson) =>
+       {
+           MainData.ConfigData = JsonTool.GetInstance.JsonToObjectByLitJson<ConfigData>(configJson);
+           actionCompleteCallback?.Invoke();
+       });
     }
 }

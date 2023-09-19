@@ -29,8 +29,6 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     private void EnterMainScene()
     {
-        new ReadConfigFile();
-
         CreateRootNode();
 
         //注册消息事件
@@ -43,11 +41,13 @@ public class GameLogic : SingletonByMono<GameLogic>
             m_IsLoadedAssets = true;
         });
 
-        //接入网络通信
-        NetworkHTTP();
-        NetworkMQTT();
-
-
+        new ReadConfigFile(() =>
+        {
+            //接入网络通信
+            NetworkHTTP();
+            NetworkMQTT();
+        });
+        
         //等待ab资源加载完毕，以及http接口获取的场景数据，解析生成场景实体
         UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() =>
         {

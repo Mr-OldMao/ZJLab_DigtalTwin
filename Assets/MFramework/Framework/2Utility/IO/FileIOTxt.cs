@@ -1,5 +1,9 @@
+using System;
+using System.Collections;
 using System.IO;
 using System.Text;
+using UnityEngine.Networking;
+
 namespace MFramework
 {
     /// <summary>
@@ -36,6 +40,11 @@ namespace MFramework
             //res = Encoding.UTF8.GetString(bytes2);
             //Debug.Log("TAB3 " + res);
             return res;
+        }
+
+        public void ReadWebgl<T>(Action<T> downSucCallback, Action downFailCallback = null) where T : class
+        {
+            DownloadAsset.GetInstance.DownLoadAssetsByURL<T>(filePath, downSucCallback, downFailCallback);
         }
 
         public override void Write(string content)
