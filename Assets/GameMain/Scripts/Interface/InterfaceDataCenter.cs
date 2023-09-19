@@ -152,7 +152,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     ChangeStateData changeStateData = JsonTool.GetInstance.JsonToObjectByLitJson<ChangeStateData>(msg);
                     string id = changeStateData.id;
                     ProgramState programState = (ProgramState)Enum.Parse(typeof(ProgramState), changeStateData.state);
-                    ChangeProgramState(id, programState);
+                    //ChangeProgramState(id, programState);
+                    UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().OnClickStateBtn(programState, id);
                     break;
                 case TOPIC_GLOBAL:
                     Debug.Log($"Topoc :{TOPIC_GLOBAL}");

@@ -73,21 +73,21 @@ public class UIFormMain : UIFormBase
     {
         BtnStart.onClick.AddListenerCustom(() =>
         {
-            InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.start);
+            OnClickStateBtn(ProgramState.start);
         });
         btnStop.onClick.AddListenerCustom(() =>
         {
-            InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.stop);
+            OnClickStateBtn(ProgramState.stop);
         });
         btnPause.onClick.AddListenerCustom(() =>
         {
-            InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.pause);
-            Time.timeScale = 0;
+            OnClickStateBtn(ProgramState.pause);
+
         });
         btnResume.onClick.AddListenerCustom(() =>
         {
-            InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.resume);
-            Time.timeScale = 1;
+            OnClickStateBtn(ProgramState.resume);
+
         });
         btnCameraFree.onClick.AddListenerCustom(() =>
         {
@@ -101,5 +101,27 @@ public class UIFormMain : UIFormBase
         {
             GameLogic.GetInstance.GenerateScene();
         });
+    }
+
+    public void OnClickStateBtn(ProgramState programState,string id = "")
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            id = MainData.ID;
+        }
+        InterfaceDataCenter.GetInstance.ChangeProgramState(id, programState);
+        switch (programState)
+        {
+            case ProgramState.start:
+                break;
+            case ProgramState.pause:
+                Time.timeScale = 0;
+                break;
+            case ProgramState.resume:
+                Time.timeScale = 1;
+                break;
+            case ProgramState.stop:
+                break;
+        }
     }
 }
