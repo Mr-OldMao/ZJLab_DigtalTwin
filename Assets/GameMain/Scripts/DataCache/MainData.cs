@@ -31,9 +31,18 @@ public class MainData
     public static GetEnvGraph getEnvGraph { get; set; }
 
     /// <summary>
-    /// 缓存生成的物品实体信息，发松到服务端
+    /// 缓存整个场景 物品实体信息
     /// </summary>
-    public static PostThingGraph CacheItemsInfo { get; set; }
+    public static PostThingGraph CacheSceneItemsInfo { get; set; }
+    /// <summary>
+    /// 缓存摄像机视野范围内的 物品实体信息
+    /// </summary>
+    public static PostThingGraph CacheCameraItemsInfo { get; set; }
+    /// <summary>
+    /// 缓存场景中所有实体
+    /// </summary>
+    public static Dictionary<string,GameObject> CacheItemsEntity = new Dictionary<string,GameObject>(); 
+
     /// <summary>
     /// 指令控制数据
     /// </summary>

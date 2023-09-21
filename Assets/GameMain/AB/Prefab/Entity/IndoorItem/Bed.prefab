@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5213223075103895237}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Size
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9016283085179977390}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -72,7 +72,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9016283086011398938}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Bed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,6 +150,14 @@ PrefabInstance:
     - target: {fileID: 7482957049183680943, guid: ecfab78f03326bf47929a56ff8c5478a, type: 3}
       propertyPath: m_Name
       value: bed001
+      objectReference: {fileID: 0}
+    - target: {fileID: 7482957049183680943, guid: ecfab78f03326bf47929a56ff8c5478a, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7482957049183680943, guid: ecfab78f03326bf47929a56ff8c5478a, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 7482957049183680943, guid: ecfab78f03326bf47929a56ff8c5478a, type: 3}
       propertyPath: m_StaticEditorFlags

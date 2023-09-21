@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4293509407148069408}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Above
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1248669987657856877}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: On
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,7 +71,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5973960892496759423}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Size
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7294148487873491784}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: In
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,7 +133,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2838508496337076748}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PutArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -168,7 +168,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2281050549655775504}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pot_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -202,7 +202,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3329260564290244780}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Below
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -233,7 +233,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1164956703984505679}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -310,6 +310,10 @@ PrefabInstance:
     - target: {fileID: 5037866941678324042, guid: 150e88377c70eca4f80f2f4c84238516, type: 3}
       propertyPath: m_Name
       value: kitchenware041
+      objectReference: {fileID: 0}
+    - target: {fileID: 5037866941678324042, guid: 150e88377c70eca4f80f2f4c84238516, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5037866941678324042, guid: 150e88377c70eca4f80f2f4c84238516, type: 3}
       propertyPath: m_StaticEditorFlags

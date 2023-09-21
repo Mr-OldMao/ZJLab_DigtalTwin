@@ -132,7 +132,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //监听消息回调
         NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
         {
-            //Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
+            Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
             switch (topic)
             {
                 case TOPIC_SEND:
@@ -156,7 +156,10 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().OnClickStateBtn(programState, id);
                     break;
                 case TOPIC_GLOBAL:
-                    Debug.Log($"Topoc :{TOPIC_GLOBAL}");
+                    //Debug.Log($"recv Topoc :{TOPIC_GLOBAL}");
+                    break;
+                case TOPIC_CAMERA:
+                    //Debug.Log($"recv Topoc :{TOPIC_CAMERA}");
                     break;
                 default:
                     Debug.Log($"Other Topoc :{topic}，msg:{msg} ");
@@ -196,7 +199,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// 更新相机视⻆场景图
     /// </summary>
     /// <param name="items"></param>
-    public void SendMQTTUpdateCamera(GetThingGraph_data_items[] items)
+    public void SendMQTTUpdateCamera(PostThingGraph items)
     {
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
         NetworkMqtt.GetInstance.Publish(TOPIC_CAMERA, jsonStr);

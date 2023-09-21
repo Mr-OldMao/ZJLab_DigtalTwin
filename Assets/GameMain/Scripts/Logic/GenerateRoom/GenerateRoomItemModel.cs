@@ -107,6 +107,8 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
 
         ////根据当前实体大小等信息找到合适的位置放置
         //SetRandomRoomInsideItemEntity(dicRoomInsideItemEntity);
+
+        MainData.CacheItemsEntity.Clear();
         SetRandomRoomInsideItemEntity(getThingGraph);
     }
 
@@ -438,7 +440,9 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                             if (canUse)
                             {
                                 //放置后标记当前位置在当前房间已被放置其他物体不可重复放置在此
-                                Debug.Log("roomType:" + roomType + ",itemEntity:" + relatedThingArr[i].target.name);
+                                Debug.Log("roomType:" + roomType + ",itemEntity:" + relatedThingArr[i].target.name +",id:"+ relatedThingArr[i].target.id);
+                                string key = relatedThingArr[i].target.name + "_" + relatedThingArr[i].target.id;
+                                MainData.CacheItemsEntity.Add(key, clone);
                                 for (int k = 0; k < needItemModelInfoArr.Count; k++)
                                 {
                                     needItemModelInfoArr[k].itemModelType =relatedThingArr[i].target.name;

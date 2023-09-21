@@ -20,7 +20,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     private bool m_IsLoadedAssets = false;
     public GameObject staticModelRootNode = null;
     private Coroutine m_CoroutineUpadeteSceneEntityInfo = null;
-
+    private Coroutine m_CoroutineUpadeteCameraEntityInfo = null;
     public void Init()
     {
         Debug.Log("Init GameLogic");
@@ -47,7 +47,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             NetworkHTTP();
             NetworkMQTT();
         });
-        
+
         //等待ab资源加载完毕，以及http接口获取的场景数据，解析生成场景实体
         UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() =>
         {
@@ -103,7 +103,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             CacheItemDataInfo();
 
             //提交场景图，物体与房间的邻接关系
-            InterfaceDataCenter.GetInstance.CommitGetThingGraph(MainData.CacheItemsInfo, () =>
+            InterfaceDataCenter.GetInstance.CommitGetThingGraph(MainData.CacheSceneItemsInfo, () =>
             {
                 //更新仿真引擎状态，从而获取服务器指令
                 InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
@@ -119,6 +119,14 @@ public class GameLogic : SingletonByMono<GameLogic>
                 m_CoroutineUpadeteSceneEntityInfo = null;
             }
             m_CoroutineUpadeteSceneEntityInfo = StartCoroutine(UpadeteSceneEntityInfo());
+
+            //提交摄像机前的实体信息
+            if (m_CoroutineUpadeteCameraEntityInfo != null)
+            {
+                StopCoroutine(m_CoroutineUpadeteCameraEntityInfo);
+                m_CoroutineUpadeteCameraEntityInfo = null;
+            }
+            m_CoroutineUpadeteCameraEntityInfo = StartCoroutine(UpadeteRobotFirstCameraEntityInfo());
         });
     }
 
@@ -255,7 +263,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         //清理实体缓存信息
         List<GetThingGraph_data_items> items = new List<GetThingGraph_data_items>();
-        MainData.CacheItemsInfo = new PostThingGraph
+        MainData.CacheSceneItemsInfo = new PostThingGraph
         {
             items = items,
             id = "test",
@@ -295,21 +303,25 @@ public class GameLogic : SingletonByMono<GameLogic>
             List<BorderEntityData> doorDataArr = GenerateRoomData.GetInstance.GetDoorInfoByRoomType((RoomType)Enum.Parse(typeof(RoomType), roomName));
             foreach (BorderEntityData doorData in doorDataArr)
             {
+                string doorID = doorData.entity?.name;
+                string doorName = roomName + "Door";
+                Transform modelTrans = doorData.entity.transform.Find("Model")?.transform;
+                doorData.entity.name = doorName+"_"+ doorID;
                 item.relatedThing.Add(new GetThingGraph_data_items_relatedThing
                 {
                     target = new GetThingGraph_data_items_relatedThing_target
                     {
-                        id = doorData.entity?.name,
-                        name = roomName + "Door",
+                        id = doorID,
+                        name = doorName,
                         relatedThing = null,
                         dynamic = true,
-                        position = new float[] { doorData.entity.transform.position.x, doorData.entity.transform.position.y, doorData.entity.transform.position.z },
-                        rotation = new float[] { doorData.entity.transform.rotation.eulerAngles.x, doorData.entity.transform.rotation.eulerAngles.y, doorData.entity.transform.rotation.eulerAngles.z },
+                        position = new float[] { modelTrans.position.x, modelTrans.position.y, modelTrans.position.z },
+                        rotation = new float[] { modelTrans.rotation.eulerAngles.x, modelTrans.rotation.eulerAngles.y, modelTrans.rotation.eulerAngles.z },
                     },
                     relationship = "In"
                 });
             }
-            MainData.CacheItemsInfo.items.Add(item);
+            MainData.CacheSceneItemsInfo.items.Add(item);
         }
     }
     //缓存数据 递归遍历
@@ -406,9 +418,9 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         while (true)
         {
-            yield return new WaitForSeconds(1f);
-
-            InterfaceDataCenter.GetInstance.SendMQTTUpdateScenes(MainData.CacheItemsInfo);
+            yield return new WaitForSeconds(3f);
+            UpdateEnityInfoTool.GetInstance.UpdateSceneEntityInfo();
+            InterfaceDataCenter.GetInstance.SendMQTTUpdateScenes(MainData.CacheSceneItemsInfo);
         }
     }
     /// <summary>
@@ -418,9 +430,10 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         while (true)
         {
-            yield return new WaitForSeconds(1f);
-            GetThingGraph_data_items[] getThingGraph_Data_Items = new GetThingGraph_data_items[] { };
-            InterfaceDataCenter.GetInstance.SendMQTTUpdateCamera(getThingGraph_Data_Items);
+            yield return new WaitForSeconds(3f);
+
+            UpdateEnityInfoTool.GetInstance.UpdateCameraFOVEntityInfo();
+            InterfaceDataCenter.GetInstance.SendMQTTUpdateCamera(MainData.CacheCameraItemsInfo);
         }
     }
     #endregion
@@ -440,9 +453,10 @@ public class GameLogic : SingletonByMono<GameLogic>
             GenerateScene();
         }
 
-        if (Input.GetKeyDown(KeyCode.F2))
+        if (Input.GetKey(KeyCode.F2))
         {
-            InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
+           GameObject obj =  GameObject.Find("TargetPoint");
+            UpdateEnityInfoTool.GetInstance.JudgeRayObstacle(obj);
         }
 
         if (Input.GetKeyDown(KeyCode.F4))

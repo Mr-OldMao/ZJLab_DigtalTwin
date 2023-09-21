@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6021715981407381007}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1250992389199822655}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Size
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -72,7 +72,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6637255092419533904}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Food_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,6 +150,10 @@ PrefabInstance:
     - target: {fileID: 2447174530387319318, guid: 0027ea97f425de54994e9cd64bad634d, type: 3}
       propertyPath: m_Name
       value: food055
+      objectReference: {fileID: 0}
+    - target: {fileID: 2447174530387319318, guid: 0027ea97f425de54994e9cd64bad634d, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 2447174530387319318, guid: 0027ea97f425de54994e9cd64bad634d, type: 3}
       propertyPath: m_StaticEditorFlags
