@@ -99,6 +99,11 @@ public class GameLogic : SingletonByMono<GameLogic>
             //初始化相机
             CameraControl.GetInstance.Init();
 
+            //启动TCP服务端 传输视频流
+            NetworkTCPServer.GetInstance.Init(
+                CameraControl.GetInstance.GetCameraEntity(CameraControl.CameraType.First).transform, 
+                CameraControl.GetInstance.GetCameraEntity(CameraControl.CameraType.Three).transform);
+
             //缓存所有实体物品数据信息
             CacheItemDataInfo();
 
