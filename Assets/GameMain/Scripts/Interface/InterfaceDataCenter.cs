@@ -41,6 +41,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     //引擎状态
     public const string TOPIC_CHANGESTATE = "simulator/changeState";
 
+    public const string TOPIC_LIVEDATA = "simulator/liveStreaming";
+
     #region HTTP
     /// <summary>
     /// 缓存场景图，物体与房间的邻接关系
@@ -119,13 +121,17 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 
         NetworkMqtt.GetInstance.AddConnectedSucEvent(() =>
         {
-            NetworkMqtt.GetInstance.Subscribe(TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_SEND, TOPIC_RECV, TOPIC_ROOMINFODATA, TOPIC_CHANGESTATE);
+            NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE);
+
+            //TEST
+            NetworkMqtt.GetInstance.Subscribe(TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_RECV, TOPIC_ROOMINFODATA);
+
         });
 
         //初始化并订阅主题tcp://10.5.24.28:1883
         NetworkMqtt.GetInstance.Init(new MqttConfig()
         {
-            clientIP = MainData.ConfigData ?.MqttConfig.ClientIP, //"10.5.24.28",
+            clientIP = MainData.ConfigData?.MqttConfig.ClientIP, //"10.5.24.28",
             clientPort = NetworkMqtt.GetInstance.IsWebgl ? 8083 : 1883
         });
 
@@ -155,14 +161,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     //ChangeProgramState(id, programState);
                     UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().OnClickStateBtn(programState, id);
                     break;
-                case TOPIC_GLOBAL:
-                    //Debug.Log($"recv Topoc :{TOPIC_GLOBAL}");
-                    break;
-                case TOPIC_CAMERA:
-                    //Debug.Log($"recv Topoc :{TOPIC_CAMERA}");
-                    break;
                 default:
-                    Debug.Log($"Other Topoc :{topic}，msg:{msg} ");
+                    //Debug.Log($"Other Topoc :{topic}，msg:{msg} ");
                     break;
             }
         });
@@ -203,6 +203,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     {
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
         NetworkMqtt.GetInstance.Publish(TOPIC_CAMERA, jsonStr);
+    }
+
+    public void SendMQTTLiveData(byte[] msgBytes)
+    {
+        NetworkMqtt.GetInstance.Publish(TOPIC_LIVEDATA, msgBytes);
     }
     #endregion
 

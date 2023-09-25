@@ -100,8 +100,8 @@ public class GameLogic : SingletonByMono<GameLogic>
             CameraControl.GetInstance.Init();
 
             //启动TCP服务端 传输视频流
-            NetworkTCPServer.GetInstance.Init(
-                CameraControl.GetInstance.GetCameraEntity(CameraControl.CameraType.First).transform, 
+            LiveStreaming.GetInstance.Init(
+                CameraControl.GetInstance.GetCameraEntity(CameraControl.CameraType.First).transform,
                 CameraControl.GetInstance.GetCameraEntity(CameraControl.CameraType.Three).transform);
 
             //缓存所有实体物品数据信息
@@ -311,7 +311,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                 string doorID = doorData.entity?.name;
                 string doorName = roomName + "Door";
                 Transform modelTrans = doorData.entity.transform.Find("Model")?.transform;
-                doorData.entity.name = doorName+"_"+ doorID;
+                doorData.entity.name = doorName + "_" + doorID;
                 item.relatedThing.Add(new GetThingGraph_data_items_relatedThing
                 {
                     target = new GetThingGraph_data_items_relatedThing_target
@@ -460,7 +460,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         if (Input.GetKey(KeyCode.F2))
         {
-           GameObject obj =  GameObject.Find("TargetPoint");
+            GameObject obj = GameObject.Find("TargetPoint");
             UpdateEnityInfoTool.GetInstance.JudgeRayObstacle(obj);
         }
 

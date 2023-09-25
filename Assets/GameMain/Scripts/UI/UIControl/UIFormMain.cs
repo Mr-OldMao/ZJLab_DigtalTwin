@@ -31,6 +31,8 @@ public class UIFormMain : UIFormBase
     private Button btnRobotRelocation;
     [SerializeField]
     private Button btnRegenerateScene;
+    [SerializeField]
+    private Toggle tgeLive;
 
     public Button BtnStart { get => btnStart; set => btnStart = value; }
     public Button BtnStop { get => btnStop; set => btnStop = value; }
@@ -42,7 +44,8 @@ public class UIFormMain : UIFormBase
     public Text TxtCameraFree { get => txtCameraFree; set => txtCameraFree = value; }
     public Button BtnRobotRelocation { get => btnRobotRelocation; set => btnRobotRelocation = value; }
     public Button BtnRegenerateScene { get => btnRegenerateScene; set => btnRegenerateScene = value; }
-
+    public Toggle TgeLive { get => tgeLive; set => tgeLive = value; }
+    
 
     protected override void Awake()
     {
@@ -52,7 +55,7 @@ public class UIFormMain : UIFormBase
     protected override void Start()
     {
         base.Start();
-        txtCameraFree.text = "切换自由视角";
+        txtCameraFree.text = "开启自由视角";
     }
 
     protected override void InitMapField()
@@ -67,6 +70,9 @@ public class UIFormMain : UIFormBase
         txtCameraFree = transform.Find<Text>("txtCameraFree");
         btnRobotRelocation = transform.Find<Button>("btnRobotRelocation");
         btnRegenerateScene = transform.Find<Button>("btnRegenerateScene");
+        tgeLive = transform.Find<Toggle>("tgeLive");
+
+        tgeLive.isOn = false;
     }
 
     protected override void RegisterUIEvnet()
@@ -82,12 +88,10 @@ public class UIFormMain : UIFormBase
         btnPause.onClick.AddListenerCustom(() =>
         {
             OnClickStateBtn(ProgramState.pause);
-
         });
         btnResume.onClick.AddListenerCustom(() =>
         {
             OnClickStateBtn(ProgramState.resume);
-
         });
         btnCameraFree.onClick.AddListenerCustom(() =>
         {
@@ -101,6 +105,11 @@ public class UIFormMain : UIFormBase
         {
             GameLogic.GetInstance.GenerateScene();
         });
+        tgeLive.onValueChanged.AddListenerCustom((ison) =>
+        {
+            LiveStreaming.GetInstance.IsBeginLiveStreaming = ison;
+        });
+
     }
 
     public void OnClickStateBtn(ProgramState programState,string id = "")

@@ -104,7 +104,7 @@ public class CameraControl : SingletonByMono<CameraControl>
         //}
         m_CameraFree?.gameObject.SetActive(!m_CameraFree.gameObject.activeSelf);
         //CurMainCamera = m_CameraFree.gameObject.activeSelf ? CameraType.Free : beforeMainCamera;
-        string des = m_CameraFree.gameObject.activeSelf ? "隐藏自由视角" : "显示自由视角";
+        string des = m_CameraFree.gameObject.activeSelf ? "关闭自由视角" : "开启自由视角";
         UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().TxtCameraFree.text = des;
 
         MsgEvent.SendMsg(MsgEventName.ChangeCamera);
