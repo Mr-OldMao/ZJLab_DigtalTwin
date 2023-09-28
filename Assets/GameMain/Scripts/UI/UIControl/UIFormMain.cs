@@ -122,6 +122,7 @@ public class UIFormMain : UIFormBase
         switch (programState)
         {
             case ProgramState.start:
+                TaskCenter.GetInstance.CanExecuteTask = true;
                 break;
             case ProgramState.pause:
                 Time.timeScale = 0;
@@ -130,6 +131,9 @@ public class UIFormMain : UIFormBase
                 Time.timeScale = 1;
                 break;
             case ProgramState.stop:
+                MsgEvent.SendMsg(MsgEventName.RobotMoveEnd);
+                TaskCenter.GetInstance.CanExecuteTask = false;
+               //FindObjectOfType<AIRobotMove>().
                 break;
         }
     }

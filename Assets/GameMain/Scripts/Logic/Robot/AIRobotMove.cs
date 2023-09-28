@@ -1,8 +1,10 @@
 using MFramework;
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
+using static GenerateRoomBorderModel;
 
 /// <summary>
 /// 标题：AI
@@ -71,17 +73,30 @@ public class AIRobotMove : MonoBehaviour
         m_RobotAnimator?.SetBool("GrabItem", false);
     }
 
+    public void SetTargetPointObj(Vector3 pos)
+    {
+        targetPoint.gameObject.SetActive(false);
+        targetPoint.position = pos;
+        targetPoint.gameObject.SetActive(true);
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    if (autoMoveTargetPoint)
+        //    {
+        //        curRobotState = RobotBaseState.Idel;
+        //        Move(targetPoint);
+        //    }
+        //}
+
+        if (Input.GetKeyDown(KeyCode.C))
         {
-            if (autoMoveTargetPoint)
-            {
-                curRobotState = RobotBaseState.Idel;
-                Move(targetPoint);
-            }
+            Debug.Log(JudgeCanArrivePos(targetPoint.position));
         }
+
 
         if (canMove && curRobotState == RobotBaseState.Moving)
         {
@@ -116,7 +131,10 @@ public class AIRobotMove : MonoBehaviour
 
         MsgEvent.RegisterMsgEvent(MsgEventName.DoorAnimBegin, () =>
         {
-            MsgEvent.SendMsg(MsgEventName.RobotMoveEnd);
+            //MsgEvent.SendMsg(MsgEventName.RobotMoveEnd);
+            m_NavMeshAgent.isStopped = true;
+            curRobotState = RobotBaseState.Idel;
+            m_RobotAnimator?.SetBool("IsMoving", false);
             m_RobotAnimator?.SetTrigger("OpenDoor");
         });
 
@@ -150,22 +168,67 @@ public class AIRobotMove : MonoBehaviour
                 MsgEvent.SendMsg(MsgEventName.RobotMoveBegin);
                 m_NavMeshAgent.isStopped = false;
                 m_NavMeshAgent.SetDestination(targetPoint);
-                MFramework.UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() =>
-                {
-                    return Vector3.Distance(transform.position, targetPoint) < 0.1f;
-                }, () =>
-                {
-                    Debug.Log("Move Complete");
-                    m_NavMeshAgent.isStopped = true;
-                    curRobotState = RobotBaseState.Idel;
-                    callback?.Invoke();
-                });
+                //MFramework.UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() =>
+                //{
+                //    return Vector3.Distance(transform.position, targetPoint) < 0.1f;
+                //}, () =>
+                //{
+                //    Debug.Log("Move Complete");
+                //    m_NavMeshAgent.isStopped = true;
+                //    curRobotState = RobotBaseState.Idel;
+                //    callback?.Invoke();
+                //});
             }
             else
             {
                 Debug.LogError("Robot is Moving");
             }
         }
+    }
+
+    /// <summary>
+    /// 判定是否能到达目标位置
+    /// </summary>
+    /// <returns></returns>
+    public bool JudgeCanArrivePos(Vector3 targetPos)
+    {
+        bool res1 = false, res2 = false;
+
+        //判定目标点是否在屋内
+        Vector2 offsetValue = GameLogic.GetInstance.GetOriginOffset();
+        //x
+        List<BorderEntityData> xBorderEntityData = GenerateRoomData.GetInstance.listRoomBuilderInfo.FindAll((p) =>
+        {
+            return (p.entityModelType == EntityModelType.Wall || p.entityModelType == EntityModelType.Door) && p.entityAxis == 0 && p.pos.x == (int)((int)targetPos.x - offsetValue.x);
+        });
+        if (xBorderEntityData?.Count > 0)
+        {
+            float maxY = xBorderEntityData[0].pos.y;
+            float minY = xBorderEntityData[0].pos.y;
+            foreach (var item in xBorderEntityData)
+            {
+                if (item.pos.y > maxY)
+                {
+                    maxY = item.pos.y;
+                }
+                if (item.pos.y < minY)
+                {
+                    minY = item.pos.y;
+                }
+            }
+            maxY += offsetValue.y;
+            minY += offsetValue.y;
+            res1 = targetPos.z >= minY && targetPos.z <= maxY;
+        }
+
+        //判断目标点是否有障碍物
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(targetPos, out hit, 1.0f, NavMesh.AllAreas))
+        {
+            res2 = true;
+        }
+
+        return res1 && res2;
     }
 
     private void UpdateMoveSpeed()
@@ -200,6 +263,7 @@ public class AIRobotMove : MonoBehaviour
         if (collision.collider.gameObject.name == "TargetPoint")
         {
             MsgEvent.SendMsg(MsgEventName.RobotMoveEnd);
+            MsgEvent.SendMsg(MsgEventName.RobotArriveTargetPos);
         }
     }
 }

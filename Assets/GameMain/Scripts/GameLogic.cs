@@ -107,11 +107,12 @@ public class GameLogic : SingletonByMono<GameLogic>
             //缓存所有实体物品数据信息
             CacheItemDataInfo();
 
+            Debug.Log("QQ1 提交场景图，物体与房间的邻接关系");
             //提交场景图，物体与房间的邻接关系
             InterfaceDataCenter.GetInstance.CommitGetThingGraph(MainData.CacheSceneItemsInfo, () =>
             {
-                //更新仿真引擎状态，从而获取服务器指令
-                InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
+                ////更新仿真引擎状态，从而获取服务器指令
+                //InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
             });
 
             //提交场景图布局，房间与房间位置关系
@@ -132,6 +133,8 @@ public class GameLogic : SingletonByMono<GameLogic>
                 m_CoroutineUpadeteCameraEntityInfo = null;
             }
             m_CoroutineUpadeteCameraEntityInfo = StartCoroutine(UpadeteRobotFirstCameraEntityInfo());
+
+            TaskCenter.GetInstance.Init();
         });
     }
 
@@ -312,6 +315,8 @@ public class GameLogic : SingletonByMono<GameLogic>
                 string doorName = roomName + "Door";
                 Transform modelTrans = doorData.entity.transform.Find("Model")?.transform;
                 doorData.entity.name = doorName + "_" + doorID;
+
+
                 item.relatedThing.Add(new GetThingGraph_data_items_relatedThing
                 {
                     target = new GetThingGraph_data_items_relatedThing_target
@@ -372,7 +377,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     /// 原点偏移量，老原点位置在客厅的左下角，新原点需要在全局房间的左下角位置
     /// </summary>
     /// <returns></returns>
-    private Vector2 GetOriginOffset()
+    public Vector2 GetOriginOffset()
     {
         //找到新原点  所有房间的minX和minY作为新原点
         int offsetX = 0, offsetY = 0;

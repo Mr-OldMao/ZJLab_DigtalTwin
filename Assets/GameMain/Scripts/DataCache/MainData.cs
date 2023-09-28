@@ -46,7 +46,7 @@ public class MainData
     /// <summary>
     /// 指令控制数据
     /// </summary>
-    public static List<ControlCommit> controlCommit { get; set; } = new List<ControlCommit>();
+    public static Queue<ControlCommit> controlCommit { get; set; } = new Queue<ControlCommit>();
 
 
 

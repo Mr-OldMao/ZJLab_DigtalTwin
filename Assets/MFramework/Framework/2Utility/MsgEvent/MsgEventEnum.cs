@@ -41,6 +41,10 @@ public enum MsgEventName
     /// 结束移动
     /// </summary>
     RobotMoveEnd,
+    /// <summary>
+    /// 机器人到达目标位置
+    /// </summary>
+    RobotArriveTargetPos,
 
     /// <summary>
     /// 门动画播放开始

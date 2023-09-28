@@ -138,15 +138,15 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //监听消息回调
         NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
         {
-            Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
+            //Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
             switch (topic)
             {
                 case TOPIC_SEND:
                     ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
                     if (controlCommit != null)
                     {
-                        MainData.controlCommit.Add(controlCommit);
-                        Debug.Log("TODO 解析指令，根据服务器决策指令，控制机器人的行为 " + controlCommit);
+                        MainData.controlCommit.Enqueue(controlCommit);
+                        Debug.Log("解析决策指令 topic：" + topic + ",msg：" + msg);
                     }
                     else
                     {
@@ -162,7 +162,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().OnClickStateBtn(programState, id);
                     break;
                 default:
-                    //Debug.Log($"Other Topoc :{topic}，msg:{msg} ");
+                    //Debug.Log($"Other Topoc :{topic}");
                     break;
             }
         });
@@ -307,7 +307,11 @@ public class ControlCommit
     /// <summary>
     /// 操作⽬标物体的id
     /// </summary>
-    public string obj;
+    public string objectName;
+    /// <summary>
+    /// 操作⽬标物体的id
+    /// </summary>
+    public string objectId;
     /// <summary>
     /// 仿真实例id，具有唯⼀性
     /// </summary>
