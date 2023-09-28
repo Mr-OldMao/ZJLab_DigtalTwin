@@ -138,7 +138,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //监听消息回调
         NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
         {
-            //Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
+            Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
             switch (topic)
             {
                 case TOPIC_SEND:

@@ -26,33 +26,44 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
     /// </summary>
     private bool m_UseMQTT = true;
 
+    /// <summary>
+    /// 计时器
+    /// </summary>
+    private float m_CurTime = 0;
+    /// <summary>
+    /// 帧动画帧数
+    /// </summary>
+    private int m_FrameCount = 10;
 
     public string ip = "10.11.80.54";//"127.0.0.1";//"10.11.80.54";
     public int port = 10003;
     /// <summary>
-    /// 渲染的质量 [0-1],1-原画质
+    /// 渲染的质量 [0-100],100-原画质
     /// </summary>
     [Range(1, 100)]
-    public int renderValue = 50;
+    public int renderValue = 20;
 
-    RenderTexture firstCameraView = null;
+    public RenderTexture firstCameraView = null;
     RenderTexture ThreeCameraView = null;
-
-    Socket socket = null;
-
-    Thread thread = null;
-
-    bool success = true;
-
-    Dictionary<string, Client> clients = new Dictionary<string, Client>();
-
-    Vector3 oldPosFirstCam;   // 旧位置
-    Quaternion oldRotFirstCam;    // 旧旋转
+    Vector3 oldPosFirstCam;
+    Quaternion oldRotFirstCam;
     Vector3 oldPosThreeCam;
     Quaternion oldRotThreeCam;
 
+
+    Socket socket = null;
+    Thread thread = null;
+    bool success = true;
+    Dictionary<string, Client> clients = new Dictionary<string, Client>();
+
+
+
     public void Init(Transform firstCameraParent, Transform threeCameraParent)
     {
+        m_FrameCount = MainData.ConfigData.VideoStreaming.Frame;
+        renderValue = MainData.ConfigData.VideoStreaming.Quality;
+        Debug.Log($"m_FrameCount:{m_FrameCount},renderValue:{renderValue}");
+
         CameraFirstRenderer = GameObject.Find("CameraFirstRenderer")?.GetComponent<Camera>();
         CameraThreeRenderer = GameObject.Find("CameraThreeRenderer")?.GetComponent<Camera>();
 
@@ -64,15 +75,22 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
         CameraThreeRenderer.transform.localPosition = Vector3.zero;
         CameraThreeRenderer.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
+        //firstCameraView = new RenderTexture((int)(Screen.width), (int)(Screen.height), 0);
+        //firstCameraView.enableRandomWrite = true;
+        //Debug.Log("LiveStreaming.init2");
+        //ThreeCameraView = new RenderTexture((int)(Screen.width), (int)(Screen.height), 0);
+        //ThreeCameraView.enableRandomWrite = true;
+        //Debug.Log("LiveStreaming.init3");
+        //CameraFirstRenderer.targetTexture = firstCameraView;
+        //Debug.Log("LiveStreaming.init4");
+        //CameraThreeRenderer.targetTexture = ThreeCameraView;
+        //Debug.Log("LiveStreaming.init5");
 
-        firstCameraView = new RenderTexture((int)(Screen.width), (int)(Screen.height), 24);
+        firstCameraView = CameraFirstRenderer.targetTexture;
+        ThreeCameraView = CameraThreeRenderer.targetTexture;
         firstCameraView.enableRandomWrite = true;
-
-        ThreeCameraView = new RenderTexture((int)(Screen.width), (int)(Screen.height), 24);
         ThreeCameraView.enableRandomWrite = true;
 
-        CameraFirstRenderer.targetTexture = firstCameraView;
-        CameraThreeRenderer.targetTexture = ThreeCameraView;
 
         oldPosFirstCam = CameraFirstRenderer.transform.position;
         oldRotFirstCam = CameraFirstRenderer.transform.rotation;
@@ -101,7 +119,7 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
         thread.Start();
     }
 
-    int isNewAdd = 0;
+    private int isNewAdd = 0;
 
     void OnStart()
     {
@@ -132,13 +150,20 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
         }
     }
 
-    void Update()
+
+
+    void FixedUpdate()
     {
         if (IsBeginLiveStreaming)
         {
+            m_CurTime += Time.deltaTime;
             if (m_UseMQTT)
             {
-                SendTexture();
+                if (m_CurTime >= 1f / m_FrameCount)
+                {
+                    SendTexture();
+                    m_CurTime = 0;
+                }
             }
             else
             {
@@ -152,7 +177,7 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
                     isNewAdd = 0;
                     SendTexture(1);
                 }
-            } 
+            }
         }
     }
 
@@ -178,9 +203,9 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
 
 
 
-    Texture2D screenShot = null;
+    Texture2D firstScreenShot = null;
     Texture2D threeScreenShot = null;
-    int gc_count = 0;
+    private int gc_count = 0;
 
     void SendTexture(int isInt = 0)
     {
@@ -235,24 +260,21 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
     private byte[] GetLiveData()
     {
         byte[] msgBytes = null;
-        if (screenShot == null)
+        if (firstScreenShot == null)
         {
-            screenShot = new Texture2D((int)(Screen.width), (int)(Screen.height), TextureFormat.RGB24, false);
+            firstScreenShot = new Texture2D((int)(Screen.width), (int)(Screen.height), TextureFormat.RGB24, false);
             threeScreenShot = new Texture2D((int)(Screen.width), (int)(Screen.height), TextureFormat.RGB24, false);
         }
         // 读取屏幕像素进行渲染
         RenderTexture.active = firstCameraView;
-        screenShot.ReadPixels(new Rect(0, 0, firstCameraView.width, firstCameraView.height), 0, 0, false);
+        firstScreenShot.ReadPixels(new Rect(0, 0, firstCameraView.width, firstCameraView.height), 0, 0, false);
         RenderTexture.active = null;
-
         // 读取屏幕像素进行渲染
         RenderTexture.active = ThreeCameraView;
         threeScreenShot.ReadPixels(new Rect(0, 0, ThreeCameraView.width, ThreeCameraView.height), 0, 0, false);
         RenderTexture.active = null;
-
-        byte[] bytesFirst = screenShot.EncodeToJPG(renderValue);
+        byte[] bytesFirst = firstScreenShot.EncodeToJPG(renderValue);
         byte[] bytesThree = threeScreenShot.EncodeToJPG(renderValue);
-
         Msg msg = new Msg()
         {
             msgData = new Msg.Data[]
