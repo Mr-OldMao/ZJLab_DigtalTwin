@@ -37,12 +37,12 @@ public class CameraControl : SingletonByMono<CameraControl>
         m_CameraFirst = GameObject.Find("CameraFirst")?.GetComponent<Camera>();
         m_CameraThree = GameObject.Find("CameraThree")?.GetComponent<Camera>();
         m_CameraFree = GameObject.Find("CameraFree")?.GetComponent<Camera>();
-
+        m_CameraFree?.gameObject.SetActive(false);
     }
 
     private void Start()
     {
-        m_CameraFree?.gameObject.SetActive(false);
+        
         m_CameraFree.depth = 1;
         m_CameraTop.depth = 0;
         m_CameraFirst.depth = 2;
