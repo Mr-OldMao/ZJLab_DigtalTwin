@@ -95,7 +95,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             return;
         }
         //到达指定位置，与物体交互，播放动画TODO
-        Debug.Log("到达指定位置");
+        RobotInteractionByOrder();
 
         //以上事务处理完毕后返回指令执行结果
         ControlResult controlResult = new ControlResult
@@ -116,6 +116,16 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             StopCoroutine(m_CorLimitTask);
             m_CorLimitTask = null;
         }
+    }
+
+    /// <summary>
+    /// 机器人与物体交互，播放动画
+    /// </summary>
+    private void RobotInteractionByOrder()
+    {
+        Debug.Log("到达指定位置");
+        //解析指令名称
+        GetCurExecuteTask.name
     }
 
     /// <summary>
