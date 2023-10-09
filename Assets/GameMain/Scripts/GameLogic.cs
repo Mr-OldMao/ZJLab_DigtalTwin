@@ -459,8 +459,10 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         if (Input.GetKeyDown(KeyCode.F7))
         {
-            UIManager.GetInstance.Show<UIFormMain>();
-            GenerateScene();
+            RobotAnimCenter robotAnimCenter = GameObject.FindObjectOfType<RobotAnimCenter>();
+            robotAnimCenter.PlayAnimByBool("CanInteraction", true);
+            robotAnimCenter.PlayAnimByName("Robot_Pick");
+            robotAnimCenter.PlayAnimByBool("CanInteraction", false);
         }
 
         if (Input.GetKey(KeyCode.F2))

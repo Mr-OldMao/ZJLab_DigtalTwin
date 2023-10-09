@@ -17,16 +17,6 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 21a9655f9954e4a48bcf91dd225fff2b
   m_SerializeEntries:
-  - m_GUID: 4dd206cebfd38704e90fc5963efa1b7a
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/SofaBig_3.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: e9202a7cd3fbc0942a078ce455586bdd
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/SofaBig_2.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
   - m_GUID: 63aad37250e880c4abf78c1f781db7b8
     m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemSofaSmall1.prefab
     m_ReadOnly: 0
@@ -39,11 +29,6 @@ MonoBehaviour:
     - ItemLable
   - m_GUID: b49f8136cdcc9a14fb015f93b615f696
     m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemComputerDeskChair.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - ItemLable
-  - m_GUID: 5ad89f9a2ff38da438ea4ab6b2f14357
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/SofaBig_1.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable
@@ -109,6 +94,11 @@ MonoBehaviour:
     - ItemLable
   - m_GUID: 4bd29552909c8ad43803d8e594cc8f73
     m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/ItemKitchenCase1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: d83e9be08e69880469688089d100e143
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Bed_2.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable

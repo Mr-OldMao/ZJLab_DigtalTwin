@@ -26,7 +26,7 @@ public class AIRobotMove : MonoBehaviour
     public Transform targetPoint;
     private NavMeshAgent m_NavMeshAgent;
     private LineRenderer m_PathLineRenderer;
-    private Animator m_RobotAnimator;
+    private RobotAnimCenter m_RobotAnimCenter;
 
     /// <summary>
     /// 机器人基本状态
@@ -58,7 +58,7 @@ public class AIRobotMove : MonoBehaviour
     {
         m_NavMeshAgent = GetComponent<NavMeshAgent>();
         m_PathLineRenderer = this.GetComponent<LineRenderer>();
-        m_RobotAnimator = transform.Find<Animator>("Mesh1");
+        m_RobotAnimCenter = GetComponent<RobotAnimCenter>();
         targetPoint = GameObject.Find("TargetPoint")?.transform;
         RegisterMsgEvent();
         InitRobotAnimParam();
@@ -67,10 +67,6 @@ public class AIRobotMove : MonoBehaviour
     private void InitRobotAnimParam()
     {
         curRobotState = RobotBaseState.Idel;
-        m_RobotAnimator?.SetBool("IsMoving", false);
-        m_RobotAnimator?.SetBool("CloseDoor", false);
-        m_RobotAnimator?.SetBool("OpenDoor", false);
-        m_RobotAnimator?.SetBool("GrabItem", false);
     }
 
     public void SetTargetPointObj(Vector3 pos)
@@ -111,7 +107,7 @@ public class AIRobotMove : MonoBehaviour
         {
             //Debug.Log("Robot RobotMoveBegin");
             curRobotState = RobotBaseState.Moving;
-            m_RobotAnimator?.SetBool("IsMoving", true);
+            m_RobotAnimCenter?.PlayAnimByBool("IsMoving", true);
         });
         MsgEvent.RegisterMsgEvent(MsgEventName.RobotMoveStay, () =>
         {
@@ -126,7 +122,7 @@ public class AIRobotMove : MonoBehaviour
             m_NavMeshAgent.isStopped = true;
             curRobotState = RobotBaseState.Idel;
             //curRobotActionState = RobotActionState.Idle;
-            m_RobotAnimator?.SetBool("IsMoving", false);
+            m_RobotAnimCenter?.PlayAnimByBool("IsMoving", false);
         });
 
         MsgEvent.RegisterMsgEvent(MsgEventName.DoorAnimBegin, () =>
@@ -134,8 +130,8 @@ public class AIRobotMove : MonoBehaviour
             //MsgEvent.SendMsg(MsgEventName.RobotMoveEnd);
             m_NavMeshAgent.isStopped = true;
             curRobotState = RobotBaseState.Idel;
-            m_RobotAnimator?.SetBool("IsMoving", false);
-            m_RobotAnimator?.SetTrigger("OpenDoor");
+            m_RobotAnimCenter?.PlayAnimByBool("IsMoving", false);
+            m_RobotAnimCenter?.PlayAnimByTrigger("OpenDoor");
         });
 
         MsgEvent.RegisterMsgEvent(MsgEventName.DoorAnimEnd, () =>

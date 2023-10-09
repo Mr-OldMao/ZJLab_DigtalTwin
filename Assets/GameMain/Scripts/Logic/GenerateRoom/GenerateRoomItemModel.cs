@@ -316,7 +316,9 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 {
                     Transform putAreaTrans = parentItem.transform.Find("PutArea/" + itemDependInfo.posRelation.ToString());
                     clone.transform.parent = putAreaTrans;
+                    Debug.Log("putAreaTrans " + putAreaTrans.position);
                     clone.transform.position = putAreaTrans.position;
+                    clone.transform.Find<Transform>("Model").transform.localPosition = Vector3.zero;
                     clone.gameObject.SetActive(true);
                 }
                 else

@@ -16,7 +16,19 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: 1a7df10094440444299299c0eb166a50
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 5ad89f9a2ff38da438ea4ab6b2f14357
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Sofa_1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4dd206cebfd38704e90fc5963efa1b7a
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Sofa_3.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e9202a7cd3fbc0942a078ce455586bdd
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Sofa_2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 13b3a089d6d69ce499381abb142d0bfb, type: 2}
   m_SchemaSet:

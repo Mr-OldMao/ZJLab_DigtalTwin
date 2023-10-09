@@ -22,9 +22,9 @@ updateTime：20230821
 | 床       | Bed            |
 | 书       | Book           |
 | 锅       | Pot            |
-| 枕头     | Pillow         |
 | 食物     | Food           |
 | 垃圾桶   | Bin            |
+|          |                |
 | 柜子     | Cabinet        |
 | 椅子     | Chair          |
 | 衣架     | Clothes        |
@@ -37,13 +37,13 @@ updateTime：20230821
 | 洗手池   | Sink           |
 | 沙发     | Sofa           |
 | 电视     | TV             |
-| 窗子     | Window         |
-| 门       | Door           |
 | 刀       | Knife          |
 |          |                |
 |          |                |
 |          |                |
-|          |                |
+| 枕头     | Pillow         |
+| 窗子     | Window         |
+| 门       | Door           |
 |          |                |
 |          |                |
 |          |                |

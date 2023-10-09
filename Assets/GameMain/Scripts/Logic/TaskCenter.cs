@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MFramework;
+using System;
 /// <summary>
 /// 标题：任务中心
 /// 功能：根据指令用于派发任务，处理任务
@@ -56,7 +57,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     {
         MsgEvent.RegisterMsgEvent(MsgEventName.RobotArriveTargetPos, () =>
         {
-            TaskExecuteSuc();
+            ArriveTargetPosCallback();
         });
     }
 
@@ -86,46 +87,167 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     }
 
     /// <summary>
-    /// 任务执行成功回调
+    /// 机器人到达目标位置回调
     /// </summary>
-    private void TaskExecuteSuc()
+    private void ArriveTargetPosCallback()
     {
         if (GetCurExecuteTask == null)
         {
             return;
         }
-        //到达指定位置，与物体交互，播放动画TODO
-        RobotInteractionByOrder();
-
-        //以上事务处理完毕后返回指令执行结果
-        ControlResult controlResult = new ControlResult
+        //到达指定位置，与物体交互，播放动画
+        RobotInteractionByOrder(() =>
         {
-            motionId = GetCurExecuteTask.motionId,
-            name = GetCurExecuteTask.name,
-            task_id = GetCurExecuteTask.task_id,
-            simulatorId = "",
-            stateCode = 0,
-            stateMsg = "suc"
-        };
-        InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
-        IsExecuteTask = false;
-        GetCurExecuteTask = null;
-        m_CurTaskExeTime = 0;
-        if (m_CorLimitTask != null)
-        {
-            StopCoroutine(m_CorLimitTask);
-            m_CorLimitTask = null;
-        }
+            //任务执行成功回调后返回指令执行结果
+            ControlResult controlResult = new ControlResult
+            {
+                motionId = GetCurExecuteTask.motionId,
+                name = GetCurExecuteTask.name,
+                task_id = GetCurExecuteTask.task_id,
+                simulatorId = "",
+                stateCode = 0,
+                stateMsg = "suc"
+            };
+            InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
+            IsExecuteTask = false;
+            GetCurExecuteTask = null;
+            m_CurTaskExeTime = 0;
+            if (m_CorLimitTask != null)
+            {
+                StopCoroutine(m_CorLimitTask);
+                m_CorLimitTask = null;
+            }
+        });
     }
 
     /// <summary>
     /// 机器人与物体交互，播放动画
     /// </summary>
-    private void RobotInteractionByOrder()
+    private void RobotInteractionByOrder(Action animCompleteCallback)
     {
-        Debug.Log("到达指定位置");
         //解析指令名称
-        GetCurExecuteTask.name
+        string orderStr = GetCurExecuteTask.name;
+        Debug.Log("到达指定位置 机器人与物体交互，播放动画  orderStr :" + orderStr);
+        RobotAnimCenter robotAnimCenter = GameObject.FindObjectOfType<RobotAnimCenter>();
+        if (robotAnimCenter != null)
+        {
+            float animSecond = 0;
+            robotAnimCenter.PlayAnimByBool("CanInteraction", true);
+
+            //“拿取”“放下”交互对象实体
+            GameObject grabObj = null;
+            //有且仅在 “拿取”“放下”物品 任务时传递当前物品的父对象实体，其他任务传null
+            GameObject grabOldParentNode = null;
+
+            switch (orderStr)
+            {
+                //拿取
+                case Order.Grab_item:
+                    //物品父节点放置在机器人手中
+                    string objName1 = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
+                    grabObj = MainData.CacheItemsEntity[objName1];
+                    if (grabObj != null)
+                    {
+                        grabOldParentNode = grabObj.transform.parent.gameObject;
+                        grabObj.transform.parent = robotAnimCenter.RobotHandleNode;
+                    }
+                    else
+                    {
+                        Debug.LogError("obj is null ,objName: " + objName1);
+                    }
+                    animSecond = robotAnimCenter.PlayAnimByName("Robot_Grab_item");
+                    break;
+                //放下
+                case Order.Grab_item_pull:
+                    //物品父节点放置在机器人手中
+                    string objName2 = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
+                    grabObj = MainData.CacheItemsEntity[objName2];
+                    if (grabObj != null)
+                    {
+                        grabOldParentNode = grabObj.transform.parent.gameObject;
+                        grabObj.transform.parent = robotAnimCenter.RobotHandleNode;
+                    }
+                    else
+                    {
+                        Debug.LogError("obj is null ,objName: " + objName2);
+                    }
+                    animSecond = robotAnimCenter.PlayAnimByName("Robot_PutDown");
+                    break;
+                //打开门
+                case Order.Close_Door_Outside:
+                    animSecond = robotAnimCenter.PlayAnimByTrigger("OpenDoor");
+                    break;
+                //关闭门
+                case Order.Close_Door_Inside:
+                    animSecond = robotAnimCenter.PlayAnimByTrigger("CloseDoor");
+                    break;
+                //擦桌子
+                case "todo2":
+                    animSecond = robotAnimCenter.PlayAnimByName("Robot_CleanTable");
+                    break;
+                ////倒水
+                //case Order.:
+                //    animSecond = robotAnimCenter.PlayAnimByName("");
+                //    break;
+                //操作阀门
+                case "todo3":
+                    animSecond = robotAnimCenter.PlayAnimByName("Robot_PressBtn");
+                    break;
+                //蹲下拾取
+                case Order.Pick_Fwd:
+                case Order.Pick_L:
+                case Order.Pick_R:
+                    animSecond = robotAnimCenter.PlayAnimByName("Robot_Pick");
+                    break;
+                //推
+                case Order.Push_End:
+                case Order.Push_Enter:
+                case Order.Push_Exit:
+                case Order.Push_Idle:
+                case Order.Push_Loop:
+                case Order.Push_Idle_inPlace:
+                case Order.Push_Start:
+                    animSecond = robotAnimCenter.PlayAnimByName("Robot_Push_Idle");
+                    break;
+                ////拉
+                //case Order.:
+                //    animSecond = robotAnimCenter.PlayAnimByName("");
+                //    break;
+                //按下按钮
+                case Order.Press_Button:
+                    animSecond = robotAnimCenter.PlayAnimByName("Robot_PressBtn");
+                    break;
+                //空闲姿态
+                case Order.IDLE:
+                    animSecond = robotAnimCenter.PlayAnimByName("Idle");
+                    break;
+                //敲门
+                case Order.Knock_on_door:
+                    animSecond = robotAnimCenter.PlayAnimByName("Robot_Knock_on_door");
+                    break;
+                default:
+                    Debug.LogError("other orderStr : " + orderStr);
+                    break;
+            }
+            robotAnimCenter.PlayAnimByBool("CanInteraction", false);
+            if (animSecond > 0)
+            {
+                UnityTool.GetInstance.DelayCoroutine(animSecond, () =>
+                {
+                    Debug.Log("play anim complete , orderStr :" + orderStr);
+                    //取消物品父节点放置在机器人手中
+                    if (grabObj != null && grabOldParentNode != null)
+                    {
+                        grabObj.transform.parent = grabOldParentNode.transform;
+                    }
+                    animCompleteCallback?.Invoke();
+                });
+            }
+        }
+        else
+        {
+            Debug.LogError("animSecond = robotAnimCenter is null");
+        }
     }
 
     /// <summary>
@@ -187,6 +309,7 @@ class Order
     public const string Close_Door_Outside = "Close_Door_Outside";
     public const string Drink = "Drink";
     public const string Grab_item = "Grab_item";
+    public const string Grab_item_pull = "";
     public const string Heal_bandages = "Heal_bandages";
     public const string Knock_on_door = "Knock_on_door";
     public const string Lever_Floor_Pull = "Lever_Floor_Pull";
