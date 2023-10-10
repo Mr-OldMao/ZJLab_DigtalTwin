@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.pimdewitte.unitymainthreaddispatcher": "https://github.com/PimDeWitte/UnityMainThreadDispatcher.git",
     "com.unity.addressables": "1.19.19",
     "com.unity.collab-proxy": "1.17.7",
     "com.unity.feature.development": "1.0.1",
