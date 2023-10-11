@@ -2,6 +2,7 @@ using MFramework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityGameFramework.Runtime;
 using static GetThingGraph;
 /// <summary>
 /// 标题：接口数据管理中心
@@ -44,6 +45,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public const string TOPIC_LIVEDATA = "simulator/liveStreaming";
     //新增房间实体模型
     public const string TOPIC_ADD_GOODS = "simulator/addGoods";
+    //删除房间实体模型
+    public const string TOPIC_DEL_GOODS = "simulator/delGoods";
     #region HTTP
     /// <summary>
     /// 缓存场景图，物体与房间的邻接关系
@@ -122,7 +125,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 
         NetworkMqtt.GetInstance.AddConnectedSucEvent(() =>
         {
-            NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS);
+            NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS,TOPIC_DEL_GOODS);
 
             //TEST
             NetworkMqtt.GetInstance.Subscribe(TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_RECV, TOPIC_ROOMINFODATA
@@ -157,36 +160,44 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     private void ParseMQTTMsg(string topic,string msg)
     {
         Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
-        switch (topic)
+        //在非Unity主线程中调用UnityEngineApi
+        PimDeWitte.UnityMainThreadDispatcher.UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {
-            case TOPIC_SEND:
-                ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
-                if (controlCommit != null)
-                {
-                    MainData.controlCommit.Enqueue(controlCommit);
-                    Debug.Log("解析决策指令 topic：" + topic + ",msg：" + msg);
-                }
-                else
-                {
-                    Debug.LogError("controlCommit is null");
-                }
-                break;
+            switch (topic)
+            {
+                case TOPIC_SEND:
+                    ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
+                    if (controlCommit != null)
+                    {
+                        MainData.controlCommit.Enqueue(controlCommit);
+                        Debug.Log("解析决策指令 topic：" + topic + ",msg：" + msg);
+                    }
+                    else
+                    {
+                        Debug.LogError("controlCommit is null");
+                    }
+                    break;
 
-            case TOPIC_CHANGESTATE:
-                ChangeStateData changeStateData = JsonTool.GetInstance.JsonToObjectByLitJson<ChangeStateData>(msg);
-                string id = changeStateData.id;
-                ProgramState programState = (ProgramState)Enum.Parse(typeof(ProgramState), changeStateData.state);
-                //ChangeProgramState(id, programState);
-                UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().OnClickStateBtn(programState, id);
-                break;
-            case TOPIC_ADD_GOODS:
-                JsonAddEntity jsonAddEntity = JsonTool.GetInstance.JsonToObjectByLitJson<JsonAddEntity>(msg);
-                GenerateRoomItemModel.GetInstance.AddEntityToTargetPlace(jsonAddEntity);
-                break;
-            default:
-                //Debug.Log($"Other Topoc :{topic}");
-                break;
-        }
+                case TOPIC_CHANGESTATE:
+                    ChangeStateData changeStateData = JsonTool.GetInstance.JsonToObjectByLitJson<ChangeStateData>(msg);
+                    string id = changeStateData.id;
+                    ProgramState programState = (ProgramState)Enum.Parse(typeof(ProgramState), changeStateData.state);
+                    //ChangeProgramState(id, programState);
+                    UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().OnClickStateBtn(programState, id);
+                    break;
+                case TOPIC_ADD_GOODS:
+                    JsonAddEntity jsonAddEntity = JsonTool.GetInstance.JsonToObjectByLitJson<JsonAddEntity>(msg);
+                    UpdateMainData.GetInstance.AddEntityToTargetPlace(jsonAddEntity);
+                    break;
+                case TOPIC_DEL_GOODS:
+                    JsonDelEntity jsonDelEntity = JsonTool.GetInstance.JsonToObjectByLitJson<JsonDelEntity>(msg);
+                    UpdateMainData.GetInstance.DelEntityToTargetPlace(jsonDelEntity);
+                    break;
+                default:
+                    //Debug.Log($"Other Topoc :{topic}");
+                    break;
+            }
+        });
     }
 
     /// <summary>

@@ -483,26 +483,12 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         if (Input.GetKeyDown(KeyCode.F6))
         {
-            InterfaceDataCenter.GetInstance.SendMQTTRoomInfoData(new RoomInfoData
-            {
-                roomInfos = new List<RoomInfoData.RoomInfoData_roomInfos>
-                 {
-                     new RoomInfoData.RoomInfoData_roomInfos()
-                     {
-                            id = "1",
-                            roomType = "LivingRoom",
-                            minPos = new int[] { 1,2},
-                            maxPos = new int[] { 5,7}
-                     },
-                       new RoomInfoData.RoomInfoData_roomInfos()
-                     {
-                            id = "2",
-                            roomType = "BedRoom",
-                            minPos = new int[] { 6,5},
-                            maxPos = new int[] { 9,8}
-                     },
-                 }
-            });
+            string testJson =
+                //"{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:9\",\r\n            \"type\": \"FOOD\",\r\n            \"delChind\":0\r\n        }\r\n    ]\r\n}"
+                "{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:8\",\r\n            \"type\": \"POT\",\r\n            \"delChind\":0\r\n        }\r\n    ]\r\n}"
+                ;
+            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_DEL_GOODS,
+        testJson);
         }
     }
 }
