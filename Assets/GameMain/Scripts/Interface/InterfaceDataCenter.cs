@@ -40,9 +40,10 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public const string TOPIC_ROOMINFODATA = "simulator/roomInfoData";
     //引擎状态
     public const string TOPIC_CHANGESTATE = "simulator/changeState";
-
+    //直播流信息
     public const string TOPIC_LIVEDATA = "simulator/liveStreaming";
-
+    //新增房间实体模型
+    public const string TOPIC_ADD_GOODS = "simulator/addGoods";
     #region HTTP
     /// <summary>
     /// 缓存场景图，物体与房间的邻接关系
@@ -121,10 +122,12 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 
         NetworkMqtt.GetInstance.AddConnectedSucEvent(() =>
         {
-            NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE);
+            NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS);
 
             //TEST
-            NetworkMqtt.GetInstance.Subscribe(TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_RECV, TOPIC_ROOMINFODATA);
+            NetworkMqtt.GetInstance.Subscribe(TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_RECV, TOPIC_ROOMINFODATA
+                //, "feature/people_perception", "feature/robot_pos"
+                );
 
         });
 
@@ -138,33 +141,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //监听消息回调
         NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
         {
-            Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
-            switch (topic)
-            {
-                case TOPIC_SEND:
-                    ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
-                    if (controlCommit != null)
-                    {
-                        MainData.controlCommit.Enqueue(controlCommit);
-                        Debug.Log("解析决策指令 topic：" + topic + ",msg：" + msg);
-                    }
-                    else
-                    {
-                        Debug.LogError("controlCommit is null");
-                    }
-                    break;
-
-                case TOPIC_CHANGESTATE:
-                    ChangeStateData changeStateData = JsonTool.GetInstance.JsonToObjectByLitJson<ChangeStateData>(msg);
-                    string id = changeStateData.id;
-                    ProgramState programState = (ProgramState)Enum.Parse(typeof(ProgramState), changeStateData.state);
-                    //ChangeProgramState(id, programState);
-                    UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().OnClickStateBtn(programState, id);
-                    break;
-                default:
-                    //Debug.Log($"Other Topoc :{topic}");
-                    break;
-            }
+            ParseMQTTMsg(topic,msg);
         });
         //NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgSubscribedEventArgs e) =>
         //{
@@ -172,17 +149,45 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //});
     }
 
+    /// <summary>
+    /// 解析MQTT消息
+    /// </summary>
+    /// <param name="topic"></param>
+    /// <param name="msg"></param>
+    private void ParseMQTTMsg(string topic,string msg)
+    {
+        Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
+        switch (topic)
+        {
+            case TOPIC_SEND:
+                ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
+                if (controlCommit != null)
+                {
+                    MainData.controlCommit.Enqueue(controlCommit);
+                    Debug.Log("解析决策指令 topic：" + topic + ",msg：" + msg);
+                }
+                else
+                {
+                    Debug.LogError("controlCommit is null");
+                }
+                break;
 
-    ///// <summary>
-    ///// 更新全局场景图
-    ///// </summary>
-    ///// <param name="items"></param>
-    //public void SendMQTTUpdateScenes(List<GetThingGraph_data_items> items)
-    //{
-    //    string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
-    //    NetworkMqtt.GetInstance.Publish(TOPIC_GLOBAL, jsonStr);
-    //    Debug.Log("更新全局场景图 jsonStr:" + jsonStr);
-    //}
+            case TOPIC_CHANGESTATE:
+                ChangeStateData changeStateData = JsonTool.GetInstance.JsonToObjectByLitJson<ChangeStateData>(msg);
+                string id = changeStateData.id;
+                ProgramState programState = (ProgramState)Enum.Parse(typeof(ProgramState), changeStateData.state);
+                //ChangeProgramState(id, programState);
+                UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().OnClickStateBtn(programState, id);
+                break;
+            case TOPIC_ADD_GOODS:
+                JsonAddEntity jsonAddEntity = JsonTool.GetInstance.JsonToObjectByLitJson<JsonAddEntity>(msg);
+                GenerateRoomItemModel.GetInstance.AddEntityToTargetPlace(jsonAddEntity);
+                break;
+            default:
+                //Debug.Log($"Other Topoc :{topic}");
+                break;
+        }
+    }
 
     /// <summary>
     /// 更新全局场景图

@@ -172,11 +172,11 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
             res = false;
         }
 
-        ////TEST
-        //if (res == false)
-        //{
-        //    Debug.LogError("物体未相机前方 " + obj);
-        //}
+        //TEST
+        if (res == false)
+        {
+            Debug.LogError("物体未相机前方 " + obj);
+        }
         return res;
     }
 
@@ -192,11 +192,11 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
         Vector3 pos2 = obj.transform.position;
 
         bool res = Vector3.Distance(pos1, pos2) <= dis;
-        ////TEST
-        //if (res == false)
-        //{
-        //    Debug.LogError("物体到摄像机的距离未在指定范围之内 " + obj);
-        //}
+        //TEST
+        if (res == false)
+        {
+            Debug.LogError("物体到摄像机的距离未在指定范围之内 " + obj);
+        }
         return res;
     }
 
@@ -235,11 +235,11 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
                 res = true;
             }
         }
-        ////TEST
-        //if (res == false)
-        //{
-        //    Debug.LogError("摄像机到目标物体之间有障碍阻挡 " + obj);
-        //}
+        //TEST
+        if (res == false)
+        {
+            Debug.LogError("摄像机到目标物体之间有障碍阻挡 " + obj);
+        }
         return res;
     } 
     #endregion

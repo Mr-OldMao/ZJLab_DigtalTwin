@@ -62,7 +62,6 @@ public class RobotAnimCenter : MonoBehaviour
         float length = 0;
 
         AnimationClip[] clips = m_RobotAnimator.runtimeAnimatorController.animationClips;
-        Debug.Log(clips.Length);
         foreach (AnimationClip clip in clips)
         {
             if (clip.name.Equals(name))

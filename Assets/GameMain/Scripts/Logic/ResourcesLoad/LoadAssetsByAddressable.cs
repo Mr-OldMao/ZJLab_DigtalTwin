@@ -6,6 +6,9 @@ using static UnityEngine.AddressableAssets.Addressables;
 using System;
 using System.IO;
 using Unity.VisualScripting;
+using static UnityEditor.Progress;
+using System.Collections;
+using System.Security.Cryptography;
 
 /// <summary>
 /// 标题：基于Addressable进行ab包的异步加载
@@ -215,25 +218,41 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
     /// <summary>
     /// 获取实体资源
     /// </summary>
-    /// <param name="entityName"></param>
-    /// <param name="index">默认index = -1获取随机资源，index > -1获取指定资源，若index越界则获取随机资源</param>
+    /// <param name="entityName">实体类型</param>
+    /// <param name="assetName">获取指定资源填写，默认assetName为空，获取随机资源，不为空则获取指定资源，若不为空且未找到指定资源则获取随机资源</param>
     /// <returns></returns>
-    public GameObject GetEntityRes(string entityName, int index = -1)
+    public GameObject GetEntityRes(string entityName, string assetName = "")
     {
         GameObject res = null;
         if (dicCacheAssets != null)
         {
             if (dicCacheAssets.ContainsKey(entityName))
             {
-                if (index != -1 && index < dicCacheAssets[entityName].items.Count)
-                {
-                    res = dicCacheAssets[entityName].items[index];
-                }
-                else
-                {
-                    int randomIndex = UnityEngine.Random.Range(0, dicCacheAssets[entityName].items.Count);
-                    res = dicCacheAssets[entityName].items[randomIndex];
-                }
+                //if (!string.IsNullOrEmpty(assetName))
+                //{
+                //    foreach (var item in dicCacheAssets[entityName].items)
+                //    {
+                //        Debug.Log(item);
+                //        Debug.Log(item.ToString());
+                //        Debug.Log(item.name);
+                //        if (item.name == assetName)
+                //        {
+                //            res = item;
+                //            break;
+                //        }
+                //    }
+                //    if (res == null)
+                //    {
+                //        Debug.LogError("未找到指定资源，改用随机资源");
+                //        int randomIndex = UnityEngine.Random.Range(0, dicCacheAssets[entityName].items.Count);
+                //        res = dicCacheAssets[entityName].items[randomIndex];
+                //    }
+                //}
+                //else
+                //{
+                int randomIndex = UnityEngine.Random.Range(0, dicCacheAssets[entityName].items.Count);
+                res = dicCacheAssets[entityName].items[randomIndex];
+                //}
             }
             else
             {
@@ -246,6 +265,41 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         }
         return res;
     }
+
+    public void GetEntityRes(string entityName, string assetName, Action<GameObject> callback)
+    {
+        if (dicCacheAssets != null && dicCacheAssets.ContainsKey(entityName))
+        {
+            PimDeWitte.UnityMainThreadDispatcher.UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            {
+                GameObject res = null;
+                foreach (var item in dicCacheAssets[entityName].items)
+                {
+                    if (item.name == assetName)
+                    {
+                        res = item;
+                        break;
+                    }
+                }
+                if (res == null)
+                {
+                    Debug.LogError("未找到指定资源，改用随机资源");
+                    int randomIndex = UnityEngine.Random.Range(0, dicCacheAssets[entityName].items.Count);
+                    res = dicCacheAssets[entityName].items[randomIndex];
+                }
+                callback?.Invoke(res);
+
+            });
+        }
+    }
+    private IEnumerator Do()
+    {
+        // 只能在主线程执行的语句
+        // ...
+        Debug.Log(dicCacheAssets["Food"].items);
+        yield return null;
+    }
+
 
     private void AddEntityRes(string itemName, GameObject value)
     {

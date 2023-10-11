@@ -107,7 +107,6 @@ public class GameLogic : SingletonByMono<GameLogic>
             //缓存所有实体物品数据信息
             CacheItemDataInfo();
 
-            Debug.Log("QQ1 提交场景图，物体与房间的邻接关系");
             //提交场景图，物体与房间的邻接关系
             InterfaceDataCenter.GetInstance.CommitGetThingGraph(MainData.CacheSceneItemsInfo, () =>
             {
@@ -232,7 +231,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         GameObject robotEntity = GameObject.FindObjectOfType<AIRobotMove>()?.gameObject;
         if (robotEntity == null)
         {
-            GameObject robotRes = LoadAssetsByAddressable.GetInstance.GetEntityRes("RobotEntity", 0);
+            GameObject robotRes = LoadAssetsByAddressable.GetInstance.GetEntityRes("RobotEntity");
             robotEntity = Instantiate(robotRes);
         }
         SetRobotPos(robotEntity);
@@ -473,8 +472,13 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         if (Input.GetKeyDown(KeyCode.F4))
         {
-            NetworkMqtt.GetInstance.Publish("TopicTest", "msg from unity " + System.DateTime.Now);
-            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_RECV, "msg from unity " + System.DateTime.Now);
+            string testJson =
+                //"{\"entityInfo\":[{\"id\":\"sim:20\",\"type\":\"Book\",\"modelId\":\"Book_1\",\"pos\":{\"x\":4.5,\"y\":13.4},\"roomInfo\":{\"roomType\":\"LivingRoom\",\"roomID\":\"sim:3\"},\"parentEntityInfo\":{\"id\":\"sim:7\",\"type\":\"BIN\",\"PutArea\":\"In\"}}]}"
+                "{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:2\",\r\n            \"type\": \"FOOD\",\r\n            \"modelId\": \"Food_1\",\r\n            \"pos\": {\r\n                \"x\": 7,\r\n                \"y\": 7\r\n            },\r\n            \"dynamic\": -1,\r\n            \"putArea\": \"In\",\r\n            \"roomInfo\": {\r\n                \"roomType\": \"LivingRoom\",\r\n                \"roomID\": \"sim:10\"\r\n            },\r\n            \"parentEntityInfo\": {\r\n                \"id\": \"sim:8\",\r\n                \"type\": \"POT\"\r\n            }\r\n        }\r\n    ]\r\n}"
+                ;
+
+            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_ADD_GOODS,
+                testJson);
         }
 
         if (Input.GetKeyDown(KeyCode.F6))

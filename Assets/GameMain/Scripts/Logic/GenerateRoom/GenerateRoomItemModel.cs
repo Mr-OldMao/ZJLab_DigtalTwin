@@ -6,6 +6,8 @@ using static GenerateRoomData;
 using System;
 using System.Linq;
 using static GetThingGraph;
+using static JsonAddEntity;
+using Unity.VisualScripting;
 /// <summary>
 /// 标题：生成各个房间内所有道具(床桌椅板凳等)
 /// 功能：针对每个房间生成合理的道具，摆放位置随机且合理(1.各个房间内部物品都朝向当前房间的中心点)
@@ -223,21 +225,22 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     /// <summary>
     /// 获取模型实体
     /// </summary>
-    /// <param name="itemModelTypes"></param>
+    /// <param name="itemModelTypes">实体类型</param>
+    /// <param name="assetName">获取指定资源填写，默认assetName为空，获取随机资源，不为空则获取指定资源，若不为空且未找到指定资源则获取随机资源</param>
     /// <returns></returns>
-    private List<GameObject> GetItemEntity(params string[] itemModelTypes)
+    private GameObject GetItemEntity(string itemModelTypes, string assetName = "", bool isAutoInstance = true)
     {
-        var res = new List<GameObject>();
-        for (int i = 0; i < itemModelTypes?.Length; i++)
+        GameObject res = null;
+        if (!string.IsNullOrEmpty(itemModelTypes))
         {
             //改为大驼峰原则
-            string itemName = itemModelTypes[i].ToString().Substring(0, 1).ToUpper() + itemModelTypes[i].ToString().Substring(1, itemModelTypes[i].ToString().Length - 1).ToLower();
-            GameObject go = LoadAssetsByAddressable.GetInstance.GetEntityRes(itemName);
-            if (go != null)
+            string itemName = itemModelTypes.ToString().Substring(0, 1).ToUpper() + itemModelTypes.ToString().Substring(1, itemModelTypes.ToString().Length - 1).ToLower();
+            res = LoadAssetsByAddressable.GetInstance.GetEntityRes(itemName, assetName);
+            if (res != null && isAutoInstance)
             {
-                res.Add(go);
+                res = Instantiate(res);
             }
-            else
+            if (res == null)
             {
                 Debug.LogError("Get ItemModelEntity Fail, name:" + itemName);
             }
@@ -269,6 +272,164 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     }
 
     /// <summary>
+    /// 生成实体放置到指定位置
+    /// </summary>
+    public void AddEntityToTargetPlace(JsonAddEntity jsonAddEntity)
+    {
+        for (int i = 0; i < jsonAddEntity?.entityInfo?.Length; i++)
+        {
+            JsonAddEntity_entityInfo entityInfo = jsonAddEntity?.entityInfo?[i];
+            JsonAddEntity_entityInfo_parentEntityInfo parentEntityInfo = entityInfo?.parentEntityInfo;
+            //GameObject clone = GetItemEntity(entityInfo.type, entityInfo.modelId);
+            //驼峰原则 首字母大写
+            string entityType = entityInfo.type[..1].ToUpper() + entityInfo.type[1..].ToLower();
+            LoadAssetsByAddressable.GetInstance.GetEntityRes(entityType, entityInfo.modelId, (obj) =>
+            {
+                Debug.Log("add obj :" + obj);
+                GameObject clone = Instantiate(obj);
+                if (clone == null)
+                {
+                    return;
+                }
+                /*设置根节点*/
+                string roomObjStr = entityInfo.roomInfo.roomType.ToString() + "_" + entityInfo.roomInfo.roomID;
+                GameObject roomContainer = ItemEntityGroupNode.transform.Find(roomObjStr)?.gameObject;
+                if (roomContainer == null)
+                {
+                    roomContainer = new GameObject(roomObjStr);
+                    roomContainer.transform.SetParent(ItemEntityGroupNode.transform);
+                }
+                GameObject parentObj = null;
+                string parentID = "";
+                //当前实体有父对象则放置在父对象下，没有则放在指定房间容器内
+                if (parentEntityInfo != null)
+                {
+                    parentID = parentEntityInfo.id;
+                    Transform parentEntity = ItemEntityGroupNode.transform.Find<Transform>(parentEntityInfo.type + "_" + parentEntityInfo.id);
+                    Transform parentEntityPutArea = parentEntity?.Find("PutArea/" + entityInfo.putArea);
+                    if (parentEntityPutArea != null)
+                    {
+                        parentObj = parentEntityPutArea.gameObject;
+                        clone.transform.SetParent(parentObj.transform, false);
+                        //实体位置pos，高度y使用PutArea/xxx 节点的高度，x/y使用web前端发来的数值
+                        clone.transform.position = new Vector3(entityInfo.pos.x, parentObj.transform.position.y, entityInfo.pos.y);
+                        clone.transform.Find("Model").transform.localPosition = Vector3.zero;
+                    }
+                    else
+                    {
+                        Debug.LogError($"add item set parent fail , roomContainer:{roomContainer}," +
+                            $"parent:{parentEntityInfo.type + "_" + parentEntityInfo.id}," +
+                            $"putArea:{entityInfo.putArea}");
+                    }
+                }
+                else
+                {
+                    parentID = entityInfo.roomInfo.roomID;
+                    parentObj = roomContainer;
+                    clone.transform.SetParent(parentObj.transform, false);
+                    clone.transform.position = new Vector3(entityInfo.pos.x, 0, entityInfo.pos.y);
+                    clone.transform.Find("Model").transform.localPosition = Vector3.zero;
+                }
+                string key = entityInfo.type + "_" + entityInfo.id;
+                clone.name = key;
+                //缓存数据1
+                if (!MainData.CacheItemsEntity.ContainsKey(key))
+                {
+                    MainData.CacheItemsEntity.Add(key, clone);
+                    //更新数据2
+                    UpdateSceneItemsInfoData(parentID, entityInfo.id, entityInfo.type, clone.transform.position, clone.transform.rotation.eulerAngles, entityInfo.dynamic == 1, entityInfo.putArea);
+                }
+                else
+                {
+                    Debug.LogError("物品已存在，新增物品更新数据失败 ");
+                }
+            });
+        }
+    }
+
+    /// <summary>
+    /// 更新新增的实体数据信息
+    /// </summary>
+    /// <param name="parentID"></param>
+    /// <param name="curID"></param>
+    /// <param name="curPos"></param>
+    /// <param name="curRot"></param>
+    /// <param name="isDynamic"></param>
+    /// <param name="relationship"></param>
+    private void UpdateSceneItemsInfoData(string parentID, string curID, string curType, Vector3 curPos, Vector3 curRot, bool isDynamic, string relationship)
+    {
+        //find parentID
+        //父对象容器
+        List<GetThingGraph_data_items_relatedThing> parentContainer = null;
+        for (int i = 0; i < MainData.CacheSceneItemsInfo.items.Count; i++)
+        {
+            string id = MainData.CacheSceneItemsInfo.items[i].id;
+            if (id == parentID)
+            {
+                if (MainData.CacheSceneItemsInfo.items[i].relatedThing == null)
+                {
+                    MainData.CacheSceneItemsInfo.items[i].relatedThing = new List<GetThingGraph_data_items_relatedThing>();
+                }
+                parentContainer = MainData.CacheSceneItemsInfo.items[i].relatedThing;
+            }
+            else
+            {
+                parentContainer = FindTargetIDData(ref MainData.CacheSceneItemsInfo.items[i].relatedThing, parentID);
+            }
+        }
+        Debug.Log("parentContainer " + parentContainer);
+        if (parentContainer != null)
+        {
+
+            parentContainer.Add(new GetThingGraph_data_items_relatedThing
+            {
+                relationship = relationship,
+                target = new GetThingGraph_data_items_relatedThing_target
+                {
+                    id = curID,
+                    name = curType,
+                    position = new float[] { curPos.x, curPos.y, curPos.z },
+                    rotation = new float[] { curRot.x, curRot.y, curRot.z },
+                    dynamic = isDynamic,
+                    relatedThing = null
+                }
+            });
+        }
+    }
+
+    private List<GetThingGraph_data_items_relatedThing> FindTargetIDData(ref List<GetThingGraph_data_items_relatedThing> node, string targetID)
+    {
+        for (int i = 0; i < node.Count; i++)
+        {
+            int tempI = i;
+            if (node[tempI].target.id == targetID)
+            {
+                if (node[tempI].target.relatedThing == null)
+                {
+                    node[tempI].target.relatedThing = new List<GetThingGraph_data_items_relatedThing>();
+                }
+                return node[tempI].target.relatedThing;
+            }
+            else if (i == node.Count - 1)
+            {
+                if (node[tempI].target.relatedThing != null)
+                {
+                    return FindTargetIDData(ref node[tempI].target.relatedThing, targetID);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+
+        return null;
+    }
+
+
+
+    /// <summary>
     /// 为每个物品实体找位置放置
     /// </summary>
     /// <param name="roomType">房间名称</param>
@@ -290,7 +451,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             {
                 continue;
             }
-            GameObject clone = Instantiate(GetItemEntity(entityName)?[0]);
+            GameObject clone = GetItemEntity(entityName);
             Transform parentTrans = ItemEntityGroupNode.transform.Find(roomType.ToString() + "_" + roomID);
             if (parentTrans == null)
             {
@@ -316,7 +477,6 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 {
                     Transform putAreaTrans = parentItem.transform.Find("PutArea/" + itemDependInfo.posRelation.ToString());
                     clone.transform.parent = putAreaTrans;
-                    Debug.Log("putAreaTrans " + putAreaTrans.position);
                     clone.transform.position = putAreaTrans.position;
                     clone.transform.Find<Transform>("Model").transform.localPosition = Vector3.zero;
                     clone.gameObject.SetActive(true);
@@ -442,12 +602,12 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                             if (canUse)
                             {
                                 //放置后标记当前位置在当前房间已被放置其他物体不可重复放置在此
-                                Debug.Log("roomType:" + roomType + ",itemEntity:" + relatedThingArr[i].target.name +",id:"+ relatedThingArr[i].target.id);
+                                Debug.Log("roomType:" + roomType + ",itemEntity:" + relatedThingArr[i].target.name + ",id:" + relatedThingArr[i].target.id);
                                 string key = relatedThingArr[i].target.name + "_" + relatedThingArr[i].target.id;
                                 MainData.CacheItemsEntity.Add(key, clone);
                                 for (int k = 0; k < needItemModelInfoArr.Count; k++)
                                 {
-                                    needItemModelInfoArr[k].itemModelType =relatedThingArr[i].target.name;
+                                    needItemModelInfoArr[k].itemModelType = relatedThingArr[i].target.name;
                                     //Debug.Log("pos:" + needItemModelInfoArr[k].pos);
                                 }
                                 clone.SetActive(true);
@@ -478,162 +638,6 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         }
     }
 
-
-    //随机放置各个房间的实体
-    private void SetRandomRoomInsideItemEntity(Dictionary<RoomType, List<GameObject>> dicRoomInsideItemEntity)
-    {
-        ClearItemEntity();
-        foreach (RoomType roomType in dicRoomInsideItemEntity?.Keys)
-        {
-            List<GameObject> itemEntityArr = dicRoomInsideItemEntity[roomType];
-            //为每个实体找位置放置
-            for (int i = 0; i < itemEntityArr?.Count; i++)
-            {
-                //当前实体信息
-                GameObject clone = Instantiate(itemEntityArr[i]);
-                clone.transform.SetParent(ItemEntityGroupNode.transform, false); //TODO 加载一层房间名称
-
-
-                clone.SetActive(false);
-                Transform model = clone.transform.Find<Transform>("Model");
-                Transform size = clone.transform.Find<Transform>("Size"); //模型在Model节点旋转角度0°时的长宽
-                int itemLength;
-                int itemWidch;
-                //找到当前房间所有可放置的位置信息
-                List<ItemModelInfo> itemModelInfos = m_DicItemModelInfo[roomType];
-
-                //已经找到可用位置
-                bool canUse = true;
-                foreach (ItemModelInfo itemInfo in itemModelInfos)
-                {
-                    if (itemInfo.itemModelType != string.Empty)
-                    {
-                        continue;
-                    }
-                    Vector2 curPos = itemInfo.pos;
-                    //当前坐标位置相对于当前房间的方位
-                    DirEnum curPosDir = itemInfo.posDir;
-
-                    //对当前房间每个坐标点进行上下左右是个方向查询是否都可放置，查询范围，从当前坐标点开始到物体的长宽结束，物体锚点默认在左下角
-                    //优先找朝向房间中心位置的方向
-                    DirEnum curDir = (DirEnum)(((int)curPosDir + 2) % Enum.GetValues(typeof(DirEnum)).Length);//初始方向与curPosDir相反
-                    int curLoopCount = 0;
-                    int loopMaxCount = 4;
-                    while (curLoopCount < loopMaxCount)
-                    {
-                        //当前模型所需占用的坐标位置
-                        List<Vector2> itemPosArr = new List<Vector2>();
-                        canUse = true;
-                        clone.transform.position = new Vector3(curPos.x, 0, curPos.y);
-                        switch (curDir)
-                        {
-                            case DirEnum.Top://up  当前物体锚点在物体的右上角 朝向下方
-                                clone.transform.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));
-                                itemLength = (int)size.transform.localScale.x;
-                                itemWidch = (int)size.transform.localScale.z;
-                                for (int m = (int)curPos.x - itemLength; m <= (int)curPos.x; m++)
-                                {
-                                    for (int n = (int)curPos.y - itemWidch; n <= (int)curPos.y; n++)
-                                    {
-                                        if (!itemPosArr.Contains(new Vector2(m, n)))
-                                        {
-                                            itemPosArr.Add(new Vector2(m, n));
-                                        }
-                                    }
-                                }
-                                break;
-                            case DirEnum.Left://left 当前物体锚点在物体的左上角 朝向右方
-                                clone.transform.localRotation = Quaternion.Euler(new Vector3(0, 90, 0));
-                                itemLength = (int)size.transform.localScale.z;
-                                itemWidch = (int)size.transform.localScale.x;
-                                for (int m = (int)curPos.x; m <= (int)curPos.x + itemLength; m++)
-                                {
-                                    for (int n = (int)curPos.y - itemWidch; n <= (int)curPos.y; n++)
-                                    {
-                                        if (!itemPosArr.Contains(new Vector2(m, n)))
-                                        {
-                                            itemPosArr.Add(new Vector2(m, n));
-                                        }
-                                    }
-                                }
-                                break;
-                            case DirEnum.Bottom://down 当前物体锚点在物体的左下角 朝向上方
-                                clone.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
-                                itemLength = (int)size.transform.localScale.x;
-                                itemWidch = (int)size.transform.localScale.z;
-                                for (int m = (int)curPos.x; m <= (int)curPos.x + itemLength; m++)
-                                {
-                                    for (int n = (int)curPos.y; n <= (int)curPos.y + itemWidch; n++)
-                                    {
-                                        if (!itemPosArr.Contains(new Vector2(m, n)))
-                                        {
-                                            itemPosArr.Add(new Vector2(m, n));
-                                        }
-                                    }
-                                }
-                                break;
-                            case DirEnum.Right://right 当前物体锚点在物体的右下角 朝向左方
-                                clone.transform.localRotation = Quaternion.Euler(new Vector3(0, -90, 0));
-                                itemLength = (int)size.transform.localScale.z;
-                                itemWidch = (int)size.transform.localScale.x;
-                                for (int m = (int)curPos.x - itemLength; m <= (int)curPos.x; m++)
-                                {
-                                    for (int n = (int)curPos.y; n <= (int)curPos.y + itemWidch; n++)
-                                    {
-                                        if (!itemPosArr.Contains(new Vector2(m, n)))
-                                        {
-                                            itemPosArr.Add(new Vector2(m, n));
-                                        }
-                                    }
-                                }
-                                break;
-                        }
-                        //判定所有坐标是否全部可用
-                        if (itemPosArr.Count == 0)
-                        {
-                            canUse = false;
-                        }
-                        else
-                        {
-                            List<ItemModelInfo> needItemModelInfoArr = new List<ItemModelInfo>();
-                            foreach (Vector2 needPos in itemPosArr)
-                            {
-                                ItemModelInfo needItemModelInfo = itemModelInfos.Find((p) => { return p.pos == needPos && p.itemModelType == string.Empty; });
-                                if (needItemModelInfo == null)
-                                {
-                                    canUse = false;
-                                    break;
-                                }
-                                else
-                                {
-                                    needItemModelInfoArr.Add(needItemModelInfo);
-                                }
-                            }
-                            if (canUse)
-                            {
-                                //放置后标记当前位置在当前房间已被放置其他物体不可重复放置在此
-                                Debug.Log("roomType:" + roomType + ",itemEntity:" + itemEntityArr[i].name);
-                                for (int k = 0; k < needItemModelInfoArr.Count; k++)
-                                {
-                                    needItemModelInfoArr[k].itemModelType = itemEntityArr[i].name;
-                                    Debug.Log("pos:" + needItemModelInfoArr[k].pos);
-                                }
-                                clone.SetActive(true);
-                                break;
-                            }
-                        }
-                        curLoopCount++;
-                        curDir = (DirEnum)(((int)curPosDir + 1) % Enum.GetValues(typeof(DirEnum)).Length);
-                    }
-                    if (canUse)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
     //清理实体对象
     private void ClearItemEntity()
     {
@@ -641,10 +645,10 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         {
             //Debug.Log("DEL " + ItemEntityGroupNode?.GetChild(i));
             int typeI = i;
-            ItemEntityGroupNode.GetChild(i).gameObject.name = "del_"+ ItemEntityGroupNode.GetChild(i).gameObject.name;
+            ItemEntityGroupNode.GetChild(i).gameObject.name = "del_" + ItemEntityGroupNode.GetChild(i).gameObject.name;
             ItemEntityGroupNode.GetChild(i).gameObject.SetActive(false);
-            
-            UnityTool.GetInstance.DelayCoroutine(1f,()=> Destroy(ItemEntityGroupNode.GetChild(typeI).gameObject));
+
+            UnityTool.GetInstance.DelayCoroutine(1f, () => Destroy(ItemEntityGroupNode.GetChild(typeI).gameObject));
         }
     }
 }
