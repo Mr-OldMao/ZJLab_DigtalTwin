@@ -93,8 +93,8 @@ public class GameLogic : SingletonByMono<GameLogic>
             //生成机器人实体
             GenerateRobot();
 
-            //监听“门”碰撞事件
-            ListenerDoorCollEvent(true);
+            ////监听“门”碰撞事件
+            //ListenerDoorCollEvent(true);
 
             //初始化相机
             CameraControl.GetInstance.Init();
@@ -137,7 +137,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         });
     }
 
-    private void ListenerDoorCollEvent(bool canListener)
+    public void ListenerDoorCollEvent(bool canListener)
     {
         foreach (var item in GameObject.FindObjectsOfType<AnimDoor>())
         {

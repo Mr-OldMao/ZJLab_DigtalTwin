@@ -16,10 +16,22 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// </summary>
     public List<string> m_ListOrder = new List<string>();
 
+    private bool m_CanExecuteTask = true;
     /// <summary>
     /// 是否允许机器人自动处理任务
     /// </summary>
-    public bool CanExecuteTask { get; set; } = true;
+    public bool CanExecuteTask
+    {   get
+        {
+            return m_CanExecuteTask;
+        }
+        set 
+        {
+            //监听“门”碰撞事件
+            GameLogic.GetInstance.ListenerDoorCollEvent(value);
+            m_CanExecuteTask = value;
+        }
+    }
     /// <summary>
     /// 机器人是否正在执行任务
     /// </summary>
