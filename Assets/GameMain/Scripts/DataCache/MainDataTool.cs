@@ -10,7 +10,7 @@ using static JsonAddEntity;
 /// 作者：毛俊峰
 /// 时间：2023.10.11
 /// </summary>
-public class UpdateMainData : SingletonByMono<UpdateMainData>
+public class MainDataTool : SingletonByMono<MainDataTool>
 {
     #region 场景中新增指定实体
     /// <summary>

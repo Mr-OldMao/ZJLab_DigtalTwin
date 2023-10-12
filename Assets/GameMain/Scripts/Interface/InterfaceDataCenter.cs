@@ -187,11 +187,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     break;
                 case TOPIC_ADD_GOODS:
                     JsonAddEntity jsonAddEntity = JsonTool.GetInstance.JsonToObjectByLitJson<JsonAddEntity>(msg);
-                    UpdateMainData.GetInstance.AddEntityToTargetPlace(jsonAddEntity);
+                    MainDataTool.GetInstance.AddEntityToTargetPlace(jsonAddEntity);
                     break;
                 case TOPIC_DEL_GOODS:
                     JsonDelEntity jsonDelEntity = JsonTool.GetInstance.JsonToObjectByLitJson<JsonDelEntity>(msg);
-                    UpdateMainData.GetInstance.DelEntityToTargetPlace(jsonDelEntity);
+                    MainDataTool.GetInstance.DelEntityToTargetPlace(jsonDelEntity);
                     break;
                 default:
                     //Debug.Log($"Other Topoc :{topic}");
