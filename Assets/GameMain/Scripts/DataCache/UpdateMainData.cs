@@ -26,7 +26,6 @@ public class UpdateMainData : SingletonByMono<UpdateMainData>
             string entityType = entityInfo.type[..1].ToUpper() + entityInfo.type[1..].ToLower();
             LoadAssetsByAddressable.GetInstance.GetEntityRes(entityType, entityInfo.modelId, (obj) =>
             {
-                Debug.Log("add obj :" + obj);
                 GameObject clone = Instantiate(obj);
                 if (clone == null)
                 {
@@ -34,39 +33,44 @@ public class UpdateMainData : SingletonByMono<UpdateMainData>
                 }
                 /*设置根节点*/
                 string roomObjStr = entityInfo.roomInfo.roomType.ToString() + "_" + entityInfo.roomInfo.roomID;
-                GameObject roomContainer = GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.Find(roomObjStr)?.gameObject;
-                if (roomContainer == null)
+                GameObject roomEntity = GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.Find(roomObjStr)?.gameObject;
+                if (roomEntity == null)
                 {
-                    roomContainer = new GameObject(roomObjStr);
-                    roomContainer.transform.SetParent(GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform);
+                    roomEntity = new GameObject(roomObjStr);
+                    roomEntity.transform.SetParent(GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform);
                 }
                 GameObject parentObj = null;
                 string parentID = "";
                 //当前实体有父对象则放置在父对象下，没有则放在指定房间容器内
-                if (parentEntityInfo != null)
+                if (!string.IsNullOrEmpty(parentEntityInfo?.id) && !string.IsNullOrEmpty(parentEntityInfo?.type))
                 {
                     parentID = parentEntityInfo.id;
                     Transform parentEntity = GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.Find<Transform>(parentEntityInfo.type + "_" + parentEntityInfo.id);
                     Transform parentEntityPutArea = parentEntity?.Find("PutArea/" + entityInfo.putArea);
                     if (parentEntityPutArea != null)
                     {
+                        //放置在其他物品下
                         parentObj = parentEntityPutArea.gameObject;
-                        clone.transform.SetParent(parentObj.transform, false);
-                        //实体位置pos，高度y使用PutArea/xxx 节点的高度，x/y使用web前端发来的数值
-                        clone.transform.position = new Vector3(entityInfo.pos.x, parentObj.transform.position.y, entityInfo.pos.y);
-                        clone.transform.Find("Model").transform.localPosition = Vector3.zero;
                     }
                     else
                     {
-                        Debug.LogError($"add item set parent fail , roomContainer:{roomContainer}," +
-                            $"parent:{parentEntityInfo.type + "_" + parentEntityInfo.id}," +
-                            $"putArea:{entityInfo.putArea}");
+                        //放置在房间下
+                        parentObj = roomEntity;
                     }
+                    Debug.Log($"add item suc, item:{clone}" +
+                        $"roomContainer:{roomEntity}," +
+                           $"parent:{parentEntityInfo.type} " + "_" +
+                           $"{parentEntityInfo.id}," +
+                           $"putArea:{entityInfo.putArea}");
+                    clone.transform.SetParent(parentObj.transform);
+                    //实体位置pos，高度y使用PutArea/xxx 节点的高度，x/y使用web前端发来的数值
+                    clone.transform.position = new Vector3(entityInfo.pos.x, parentObj.transform.position.y, entityInfo.pos.y);
+                    clone.transform.Find("Model").transform.localPosition = Vector3.zero;
                 }
                 else
                 {
                     parentID = entityInfo.roomInfo.roomID;
-                    parentObj = roomContainer;
+                    parentObj = roomEntity;
                     clone.transform.SetParent(parentObj.transform, false);
                     clone.transform.position = new Vector3(entityInfo.pos.x, 0, entityInfo.pos.y);
                     clone.transform.Find("Model").transform.localPosition = Vector3.zero;
@@ -91,13 +95,13 @@ public class UpdateMainData : SingletonByMono<UpdateMainData>
     /// <summary>
     /// 更新新增的实体数据信息
     /// </summary>
-    /// <param name="parentID"></param>
+    /// <param name="parentEntityName"></param>
     /// <param name="curID"></param>
     /// <param name="curPos"></param>
     /// <param name="curRot"></param>
     /// <param name="isDynamic"></param>
     /// <param name="relationship"></param>
-    private void UpdateSceneItemsInfoData(string parentID, string curID, string curType, Vector3 curPos, Vector3 curRot, bool isDynamic, string relationship)
+    private void UpdateSceneItemsInfoData(string parentEntityName, string curID, string curType, Vector3 curPos, Vector3 curRot, bool isDynamic, string relationship)
     {
         //find parentID
         //父对象容器
@@ -105,17 +109,18 @@ public class UpdateMainData : SingletonByMono<UpdateMainData>
         for (int i = 0; i < MainData.CacheSceneItemsInfo.items.Count; i++)
         {
             string id = MainData.CacheSceneItemsInfo.items[i].id;
-            if (id == parentID)
+            if (id == parentEntityName)
             {
                 if (MainData.CacheSceneItemsInfo.items[i].relatedThing == null)
                 {
                     MainData.CacheSceneItemsInfo.items[i].relatedThing = new List<GetThingGraph_data_items_relatedThing>();
                 }
                 parentContainer = MainData.CacheSceneItemsInfo.items[i].relatedThing;
+                break;
             }
             else
             {
-                parentContainer = FindTargetIDData(ref MainData.CacheSceneItemsInfo.items[i].relatedThing, parentID);
+                parentContainer = FindTargetIDData(ref MainData.CacheSceneItemsInfo.items[i].relatedThing, parentEntityName);
             }
         }
         if (parentContainer != null)

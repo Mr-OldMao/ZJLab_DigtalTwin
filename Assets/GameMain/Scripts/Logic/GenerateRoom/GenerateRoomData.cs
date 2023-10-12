@@ -741,6 +741,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 entityAxis = doorData.entityAxis,
                 entityModelType = EntityModelType.Door,
                 listRoomType = doorData.listRoomType,
+                listRoomTypeID = doorData.listRoomTypeID,
             };
             roomInfos[i].listDoorPosInfo = new List<BorderEntityData> { doorBorderEntityData };
 
@@ -933,9 +934,9 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     }
     #endregion
 
-    public List<BorderEntityData> GetDoorInfoByRoomType(RoomType roomType)
+    public List<BorderEntityData> GetDoorInfoByRoomType(RoomType roomType,string roomID)
     {
-        return listRoomBuilderInfo.FindAll((p) => { return p.entityModelType == EntityModelType.Door && p.listRoomType.Contains(roomType); });
+        return listRoomBuilderInfo.FindAll((p) => { return p.entityModelType == EntityModelType.Door && p.listRoomType.Contains(roomType) && p.listRoomTypeID.Contains(roomID); });
     }
 
     private void Update()

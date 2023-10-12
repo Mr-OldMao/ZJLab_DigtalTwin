@@ -33,7 +33,16 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
         for (int j = 0; j < relatedThingArr.Count; j++)
         {
             int tempJ = j;
-            string key = relatedThingArr[tempJ].target.name + "_" + relatedThingArr[tempJ].target.id;
+            //key 除了“门”模型外都是 name_id 格式
+            string key = string.Empty;
+            if (relatedThingArr[tempJ].target.name.Contains("Door"))
+            {
+                key = relatedThingArr[tempJ].target.id;
+            }
+            else
+            {
+                key = relatedThingArr[tempJ].target.name + "_" + relatedThingArr[tempJ].target.id;
+            }
             GameObject targetObj = GetItemEntity(key);
             if (targetObj != null)
             {
@@ -118,7 +127,16 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
     private bool JudgeEntityExistCameraFOV(GetThingGraph_data_items_relatedThing getThingGraph_Data_Items)
     {
         bool isExist = false;
-        string key = getThingGraph_Data_Items.target.name + "_" + getThingGraph_Data_Items.target.id;
+        //key 除了“门”模型外都是 name_id 格式
+        string key = string.Empty;
+        if (getThingGraph_Data_Items.target.name.Contains("Door"))
+        {
+            key = getThingGraph_Data_Items.target.id;
+        }
+        else
+        {
+            key = getThingGraph_Data_Items.target.name + "_" + getThingGraph_Data_Items.target.id;
+        }
         if (!MainData.CacheItemsEntity.ContainsKey(key))
         {
             Debug.LogError("not exist key : " + key);
@@ -241,7 +259,7 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
         //    Debug.LogError("摄像机到目标物体之间有障碍阻挡 " + obj);
         //}
         return res;
-    } 
+    }
     #endregion
 
     private GameObject GetItemEntity(string key)

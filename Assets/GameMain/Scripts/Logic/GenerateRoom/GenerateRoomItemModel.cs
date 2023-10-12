@@ -8,6 +8,7 @@ using System.Linq;
 using static GetThingGraph;
 using static JsonAddEntity;
 using Unity.VisualScripting;
+using static GetEnvGraph;
 /// <summary>
 /// 标题：生成各个房间内所有道具(床桌椅板凳等)
 /// 功能：针对每个房间生成合理的道具，摆放位置随机且合理(1.各个房间内部物品都朝向当前房间的中心点)
@@ -253,7 +254,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     private void SetRandomRoomInsideItemEntity(GetThingGraph getThingGraph)
     {
         ClearItemEntity();
-
+        CreateRoomContainer();
         if (getThingGraph != null && getThingGraph.data?.items?.Count > 0)
         {
             for (int i = 0; i < getThingGraph.data?.items?.Count; i++)
@@ -267,6 +268,41 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     dependItemID = data.id,
                     dependItemName = data.name,
                 });
+            }
+        }
+    }
+
+    /// <summary>
+    /// 创建物品实体的放置房间容器
+    /// </summary>
+    private void CreateRoomContainer()
+    {
+        GetEnvGraph_data_items[] roomItemsData = MainData.getEnvGraph.data.items;
+
+        string roomType = string.Empty;
+        string roomId = string.Empty;
+        string roomName = string.Empty;
+        for (int i = 0; i < roomItemsData.Length; i++)
+        {
+            roomType = roomItemsData[i].name;
+            roomId = roomItemsData[i].id;
+            roomName = roomType + "_" + roomId;
+            if (ItemEntityGroupNode.Find(roomName) == null)
+            {
+                GameObject roomContainer = new GameObject(roomName);
+                roomContainer.transform.SetParent(ItemEntityGroupNode);
+            }
+            for (int j = 0; j < roomItemsData[i].relatedThing?.Length; j++)
+            {
+                 roomType = roomItemsData[i].relatedThing[j].target.name;
+                 roomId = roomItemsData[i].relatedThing[j].target.id;
+                 roomName = roomType + "_" + roomId;
+
+                if (ItemEntityGroupNode.Find(roomName) == null)
+                {
+                    GameObject roomContainer = new GameObject(roomName);
+                    roomContainer.transform.SetParent(ItemEntityGroupNode);
+                }
             }
         }
     }

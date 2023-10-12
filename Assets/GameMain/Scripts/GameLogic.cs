@@ -105,7 +105,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                 CameraControl.GetInstance.GetCameraEntity(CameraControl.CameraType.Three).transform);
 
             //缓存所有实体物品数据信息
-            CacheItemDataInfo();
+            InitCreateCacheItemDataInfo();
 
             //提交场景图，物体与房间的邻接关系
             InterfaceDataCenter.GetInstance.CommitGetThingGraph(MainData.CacheSceneItemsInfo, () =>
@@ -265,8 +265,10 @@ public class GameLogic : SingletonByMono<GameLogic>
     #endregion
 
     #region 缓存房间内实体信息
-    //缓存房间内实体信息
-    private void CacheItemDataInfo()
+    /// <summary>
+    /// 初始化创建房间内实体信息对象
+    /// </summary>
+    private void InitCreateCacheItemDataInfo()
     {
         //清理实体缓存信息
         List<GetThingGraph_data_items> items = new List<GetThingGraph_data_items>();
@@ -307,13 +309,14 @@ public class GameLogic : SingletonByMono<GameLogic>
                 });
             }
             //手动添加该房间的实体门信息
-            List<BorderEntityData> doorDataArr = GenerateRoomData.GetInstance.GetDoorInfoByRoomType((RoomType)Enum.Parse(typeof(RoomType), roomName));
+            List<BorderEntityData> doorDataArr = GenerateRoomData.GetInstance.GetDoorInfoByRoomType((RoomType)Enum.Parse(typeof(RoomType), roomName), roomID);
             foreach (BorderEntityData doorData in doorDataArr)
             {
+                Debug.Log(doorData);
                 string doorID = doorData.entity?.name;
                 string doorName = roomName + "Door";
                 Transform modelTrans = doorData.entity.transform.Find("Model")?.transform;
-                doorData.entity.name = doorName + "_" + doorID;
+                //doorData.entity.name = doorName + "_" + doorID;
 
 
                 item.relatedThing.Add(new GetThingGraph_data_items_relatedThing
@@ -329,6 +332,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                     },
                     relationship = "In"
                 });
+
             }
             MainData.CacheSceneItemsInfo.items.Add(item);
         }
@@ -474,7 +478,9 @@ public class GameLogic : SingletonByMono<GameLogic>
         {
             string testJson =
                 //"{\"entityInfo\":[{\"id\":\"sim:20\",\"type\":\"Book\",\"modelId\":\"Book_1\",\"pos\":{\"x\":4.5,\"y\":13.4},\"roomInfo\":{\"roomType\":\"LivingRoom\",\"roomID\":\"sim:3\"},\"parentEntityInfo\":{\"id\":\"sim:7\",\"type\":\"BIN\",\"PutArea\":\"In\"}}]}"
-                "{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:2\",\r\n            \"type\": \"FOOD\",\r\n            \"modelId\": \"Food_1\",\r\n            \"pos\": {\r\n                \"x\": 7,\r\n                \"y\": 7\r\n            },\r\n            \"dynamic\": -1,\r\n            \"putArea\": \"In\",\r\n            \"roomInfo\": {\r\n                \"roomType\": \"LivingRoom\",\r\n                \"roomID\": \"sim:10\"\r\n            },\r\n            \"parentEntityInfo\": {\r\n                \"id\": \"sim:8\",\r\n                \"type\": \"POT\"\r\n            }\r\n        }\r\n    ]\r\n}"
+                //"{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:2\",\r\n            \"type\": \"FOOD\",\r\n            \"modelId\": \"Food_1\",\r\n            \"pos\": {\r\n                \"x\": 7,\r\n                \"y\": 7\r\n            },\r\n            \"dynamic\": -1,\r\n            \"putArea\": \"In\",\r\n            \"roomInfo\": {\r\n                \"roomType\": \"LivingRoom\",\r\n                \"roomID\": \"sim:10\"\r\n            },\r\n            \"parentEntityInfo\": {\r\n                \"id\": \"sim:8\",\r\n                \"type\": \"POT\"\r\n            }\r\n        }\r\n    ]\r\n}"
+                //"{\"entityInfo\":[{\"id\":\"sim:8\",\"type\":\"Book\",\"modelId\":\"Book_1\",\"pos\":{\"x\":8.033,\"y\":5.967},\"dynamic\":0,\"roomInfo\":{\"roomType\":\"LivingRoom\",\"roomID\":\"sim:1\"},\"PutArea\":\"On\",\"parentEntityInfo\":{\"id\":\"sim:6\",\"type\":\"BED\"}}]}"
+                "{\"entityInfo\":[{\"id\":\"sim:10\",\"type\":\"Desk\",\"modelId\":\"Desk_1\",\"pos\":{\"x\":1,\"y\":7},\"dynamic\":0,\"roomInfo\":{\"roomType\":\"LivingRoom\",\"roomID\":\"sim:3\"},\"putArea\":\"In\",\"parentEntityInfo\":{}}]}"
                 ;
 
             NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_ADD_GOODS,
