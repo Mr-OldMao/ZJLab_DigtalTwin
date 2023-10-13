@@ -159,7 +159,9 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// <param name="msg"></param>
     private void ParseMQTTMsg(string topic,string msg)
     {
-        Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
+        //Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
+        Debug.Log($"recv mqtt callback. topic：{topic}");
+
         //在非Unity主线程中调用UnityEngineApi
         PimDeWitte.UnityMainThreadDispatcher.UnityMainThreadDispatcher.Instance().Enqueue(() =>
         {

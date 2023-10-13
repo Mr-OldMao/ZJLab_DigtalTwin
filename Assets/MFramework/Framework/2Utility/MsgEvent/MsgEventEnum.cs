@@ -11,6 +11,12 @@ public class MsgEventEnum { }
 public enum MsgEventName
 {
     Test,
+
+    /// <summary>
+    /// 初始化场景数据完毕
+    /// </summary>
+    InitComplete,
+
     /// <summary>
     /// 所有的房间、物体生成完毕
     /// </summary>

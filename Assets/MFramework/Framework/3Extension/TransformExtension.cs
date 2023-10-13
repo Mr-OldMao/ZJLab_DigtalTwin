@@ -40,6 +40,36 @@ namespace MFramework
         }
 
         /// <summary>
+        /// 批量查找游戏对象(Transform静态扩展)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transform"></param>
+        /// <param name="targetName">查找的对象名</param>
+        /// <param name="includeInactive">查找范围是否包含未激活的游戏对象</param>
+        /// <returns></returns>
+        public static List<T> Finds<T>(this Transform transform, string targetName, bool includeInactive = true) where T : Component
+        {
+            List<T> res = default;
+            if (transform == null || string.IsNullOrEmpty(targetName))
+            {
+                res = null;
+            }
+            var targetArr = transform.GetComponentsInChildren<T>(includeInactive);
+            for (int i = 0; i < targetArr.Length; i++)
+            {
+                if (targetArr[i].name == targetName)
+                {
+                    if (res == null)
+                    {
+                        res = new List<T>();
+                    }
+                    res.Add(targetArr[i]);
+                }
+            }
+            return res;
+        }
+
+        /// <summary>
         /// 查找游戏对象(Transform静态扩展)
         /// </summary>
         /// <param name="transform"></param>
@@ -57,7 +87,7 @@ namespace MFramework
         /// </summary>
         /// <param name="transform"></param>
         /// <param name="isShow"></param>
-        public static void SetActive(this Transform transform,bool isShow)
+        public static void SetActive(this Transform transform, bool isShow)
         {
             transform.gameObject.SetActive(isShow);
         }

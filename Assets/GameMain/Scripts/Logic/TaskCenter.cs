@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MFramework;
 using System;
+using UnityEngine.AI;
 /// <summary>
 /// 标题：任务中心
 /// 功能：根据指令用于派发任务，处理任务
@@ -21,11 +22,12 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// 是否允许机器人自动处理任务
     /// </summary>
     public bool CanExecuteTask
-    {   get
+    {
+        get
         {
             return m_CanExecuteTask;
         }
-        set 
+        set
         {
             //监听“门”碰撞事件
             GameLogic.GetInstance.ListenerDoorCollEvent(value);
@@ -150,7 +152,6 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             GameObject grabObj = null;
             //有且仅在 “拿取”“放下”物品 任务时传递当前物品的父对象实体，其他任务传null
             GameObject grabOldParentNode = null;
-
             switch (orderStr)
             {
                 //拿取
@@ -162,6 +163,20 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     {
                         grabOldParentNode = grabObj.transform.parent.gameObject;
                         grabObj.transform.parent = robotAnimCenter.RobotHandleNode;
+                        grabObj.transform.localPosition = Vector3.zero;
+                        grabObj.transform.localRotation = Quaternion.Euler(Vector3.zero);
+                        foreach (var item in grabObj.transform.Finds<Transform>("Model"))
+                        {
+                            item.transform.localPosition = Vector3.zero;
+                        }
+                        foreach (var item in grabObj.GetComponentsInChildren<MeshCollider>())
+                        {
+                            item.enabled = false;
+                        }
+                        foreach (var item in grabObj.GetComponentsInChildren<NavMeshObstacle>())
+                        {
+                            item.enabled = false;
+                        }
                     }
                     else
                     {
@@ -187,14 +202,14 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     break;
                 //打开门
                 case Order.Close_Door_Outside:
-                    animSecond = robotAnimCenter.PlayAnimByTrigger("OpenDoor");
+                    animSecond = robotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Outside");
                     break;
                 //关闭门
                 case Order.Close_Door_Inside:
-                    animSecond = robotAnimCenter.PlayAnimByTrigger("CloseDoor");
+                    animSecond = robotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Inside");
                     break;
                 //擦桌子
-                case "todo2":
+                case Order.Robot_CleanTable:
                     animSecond = robotAnimCenter.PlayAnimByName("Robot_CleanTable");
                     break;
                 ////倒水
@@ -238,7 +253,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     animSecond = robotAnimCenter.PlayAnimByName("Robot_Knock_on_door");
                     break;
                 default:
-                    Debug.LogError("other orderStr : " + orderStr);
+                    Debug.LogError("当前指令动画未配置 orderAnim: " + orderStr + "，motionId:" + GetCurExecuteTask.motionId);
+                    animSecond = robotAnimCenter.PlayAnimByName("Robot_Other");
                     break;
             }
             robotAnimCenter.PlayAnimByBool("CanInteraction", false);
@@ -251,9 +267,21 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     if (grabObj != null && grabOldParentNode != null)
                     {
                         grabObj.transform.parent = grabOldParentNode.transform;
+                        foreach (var item in grabObj.GetComponentsInChildren<MeshCollider>())
+                        {
+                            item.enabled = true;
+                        }
+                        foreach (var item in grabObj.GetComponentsInChildren<NavMeshObstacle>())
+                        {
+                            item.enabled = true;
+                        }
                     }
                     animCompleteCallback?.Invoke();
                 });
+            }
+            else
+            {
+                Debug.LogError("get animSecond fail , orderStr : " + orderStr);
             }
         }
         else
@@ -341,4 +369,6 @@ class Order
     public const string Push_Loop = "Push_Loop";
     public const string Push_Start = "Push_Start";
     public const string IDLE = "IDLE";
+
+    public const string Robot_CleanTable = "Robot_CleanTable";
 }

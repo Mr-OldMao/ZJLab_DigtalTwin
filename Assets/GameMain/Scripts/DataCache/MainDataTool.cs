@@ -12,6 +12,18 @@ using static JsonAddEntity;
 /// </summary>
 public class MainDataTool : SingletonByMono<MainDataTool>
 {
+
+    /// <summary>
+    /// h5外部调用，用于初始化场景id
+    /// </summary>
+    public void InitMainDataParam(string id)
+    {
+        MainData.ID = id;
+        Debug.Log("[Unity] InitMainDataParam");
+        MsgEvent.SendMsg(MsgEventName.InitComplete);
+    }
+
+
     #region 场景中新增指定实体
     /// <summary>
     /// 生成实体放置到指定位置

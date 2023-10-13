@@ -24,7 +24,19 @@ public class GameLogic : SingletonByMono<GameLogic>
     public void Init()
     {
         Debug.Log("Init GameLogic");
-        this.EnterMainScene();
+
+        MsgEvent.RegisterMsgEvent(MsgEventName.InitComplete, () =>
+        {
+            this.EnterMainScene();
+        });
+#if UNITY_EDITOR
+        MainDataTool.GetInstance.InitMainDataParam("test");
+#endif
+    }
+
+    private void OnDisable()
+    {
+        MsgEvent.UnregisterMsgEvent(MsgEventName.InitComplete);
     }
 
     private void EnterMainScene()
@@ -72,8 +84,8 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     private void NetworkHTTP()
     {
-        InterfaceDataCenter.GetInstance.CacheGetThingGraph("test");
-        InterfaceDataCenter.GetInstance.CacheGetEnvGraph("test");
+        InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.ID);
+        InterfaceDataCenter.GetInstance.CacheGetEnvGraph(MainData.ID);
     }
 
     private void NetworkMQTT()
@@ -111,7 +123,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             InterfaceDataCenter.GetInstance.CommitGetThingGraph(MainData.CacheSceneItemsInfo, () =>
             {
                 ////更新仿真引擎状态，从而获取服务器指令
-                //InterfaceDataCenter.GetInstance.ChangeProgramState("test", ProgramState.start);
+                //InterfaceDataCenter.GetInstance.ChangeProgramState(MainData.ID, ProgramState.start);
             });
 
             //提交场景图布局，房间与房间位置关系
@@ -275,7 +287,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         MainData.CacheSceneItemsInfo = new PostThingGraph
         {
             items = items,
-            id = "test",
+            id = MainData.ID,
         };
         Transform ItemEntityGroupNode = GenerateRoomItemModel.GetInstance.ItemEntityGroupNode;
         //遍历所有房间

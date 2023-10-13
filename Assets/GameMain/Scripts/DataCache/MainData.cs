@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using static GetThingGraph;
 
@@ -19,7 +20,7 @@ public class MainData
     /// <summary>
     /// 接口参数ID
     /// </summary>
-    public const string ID = "test";
+    public static string ID = string.Empty;
 
     /// <summary>
     /// 物体与房间的邻接关系数据
@@ -41,7 +42,7 @@ public class MainData
     /// <summary>
     /// 缓存场景中所有实体
     /// </summary>
-    public static Dictionary<string,GameObject> CacheItemsEntity = new Dictionary<string,GameObject>(); 
+    public static Dictionary<string, GameObject> CacheItemsEntity = new Dictionary<string, GameObject>();
 
     /// <summary>
     /// 指令控制数据
