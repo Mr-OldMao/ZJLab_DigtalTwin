@@ -44,8 +44,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// </summary>
     public ControlCommit GetCurExecuteTask { get; private set; }
 
-    private AIRobotMove aIRobotMove = null;
-
+    private AIRobotMove m_AIRobotMove = null;
+    private RobotAnimCenter m_RobotAnimCenter = null;
     /// <summary>
     /// 执行任务限制用时
     /// </summary>
@@ -60,12 +60,14 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     private Coroutine m_CorLimitTask;
     public void Init()
     {
-        if (aIRobotMove == null)
+        if (m_AIRobotMove == null)
         {
             //aIRobotMove = GameObject.FindGameObjectWithTag("Player")?.GetComponent<AIRobotMove>();
-            aIRobotMove = FindObjectOfType<AIRobotMove>();
+            m_AIRobotMove = FindObjectOfType<AIRobotMove>();
             RegisterEvent();
         }
+
+        m_RobotAnimCenter = GameObject.FindObjectOfType<RobotAnimCenter>();
     }
     private void RegisterEvent()
     {
@@ -84,12 +86,12 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         GetCurExecuteTask = controlCommit;
         Vector3 targetPos = new Vector3(controlCommit.position[0], controlCommit.position[1], controlCommit.position[2]);
         //判定是否能到达目标位置
-        bool canArrive = aIRobotMove.JudgeCanArrivePos(targetPos);
+        bool canArrive = m_AIRobotMove.JudgeCanArrivePos(targetPos);
         if (canArrive)
         {
-            aIRobotMove.SetTargetPointObj(targetPos);
+            m_AIRobotMove.SetTargetPointObj(targetPos);
             //导航到目标位置
-            aIRobotMove.Move(targetPos);
+            m_AIRobotMove.Move(targetPos);
 
             //限时，未在指定时间内到达指定位置视为无法到达
             m_CorLimitTask = UnityTool.GetInstance.DelayCoroutine(m_TaskLimitTime, () => TaskExecuteFail());
@@ -142,11 +144,10 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         //解析指令名称
         string orderStr = GetCurExecuteTask.name;
         Debug.Log("到达指定位置 机器人与物体交互，播放动画  orderStr :" + orderStr);
-        RobotAnimCenter robotAnimCenter = GameObject.FindObjectOfType<RobotAnimCenter>();
-        if (robotAnimCenter != null)
+        if (m_RobotAnimCenter != null)
         {
             float animSecond = 0;
-            robotAnimCenter.PlayAnimByBool("CanInteraction", true);
+            m_RobotAnimCenter.PlayAnimByBool("CanInteraction", true);
 
             //“拿取”“放下”交互对象实体
             GameObject grabObj = null;
@@ -162,7 +163,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     if (grabObj != null)
                     {
                         grabOldParentNode = grabObj.transform.parent.gameObject;
-                        grabObj.transform.parent = robotAnimCenter.RobotHandleNode;
+                        grabObj.transform.parent = m_RobotAnimCenter.RobotHandleNode;
                         grabObj.transform.localPosition = Vector3.zero;
                         grabObj.transform.localRotation = Quaternion.Euler(Vector3.zero);
                         foreach (var item in grabObj.transform.Finds<Transform>("Model"))
@@ -182,7 +183,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     {
                         Debug.LogError("obj is null ,objName: " + objName1);
                     }
-                    animSecond = robotAnimCenter.PlayAnimByName("Robot_Grab_item");
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Grab_item");
                     break;
                 //放下
                 case Order.Grab_item_pull:
@@ -192,25 +193,25 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     if (grabObj != null)
                     {
                         grabOldParentNode = grabObj.transform.parent.gameObject;
-                        grabObj.transform.parent = robotAnimCenter.RobotHandleNode;
+                        grabObj.transform.parent = m_RobotAnimCenter.RobotHandleNode;
                     }
                     else
                     {
                         Debug.LogError("obj is null ,objName: " + objName2);
                     }
-                    animSecond = robotAnimCenter.PlayAnimByName("Robot_PutDown");
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PutDown");
                     break;
                 //打开门
                 case Order.Close_Door_Outside:
-                    animSecond = robotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Outside");
+                    animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Outside");
                     break;
                 //关闭门
                 case Order.Close_Door_Inside:
-                    animSecond = robotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Inside");
+                    animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Inside");
                     break;
                 //擦桌子
                 case Order.Robot_CleanTable:
-                    animSecond = robotAnimCenter.PlayAnimByName("Robot_CleanTable");
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_CleanTable");
                     break;
                 ////倒水
                 //case Order.:
@@ -218,13 +219,13 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 //    break;
                 //操作阀门
                 case "todo3":
-                    animSecond = robotAnimCenter.PlayAnimByName("Robot_PressBtn");
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PressBtn");
                     break;
                 //蹲下拾取
                 case Order.Pick_Fwd:
                 case Order.Pick_L:
                 case Order.Pick_R:
-                    animSecond = robotAnimCenter.PlayAnimByName("Robot_Pick");
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Pick");
                     break;
                 //推
                 case Order.Push_End:
@@ -234,7 +235,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case Order.Push_Loop:
                 case Order.Push_Idle_inPlace:
                 case Order.Push_Start:
-                    animSecond = robotAnimCenter.PlayAnimByName("Robot_Push_Idle");
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Push_Idle");
                     break;
                 ////拉
                 //case Order.:
@@ -242,22 +243,22 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 //    break;
                 //按下按钮
                 case Order.Press_Button:
-                    animSecond = robotAnimCenter.PlayAnimByName("Robot_PressBtn");
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PressBtn");
                     break;
                 //空闲姿态
                 case Order.IDLE:
-                    animSecond = robotAnimCenter.PlayAnimByName("Idle");
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Idle");
                     break;
                 //敲门
                 case Order.Knock_on_door:
-                    animSecond = robotAnimCenter.PlayAnimByName("Robot_Knock_on_door");
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Knock_on_door");
                     break;
                 default:
                     Debug.LogError("当前指令动画未配置 orderAnim: " + orderStr + "，motionId:" + GetCurExecuteTask.motionId);
-                    animSecond = robotAnimCenter.PlayAnimByName("Robot_Other");
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Other");
                     break;
             }
-            robotAnimCenter.PlayAnimByBool("CanInteraction", false);
+            m_RobotAnimCenter.PlayAnimByBool("CanInteraction", false);
             if (animSecond > 0)
             {
                 UnityTool.GetInstance.DelayCoroutine(animSecond, () =>
@@ -297,6 +298,11 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     private void TaskExecuteFail(int stateCode = 2)
     {
         Debug.LogError("无法导航到目标位置");
+
+        //改变机器人状态
+        m_RobotAnimCenter.PlayAnimByBool("IsMoving", false);
+        m_AIRobotMove.curRobotState = AIRobotMove.RobotBaseState.Idel;
+
         //返回指令执行结果
         ControlResult controlResult = new ControlResult
         {
