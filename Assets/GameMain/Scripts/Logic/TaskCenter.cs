@@ -49,7 +49,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// <summary>
     /// 执行任务限制用时
     /// </summary>
-    private const float m_TaskLimitTime = 20f;
+    private const float m_TaskLimitTime = 10f;
     /// <summary>
     /// 执行当前任务用时
     /// </summary>
@@ -82,6 +82,11 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// </summary>
     public void ParseOrderExcute(ControlCommit controlCommit)
     {
+        //强制改变机器人状态
+        m_RobotAnimCenter.PlayAnimByBool("IsMoving", false);
+        m_AIRobotMove.curRobotState = AIRobotMove.RobotBaseState.Idel;
+
+
         IsExecuteTask = true;
         GetCurExecuteTask = controlCommit;
         Vector3 targetPos = new Vector3(controlCommit.position[0], controlCommit.position[1], controlCommit.position[2]);
@@ -143,7 +148,12 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     {
         //解析指令名称
         string orderStr = GetCurExecuteTask.name;
+
+
         Debug.Log("到达指定位置 机器人与物体交互，播放动画  orderStr :" + orderStr);
+
+        
+
         if (m_RobotAnimCenter != null)
         {
             float animSecond = 0;
@@ -334,6 +344,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             {
                 ControlCommit controlCommit = MainData.controlCommit.Dequeue();
                 ParseOrderExcute(controlCommit);
+
             }
         }
         if (IsExecuteTask)
