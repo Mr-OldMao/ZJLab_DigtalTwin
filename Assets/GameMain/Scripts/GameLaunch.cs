@@ -17,6 +17,13 @@ public class GameLaunch : SingletonByMono<GameLaunch>
     /// </summary>
     public LaunchModel LaunchModel { get => m_LaunchModel; }
 
+    public Scenes scene;
+
+    public enum Scenes
+    {
+        MainScene1,
+        MainScene2
+    }
 
     private void Awake()
     {
@@ -44,24 +51,34 @@ public class GameLaunch : SingletonByMono<GameLaunch>
     }
     private void InitGameLogic()
     {
-       
-        switch (m_LaunchModel)
+        switch (scene)
         {
-            case LaunchModel.EditorModel:
-                NetworkMqtt.GetInstance.IsWebgl = false;
-                break;
-            case LaunchModel.BuilderModel:
+            case Scenes.MainScene1:
+                switch (m_LaunchModel)
+                {
+                    case LaunchModel.EditorModel:
+                        NetworkMqtt.GetInstance.IsWebgl = false;
+                        break;
+                    case LaunchModel.BuilderModel:
 #if UNITY_WEBGL && !UNITY_EDITOR
                 NetworkMqtt.GetInstance.IsWebgl = true;
 #else
-                NetworkMqtt.GetInstance.IsWebgl = false;
+                        NetworkMqtt.GetInstance.IsWebgl = false;
 #endif
+                        break;
+                    default:
+                        break;
+                }
+                Debug.Log("iswebgl:" + NetworkMqtt.GetInstance.IsWebgl);
+                GameLogic.GetInstance.Init();
+                break;
+            case Scenes.MainScene2:
+                GameLogic2.GetInstance.Init();
                 break;
             default:
                 break;
         }
-        Debug.Log("iswebgl:" + NetworkMqtt.GetInstance.IsWebgl);
-        GameLogic.GetInstance.Init();
+       
     }
 }
 

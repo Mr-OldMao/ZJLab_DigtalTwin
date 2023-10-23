@@ -74,14 +74,16 @@ namespace MFramework.Editor
                 isSummaryAnnotation = isSummaryAnnotation,
                 isOverrideScript = isOverrideScript
             };
-            try
-            {
-                AutoCreateScriptImpl.BuildScript();
-            }
-            catch (System.Exception)
-            {
-                Debug.Log("脚本自动化生成工具运行失败! Json数据 格式错误 请检查 jsonStr：" + jsonMapClassStruct.jsonStr);
-            }
+            AutoCreateScriptImpl.BuildScript();
+
+            //try
+            //{
+            //    AutoCreateScriptImpl.BuildScript();
+            //}
+            //catch (System.Exception)
+            //{
+            //    Debug.Log("脚本自动化生成工具运行失败! Json数据 格式错误 请检查 jsonStr：" + jsonMapClassStruct.jsonStr);
+            //}
         }
         private void OnWizardOtherButton()
         {
@@ -167,7 +169,18 @@ namespace MFramework.Editor
             /// <param name="curClassName">当前json包含的字段的类名</param>
             private static void DeserializeObject(string jsonStr, string curClassName)
             {
-                JObject jObject = (JObject)JsonConvert.DeserializeObject(jsonStr);//将json字符串转化为JObject
+                Debug.Log(jsonStr + ",curClassName:" + curClassName);
+                JObject jObject = null;
+                try
+                {
+                    jObject = (JObject)JsonConvert.DeserializeObject(jsonStr);//将json字符串转化为JObject
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError("子json转换实体类失败 e:" + e);
+                    return;
+                }
+
                 foreach (var obj in jObject)
                 {
                     //Debug.Log("testTemp:" + testTemp + ",item.Key:" + obj.Key + " ,item.Value.Type:" + obj.Value.Type + ",item.Value : " + obj.Value);
@@ -213,7 +226,7 @@ namespace MFramework.Editor
                     else
                     {
                         string fieldName = obj.Key;
-                        string fieldType = GetFieldTypeByJTokenType(fieldName, obj.Value.Type); 
+                        string fieldType = GetFieldTypeByJTokenType(fieldName, obj.Value.Type);
                         //Debug.Log("testTemp:" + testTemp +  "，fieldName：" + fieldName + "，fieldContent：" + obj.Value+"，type：" + obj.Value.Type + "，fieldType："+ fieldType);
                         SpliceStr(curClassName, fieldName, fieldType);
                     }

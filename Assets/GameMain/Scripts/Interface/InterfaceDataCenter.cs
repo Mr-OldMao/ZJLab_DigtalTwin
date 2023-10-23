@@ -28,6 +28,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     private static string URL_CHANGE_SIMULATOR_STATE = URL_SUBROOT + "simulator/changeSimulatorState";
 
     /*MQTT*/
+    #region 仿真
     //更新全局场景图
     private const string TOPIC_GLOBAL = "/simulator/thingGraph/global";
     //更新相机视⻆场景图
@@ -47,6 +48,15 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public const string TOPIC_ADD_GOODS = "simulator/addGoods";
     //删除房间实体模型
     public const string TOPIC_DEL_GOODS = "simulator/delGoods";
+    #endregion
+
+    #region 数字孪生
+    //访客坐标信息
+    public const string TOPIC_PEOPLE_PERCEPTION = "feature/people_perception";
+    //机器人坐标信息
+    public const string TOPIC_ROBOT_POS = "feature/robot_pos";
+    #endregion
+
     #region HTTP
     /// <summary>
     /// 缓存场景图，物体与房间的邻接关系
@@ -125,13 +135,20 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 
         NetworkMqtt.GetInstance.AddConnectedSucEvent(() =>
         {
-            NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS,TOPIC_DEL_GOODS);
-
-            //TEST
-            NetworkMqtt.GetInstance.Subscribe(TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_RECV, TOPIC_ROOMINFODATA
-                //, "feature/people_perception", "feature/robot_pos"
-                );
-
+            switch (GameLaunch.GetInstance.scene)
+            {
+                case GameLaunch.Scenes.MainScene1:
+                    NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS, TOPIC_DEL_GOODS);
+                    //TEST
+                    NetworkMqtt.GetInstance.Subscribe(TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_RECV, TOPIC_ROOMINFODATA
+                        );
+                    break;
+                case GameLaunch.Scenes.MainScene2:
+                    NetworkMqtt.GetInstance.Subscribe(TOPIC_PEOPLE_PERCEPTION, TOPIC_ROBOT_POS);
+                    break;
+                default:
+                    break;
+            }
         });
 
         //初始化并订阅主题tcp://10.5.24.28:1883
@@ -144,7 +161,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         //监听消息回调
         NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
         {
-            ParseMQTTMsg(topic,msg);
+            ParseMQTTMsg(topic, msg);
         });
         //NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgSubscribedEventArgs e) =>
         //{
@@ -157,10 +174,10 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// </summary>
     /// <param name="topic"></param>
     /// <param name="msg"></param>
-    private void ParseMQTTMsg(string topic,string msg)
+    private void ParseMQTTMsg(string topic, string msg)
     {
-        //Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
-        Debug.Log($"recv mqtt callback. topic：{topic}");
+        Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
+        //Debug.Log($"recv mqtt callback. topic：{topic}");
 
         //在非Unity主线程中调用UnityEngineApi
         PimDeWitte.UnityMainThreadDispatcher.UnityMainThreadDispatcher.Instance().Enqueue(() =>
@@ -194,6 +211,14 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                 case TOPIC_DEL_GOODS:
                     JsonDelEntity jsonDelEntity = JsonTool.GetInstance.JsonToObjectByLitJson<JsonDelEntity>(msg);
                     MainDataTool.GetInstance.DelEntityToTargetPlace(jsonDelEntity);
+                    break;
+                case TOPIC_ROBOT_POS:
+                    Feature_Robot_Pos feature_Robot_Pos = JsonTool.GetInstance.JsonToObjectByLitJson<Feature_Robot_Pos>(msg);
+                    MainData.feature_robot_pos.Enqueue(feature_Robot_Pos);
+                    break;
+                case TOPIC_PEOPLE_PERCEPTION:
+                    Feature_People_Perception feature_People_Perception = JsonTool.GetInstance.JsonToObjectByLitJson<Feature_People_Perception>(msg);
+                    MainData.feature_People_Perceptions.Enqueue(feature_People_Perception);
                     break;
                 default:
                     //Debug.Log($"Other Topoc :{topic}");

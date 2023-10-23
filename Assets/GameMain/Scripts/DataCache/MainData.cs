@@ -51,4 +51,12 @@ public class MainData
 
 
 
+    /// <summary>
+    /// 机器人坐标信息
+    /// </summary>
+    public static Queue<Feature_Robot_Pos> feature_robot_pos { get; set; } = new Queue<Feature_Robot_Pos> { };
+    /// <summary>
+    /// 访客坐标信息
+    /// </summary>
+    public static Queue<Feature_People_Perception> feature_People_Perceptions { get; set; } = new Queue<Feature_People_Perception> { };
 }

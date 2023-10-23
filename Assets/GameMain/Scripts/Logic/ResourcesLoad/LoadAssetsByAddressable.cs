@@ -34,10 +34,10 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
     public class ResInfo
     {
         public List<GameObject> items = null;
-        /// <summary>
-        /// 当前实体放置限制，只能放置在此类对象上
-        /// </summary>
-        public List<GameObject> limitItems = null;
+        ///// <summary>
+        ///// 当前实体放置限制，只能放置在此类对象上
+        ///// </summary>
+        //public List<GameObject> limitItems = null;
     }
 
     /// <summary>
@@ -308,7 +308,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
             resInfo = new ResInfo()
             {
                 items = new List<GameObject>() { value },
-                limitItems = null
+                //limitItems = null
             };
             dicCacheAssets.Add(parseItemName, resInfo);
         }
