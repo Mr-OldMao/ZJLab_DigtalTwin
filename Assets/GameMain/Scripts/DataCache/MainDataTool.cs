@@ -18,7 +18,7 @@ public class MainDataTool : SingletonByMono<MainDataTool>
     /// </summary>
     public void InitMainDataParam(string id)
     {
-        MainData.ID = id;
+        MainData.IDScene = id;
         Debug.Log("[Unity] InitMainDataParam");
         MsgEvent.SendMsg(MsgEventName.InitComplete);
     }

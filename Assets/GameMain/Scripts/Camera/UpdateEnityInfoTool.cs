@@ -78,7 +78,7 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
     {
         if (MainData.CacheCameraItemsInfo == null)
         {
-            MainData.CacheCameraItemsInfo = new PostThingGraph { id = MainData.ID };
+            MainData.CacheCameraItemsInfo = new PostThingGraph { id = MainData.IDScene };
         }
         if (MainData.CacheCameraItemsInfo.items == null)
         {

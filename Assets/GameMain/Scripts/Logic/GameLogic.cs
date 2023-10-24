@@ -84,8 +84,8 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     private void NetworkHTTP()
     {
-        InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.ID);
-        InterfaceDataCenter.GetInstance.CacheGetEnvGraph(MainData.ID);
+        InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.IDScene);
+        InterfaceDataCenter.GetInstance.CacheGetEnvGraph(MainData.IDScene);
     }
 
     private void NetworkMQTT()
@@ -287,7 +287,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         MainData.CacheSceneItemsInfo = new PostThingGraph
         {
             items = items,
-            id = MainData.ID,
+            id = MainData.IDScene,
         };
         Transform ItemEntityGroupNode = GenerateRoomItemModel.GetInstance.ItemEntityGroupNode;
         //遍历所有房间

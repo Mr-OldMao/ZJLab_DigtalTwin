@@ -4,8 +4,9 @@
 /// 创建时间：2023/10/10 9:59:46
 /// </summary>
 public class JsonAddEntity
-{  
-	public JsonAddEntity_entityInfo[] entityInfo;
+{
+    public string idScene = MainData.IDScene;
+    public JsonAddEntity_entityInfo[] entityInfo;
 	public class JsonAddEntity_entityInfo
 	{
 		public string id;

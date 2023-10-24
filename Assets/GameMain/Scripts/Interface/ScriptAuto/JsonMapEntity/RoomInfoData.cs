@@ -9,9 +9,13 @@ public class RoomInfoData
 	public List<RoomInfoData_roomInfos> roomInfos;
 	public class RoomInfoData_roomInfos
 	{
+		/// <summary>
+		/// 房间id
+		/// </summary>
         public string id;
         public string roomType;
 		public int[] minPos;
 		public int[] maxPos;
 	}
+    public string idScene = MainData.IDScene;
 }

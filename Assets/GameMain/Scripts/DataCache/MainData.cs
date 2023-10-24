@@ -18,9 +18,9 @@ public class MainData
     public static ConfigData ConfigData { get; set; }
 
     /// <summary>
-    /// 接口参数ID
+    /// 场景ID 接口参数ID
     /// </summary>
-    public static string ID = string.Empty;
+    public static string IDScene = string.Empty;
 
     /// <summary>
     /// 物体与房间的邻接关系数据
