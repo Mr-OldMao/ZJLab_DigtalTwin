@@ -6,6 +6,7 @@ using static UnityEngine.AddressableAssets.Addressables;
 using System;
 using System.IO;
 using System.Collections;
+using static LoadAssetsByAddressable;
 
 /// <summary>
 /// 标题：基于Addressable进行ab包的异步加载
@@ -34,10 +35,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
     public class ResInfo
     {
         public List<GameObject> items = null;
-        ///// <summary>
-        ///// 当前实体放置限制，只能放置在此类对象上
-        ///// </summary>
-        //public List<GameObject> limitItems = null;
+        public List<Material> materials = null;
     }
 
     /// <summary>
@@ -78,6 +76,21 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         }
         Debug.Log("Loading Assets ...");
         Init();
+
+        bool loadMatComplete = false;
+        bool loadPrefabComplete = false;
+
+        Addressables.LoadAssetsAsync<Material>(lables, (p) =>
+        {
+            AddMatRes(p.name, p);
+            m_CurLoadedCount++;
+            //GetLoadProgress(AllAssetsCount);
+        }, MergeMode.Union, true).Completed += (UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle<IList<Material>> obj) =>
+        {
+            loadMatComplete = true;
+            Debug.Log("Loading Material Complete");
+        };
+
         Addressables.LoadAssetsAsync<GameObject>(lables, (p) =>
         {
             AddEntityRes(p.name, p);
@@ -85,9 +98,15 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
             //GetLoadProgress(AllAssetsCount);
         }, MergeMode.Union, true).Completed += (UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle<IList<GameObject>> obj) =>
         {
-            Debug.Log("Loading Assets Complete");
-            callbackLoadedComplete?.Invoke();
+            loadPrefabComplete = true;
+            Debug.Log("Loading Prefab Complete");
         };
+
+        UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() => { return loadMatComplete && loadPrefabComplete; }, () =>
+        {
+            Debug.Log("Loading All Assets Complete");
+            callbackLoadedComplete?.Invoke();
+        });
     }
 
     /// <summary>
@@ -297,6 +316,61 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         yield return null;
     }
 
+    public void AddMatRes(string matName, Material value)
+    {
+        ResInfo resInfo = null;
+        if (!dicCacheAssets.ContainsKey(matName))
+        {
+            resInfo = new ResInfo()
+            {
+                materials = new List<Material>() { value }
+            };
+            dicCacheAssets.Add(matName, resInfo);
+        }
+        else
+        {
+            resInfo = dicCacheAssets[matName];
+            resInfo.materials.Add(value);
+        }
+    }
+    public T GetRes<T>(string resName, bool isInstantiate) where T : UnityEngine.Object
+    {
+        T res = null;
+        if (dicCacheAssets.ContainsKey(resName))
+        {
+            if (typeof(T) == typeof(Material))
+            {
+                Material material = dicCacheAssets[resName].materials[UnityEngine.Random.Range(0, dicCacheAssets[resName].materials.Count)];
+                Material matRes = Instantiate(material);
+                if (isInstantiate)
+                {
+                    res = matRes as T;
+                }
+                else
+                {
+                    res = material as T;
+                }
+            }
+            else if (typeof(T) == typeof(GameObject))
+            {
+                GameObject obj = dicCacheAssets[resName].items[UnityEngine.Random.Range(0, dicCacheAssets[resName].items.Count)];
+                GameObject objRes = Instantiate(obj);
+                if (isInstantiate)
+                {
+                    res = objRes as T;
+                }
+                else
+                {
+                    res = obj as T;
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("resName not find , resName:" + resName);
+        }
+        return res;
+    }
 
     private void AddEntityRes(string itemName, GameObject value)
     {
@@ -307,8 +381,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         {
             resInfo = new ResInfo()
             {
-                items = new List<GameObject>() { value },
-                //limitItems = null
+                items = new List<GameObject>() { value }
             };
             dicCacheAssets.Add(parseItemName, resInfo);
         }

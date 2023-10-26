@@ -118,6 +118,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
 
         m_ListRoomInfo = new List<RoomInfo>();
 
+        //随机生成所有房间顺序：首先生成客厅房间，其次是邻接关系最多的房间，到最好邻接关系最少的房间
         //找到客厅房间放置在坐标系，房间左下角在原点，向第一象限延申
         RoomBaseInfo livingRoomBaseInfo = roomBaseInfos.Find((p) => { return p.curRoomType == RoomType.LivingRoom; });
         string firstGenerateID = livingRoomBaseInfo.curRoomID;
@@ -137,9 +138,14 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
 
         int loopCpuntMax = 30;
         int curLoopCount = 0;
+
         //遍历其他房间
         for (int i = 0; roomBaseInfos.Count > 0;)
         {
+            //寻找邻接关系最多的房间
+            RoomBaseInfo curRoom = FindNextRoom(roomBaseInfos);
+
+
             curLoopCount++;
             //容错 避免死循环
             if (curLoopCount > loopCpuntMax)
@@ -153,7 +159,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             {
                 i = 0;
             }
-            foreach (var item in roomBaseInfos[i].targetRoomsDirRelation)
+            foreach (var item in curRoom.targetRoomsDirRelation)
             {
                 //如果当前房间有邻接房间已创建，则允许该当前房间创建
                 if (m_ListRoomInfo.Find((p) => { return p.roomType == item.targetRoomType; }) != null)
@@ -182,7 +188,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             }
             //Debug.Log(" Cur Generate RoomType:" + roomBaseInfos[i].curRoomType);
             //根据房间邻接的边界信息，给出roomPosMin，roomPosMax
-            List<Vector2> pos = GetRandomRoomPosByDirRelaateion(roomBaseInfos[i], (p) =>
+            List<Vector2> pos = GetRandomRoomPosByDirRelaateion(curRoom, (p) =>
             {
                 if (!p)
                 {
@@ -191,20 +197,21 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             });
             RoomInfo roomInfo = new RoomInfo
             {
-                roomType = roomBaseInfos[i].curRoomType,
-                roomSize = roomBaseInfos[i].roomSize,
+                roomType = curRoom.curRoomType,
+                roomSize = curRoom.roomSize,
                 roomPosMin = pos[0],
                 roomPosMax = pos[1],
                 listDoorPosInfo = null, //TODO
                 listEmptyPosInfo = null, //TODO
-                roomID = roomBaseInfos[i].curRoomID
+                roomID = curRoom.curRoomID
             };
             m_ListRoomInfo.Add(roomInfo);
             UpdateRoomBuilderInfo(roomInfo);
-            roomBaseInfos.Remove(roomBaseInfos[i]);
+            roomBaseInfos.Remove(curRoom);
         }
         if (!isGenerateSuc)
         {
+            Debug.Log("111");
             callback(null, null);
             return;
         }
@@ -216,6 +223,25 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
 
         //Debug.Log("房间邻接的边界信息生成成功！");
         callback(listRoomBuilderInfo, m_ListRoomInfo);
+    }
+
+    /// <summary>
+    /// 寻找下一个要生成随机位置数据的房间
+    /// </summary>
+    /// <param name="roomBaseInfos"></param>
+    /// <returns></returns>
+    private RoomBaseInfo FindNextRoom(List<RoomBaseInfo> roomBaseInfos)
+    {
+        RoomBaseInfo res = roomBaseInfos?[0];
+        for (int i = 1; i < roomBaseInfos.Count; i++)
+        {
+            if (roomBaseInfos[i].targetRoomsDirRelation.Count > res.targetRoomsDirRelation.Count)
+            {
+                res = roomBaseInfos[i];
+            }
+        }
+        Debug.Log("next generage room :" + res.curRoomType.ToString() + ", roomid : " + res.curRoomID);
+        return res;
     }
 
     /// <summary>
@@ -263,16 +289,20 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             borderItemPosInfos.Add(new BorderEntityData
             {
                 entityAxis = 0,
+                borderDir = BorderDir.Down,
                 pos = new Vector2(curX, roomInfo.roomPosMin.y),
                 entityModelType = EntityModelType.Wall,
-                listRoomType = new List<RoomType> { roomInfo.roomType }
+                listRoomType = new List<RoomType> { roomInfo.roomType },
+                listRoomTypeID = new List<string> { roomInfo.roomID }
             });
             borderItemPosInfos.Add(new BorderEntityData
             {
                 entityAxis = 0,
+                borderDir = BorderDir.Up,
                 pos = new Vector2(curX, roomInfo.roomPosMax.y),
                 entityModelType = EntityModelType.Wall,
-                listRoomType = new List<RoomType> { roomInfo.roomType }
+                listRoomType = new List<RoomType> { roomInfo.roomType },
+                listRoomTypeID = new List<string> { roomInfo.roomID }
             });
         }
 
@@ -282,16 +312,20 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             borderItemPosInfos.Add(new BorderEntityData
             {
                 entityAxis = 1,
+                borderDir = BorderDir.Left,
                 pos = new Vector2(roomInfo.roomPosMin.x, curY),
                 entityModelType = EntityModelType.Wall,
-                listRoomType = new List<RoomType> { roomInfo.roomType }
+                listRoomType = new List<RoomType> { roomInfo.roomType },
+                listRoomTypeID = new List<string> { roomInfo.roomID }
             });
             borderItemPosInfos.Add(new BorderEntityData
             {
                 entityAxis = 1,
+                borderDir = BorderDir.Right,
                 pos = new Vector2(roomInfo.roomPosMax.x, curY),
                 entityModelType = EntityModelType.Wall,
-                listRoomType = new List<RoomType> { roomInfo.roomType }
+                listRoomType = new List<RoomType> { roomInfo.roomType },
+                listRoomTypeID = new List<string> { roomInfo.roomID }
             });
         }
 
@@ -310,6 +344,27 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             borderItemPosInfo.entityModelType = roomInfo.listEmptyPosInfo[temp].entityModelType;
             //Debug.Log("更正实体类型：" + borderItemPosInfo.pos + "," + borderItemPosInfo.entityModelType);
         }
+        //add smallWall
+        List<BorderEntityData> smallBorderEntityData = new List<BorderEntityData>();
+        for (int i = 0; i < borderItemPosInfos.Count; i++)
+        {
+            BorderEntityData borderEntityData = new BorderEntityData
+            {
+                entity = borderItemPosInfos[i].entity,
+                borderDir = borderItemPosInfos[i].borderDir,
+                pos = borderItemPosInfos[i].pos,
+                entityModelType = EntityModelType.SmallWall,
+                listRoomType = borderItemPosInfos[i].listRoomType,
+                entityAxis = borderItemPosInfos[i].entityAxis,
+                listRoomTypeID = borderItemPosInfos[i].listRoomTypeID
+            };
+            smallBorderEntityData.Add(borderEntityData);
+        }
+        //for (int i = 0; i < smallBorderEntityData.Count; i++)
+        //{
+        //    borderItemPosInfos.Add(smallBorderEntityData[i]);
+        //}
+        borderItemPosInfos = borderItemPosInfos.Union(smallBorderEntityData).ToList();
         return borderItemPosInfos;
 
     }
@@ -469,10 +524,12 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         int randomMax;
 
         int curRandomCount = 0;
-        int maxRandomCount = 30;
+        int maxRandomCount = 100;
         switch (otherPosCount)
         {
             case 2:
+            case 3:
+            case 4:
                 //1.单边限制，已知两个点位信息
                 if (otherPosLeftDown != null && otherPosRightDown != null) //当前房间在目标房间下侧
                 {
@@ -527,6 +584,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         maxPos = new Vector2(otherPosRightUp.Value.x + roomBaseInfo.roomSize[0], randomMinY + roomBaseInfo.roomSize[1]);
                     } while (!JudgeRandomPosIsRight(minPos, maxPos) && ++curRandomCount < maxRandomCount);
                 }
+                Debug.Log("获取当前房间随机坐标数据 roomType" + roomBaseInfo.curRoomType + ",roomID:" + roomBaseInfo.curRoomID + ", otherPosCount：" + otherPosCount);
                 callback(curRandomCount < maxRandomCount);
                 break;
             //case 3://2.双边限制，已知三个点位信息 TODO
@@ -553,6 +611,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     {
         for (int i = 0; i < roomBaseInfos.Count; i++)
         {
+            string curRoomID = roomBaseInfos[i].curRoomID;
             for (int j = 0; j < roomBaseInfos[i].targetRoomsDirRelation.Count; j++)
             {
                 //房间A的邻接房间信息
@@ -566,6 +625,11 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 if (targetRoomBaseInfo != null)
                 {
                     //判定房间A是否存在房间B的邻接信息中
+                    bool isExist = targetRoomBaseInfo.targetRoomsDirRelation?.Find((p) => { return p.targetRoomID == curRoomID; }) != null;
+                    if (isExist)
+                    {
+                        continue;
+                    }
                     //房间B无邻接房间信息
                     if (targetRoomBaseInfo.targetRoomsDirRelation == null)
                     {
@@ -739,13 +803,14 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             {
                 pos = doorData.pos,
                 entityAxis = doorData.entityAxis,
+                borderDir = doorData.borderDir,
                 entityModelType = EntityModelType.Door,
                 listRoomType = doorData.listRoomType,
                 listRoomTypeID = doorData.listRoomTypeID,
             };
             roomInfos[i].listDoorPosInfo = new List<BorderEntityData> { doorBorderEntityData };
 
-            //清楚当前坐标位置的墙体
+            //清楚当前坐标位置“门”所在的墙体
             List<BorderEntityData> borderItemPosInfos = listRoomBuilderInfo.FindAll((p) =>
             {
                 return p.pos == doorData.pos && p.entityAxis == doorData.entityAxis && p.entityModelType == EntityModelType.Wall;
@@ -782,6 +847,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         borderItemPosInfoX = new BorderEntityData
                         {
                             entityAxis = 0,
+                            borderDir = BorderDir.Down,
                             pos = pos1,
                             entityModelType = EntityModelType.Wall,
                             listRoomType = new List<RoomType> { roomInfo.roomType },
@@ -796,6 +862,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         m_DicRoomWallInfo[pos1].borderItemPosInfoX = new BorderEntityData
                         {
                             entityAxis = 0,
+                            borderDir = BorderDir.Down,
                             pos = pos1,
                             entityModelType = EntityModelType.Wall,
                             listRoomType = new List<RoomType> { roomInfo.roomType },
@@ -820,6 +887,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         borderItemPosInfoX = new BorderEntityData
                         {
                             entityAxis = 0,
+                            borderDir = BorderDir.Up,
                             pos = pos2,
                             entityModelType = EntityModelType.Wall,
                             listRoomType = new List<RoomType> { roomInfo.roomType },
@@ -834,6 +902,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         m_DicRoomWallInfo[pos2].borderItemPosInfoX = new BorderEntityData
                         {
                             entityAxis = 0,
+                            borderDir = BorderDir.Up,
                             pos = pos2,
                             entityModelType = EntityModelType.Wall,
                             listRoomType = new List<RoomType> { roomInfo.roomType },
@@ -862,6 +931,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         borderItemPosInfoY = new BorderEntityData
                         {
                             entityAxis = 1,
+                            borderDir = BorderDir.Left,
                             pos = pos1,
                             entityModelType = EntityModelType.Wall,
                             listRoomType = new List<RoomType> { roomInfo.roomType },
@@ -876,6 +946,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         m_DicRoomWallInfo[pos1].borderItemPosInfoY = new BorderEntityData
                         {
                             entityAxis = 1,
+                            borderDir = BorderDir.Left,
                             pos = pos1,
                             entityModelType = EntityModelType.Wall,
                             listRoomType = new List<RoomType> { roomInfo.roomType },
@@ -900,6 +971,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         borderItemPosInfoY = new BorderEntityData
                         {
                             entityAxis = 1,
+                            borderDir = BorderDir.Right,
                             pos = pos2,
                             entityModelType = EntityModelType.Wall,
                             listRoomType = new List<RoomType> { roomInfo.roomType },
@@ -914,6 +986,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         m_DicRoomWallInfo[pos2].borderItemPosInfoY = new BorderEntityData
                         {
                             entityAxis = 1,
+                            borderDir = BorderDir.Right,
                             pos = pos2,
                             entityModelType = EntityModelType.Wall,
                             listRoomType = new List<RoomType> { roomInfo.roomType },
@@ -934,9 +1007,86 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     }
     #endregion
 
-    public List<BorderEntityData> GetDoorInfoByRoomType(RoomType roomType,string roomID)
+    public List<BorderEntityData> GetDoorInfoByRoomType(RoomType roomType, string roomID)
     {
         return listRoomBuilderInfo.FindAll((p) => { return p.entityModelType == EntityModelType.Door && p.listRoomType.Contains(roomType) && p.listRoomTypeID.Contains(roomID); });
+    }
+
+    /// <summary>
+    /// 获取房间的顶视图中心点位置
+    /// </summary>
+    /// <param name="roomID"></param>
+    /// <returns></returns>
+    public Vector3 GetRoomCenterPos(string roomID)
+    {
+        Vector3 res = Vector3.zero;
+        RoomInfo roomInfo = m_ListRoomInfo.Find((p) => { return p.roomID == roomID; });
+        if (roomInfo != null)
+        {
+            float x = roomInfo.roomPosMin.x + (roomInfo.roomPosMax.x - roomInfo.roomPosMin.x) / 2f;
+            float z = roomInfo.roomPosMin.y + (roomInfo.roomPosMax.y - roomInfo.roomPosMin.y) / 2f;
+            res = new Vector3(x, 0, z);
+        }
+        else
+        {
+            Debug.LogError("无法获取房间信息学 roomID：" + roomID);
+        }
+        return res;
+    }
+
+
+    /// <summary>
+    /// 获取所有RoomID根据房间类型
+    /// </summary>
+    /// <param name="roomType"></param>
+    /// <returns></returns>
+    public List<string> GetAllRoomID(RoomType roomType)
+    {
+        List<string> result = null;
+        List<RoomInfo> data = m_ListRoomInfo.FindAll((p) => { return p.roomType == roomType; });
+        if (data?.Count > 0)
+        {
+            result = new List<string>();
+            foreach (RoomInfo roomInfo in data)
+            {
+                result.Add(roomInfo.roomID);
+            }
+        }
+        else
+        {
+            Debug.LogError("roomID dont find , roomType : " + roomType);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 获取首个RoomID根据房间类型
+    /// </summary>
+    /// <param name="roomType"></param>
+    /// <returns></returns>
+    public string GetRoomID(RoomType roomType)
+    {
+        return GetAllRoomID(roomType)?[0];
+    }
+
+    /// <summary>
+    /// 获取房间类型根据RoomID
+    /// </summary>
+    /// <param name="roomID"></param>
+    /// <returns></returns>
+    public RoomType GetRoomType(string roomID)
+    {
+        RoomType result = RoomType.Null;
+        RoomInfo data = m_ListRoomInfo.Find((p) => { return p.roomID == roomID; });
+        if (data != null)
+        {
+            result = data.roomType;
+        }
+        else
+        {
+            Debug.LogError("roomType dont find , roomID : " + roomID);
+        }
+        return result;
     }
 
     private void Update()

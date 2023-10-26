@@ -81,6 +81,11 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
         public int entityAxis;
 
         /// <summary>
+        /// 边界实体方位，相对于当前房间中心点的方位
+        /// </summary>
+        public BorderDir borderDir;
+
+        /// <summary>
         /// 当前实体所属房间类型，一个边界实体最多可属于两个房间，listRoomType.count<=2
         /// </summary>
         public List<RoomType> listRoomType;
@@ -89,6 +94,17 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
         /// 当前实体所属房间类型ID,可代替listRoomType使用，一个边界实体最多可属于两个房间，listRoomType.count<=2
         /// </summary>
         public List<string> listRoomTypeID;
+    }
+
+    /// <summary>
+    /// 实体方位
+    /// </summary>
+    public enum BorderDir
+    {
+        Up,
+        Down,
+        Left,
+        Right
     }
 
     private void Awake()
@@ -115,13 +131,43 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
                 case EntityModelType.Null:
                     break;
                 case EntityModelType.Wall:
-                    entityModel = borderEntityData.entityAxis == 0 ? LoadAssetsByAddressable.GetInstance.GetEntityRes("WallX") : LoadAssetsByAddressable.GetInstance.GetEntityRes("WallY");
+                    //entityModel = borderEntityData.entityAxis == 0 ? LoadAssetsByAddressable.GetInstance.GetEntityRes("WallX") : LoadAssetsByAddressable.GetInstance.GetEntityRes("WallY");
+                    entityModel = LoadAssetsByAddressable.GetInstance.GetEntityRes("WallPrefab");
+                    for (int j = 0; j < entityModel.transform.childCount; j++)
+                    {
+                        bool isTrue = entityModel.transform.GetChild(j).name == borderEntityData.borderDir.ToString();
+                        entityModel.transform.GetChild(j).SetActive(isTrue);
+                        if (isTrue)
+                        {
+                            string reskey = borderEntityData.listRoomType[0].ToString() + "_Wall";
+                            Material mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(reskey, false);
+                            entityModel.transform.GetChild(j).GetComponentInChildren<MeshRenderer>().material = mat;
+                        }
+                    }
+                    break;
+                case EntityModelType.SmallWall:
+                    entityModel = LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallPrefab");
+                    for (int j = 0; j < entityModel.transform.childCount; j++)
+                    {
+                        bool isTrue = entityModel.transform.GetChild(j).name == borderEntityData.borderDir.ToString();
+                        entityModel.transform.GetChild(j).SetActive(isTrue);
+                        if (isTrue)
+                        {
+                            string reskey = borderEntityData.listRoomType[0].ToString() + "_SmallWall";
+                            Material mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(reskey, false);
+                            entityModel.transform.GetChild(j).GetComponentInChildren<MeshRenderer>().material = mat;
+                        }
+                    }
                     break;
                 case EntityModelType.Door:
                     entityModel = borderEntityData.entityAxis == 0 ? LoadAssetsByAddressable.GetInstance.GetEntityRes("DoorX") : LoadAssetsByAddressable.GetInstance.GetEntityRes("DoorY");
                     break;
                 case EntityModelType.Floor:
+
                     entityModel = LoadAssetsByAddressable.GetInstance.GetEntityRes("Floor");
+                    string entityResName = "Floor_" + borderEntityData.listRoomType[0].ToString();
+                    Material floorMat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(entityResName,false);
+                    entityModel.GetComponentInChildren<MeshRenderer>().material = floorMat;
                     break;
                 default:
                     break;
@@ -129,18 +175,64 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
             if (entityModel != null)
             {
                 GameObject clone = Instantiate(entityModel, new Vector3(borderEntityData.pos.x, 0, borderEntityData.pos.y), Quaternion.identity);
+                //string temp = "_";
+                //foreach (var item in borderEntityData.listRoomType)
+                //{
+                //    temp += item.ToString() + "_";
+                //}
+                //if (borderEntityData?.listRoomTypeID?.Count>0)
+                //{
+                //    foreach (var item in borderEntityData?.listRoomTypeID)
+                //    {
+                //        temp += item.ToString() + "_";
+                //    }
+                //}
+                //clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y + temp;
                 clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
                 clone.transform.parent = GetRoomRootNode(borderEntityData.listRoomType[0]).transform; //TODO listRoomType[0]
                 borderEntityData.entity = clone;
             }
-            if (borderEntityData.entityModelType == EntityModelType.Wall || borderEntityData.entityModelType == EntityModelType.Door)
-            {
-                GameObject modelWallSmall = borderEntityData.entityAxis == 0 ? LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallX") : LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallY");
-                GameObject clone = Instantiate(modelWallSmall, new Vector3(borderEntityData.pos.x, 0, borderEntityData.pos.y), Quaternion.identity);
-                //clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
-                clone.name = modelWallSmall.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
-                clone.transform.parent = GetRoomRootNode(borderEntityData.listRoomType[0]).transform; //TODO listRoomType[0]
-            }
+
+            //if (borderEntityData.entityModelType == EntityModelType.Wall )
+            //{
+            //    GameObject modelWallSmall = LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallPrefab");
+            //    //GameObject modelWallSmall = borderEntityData.entityAxis == 0 ? LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallX") : LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallY");
+            //    for (int j = 0; j < modelWallSmall.transform.childCount; j++)
+            //    {
+            //        modelWallSmall.transform.GetChild(j).SetActive(modelWallSmall.transform.GetChild(j).name == borderEntityData.borderDir.ToString());
+            //    }
+            //    GameObject clone = Instantiate(modelWallSmall, new Vector3(borderEntityData.pos.x, 0, borderEntityData.pos.y), Quaternion.identity);
+            //    //clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
+
+            //    string temp = "_";
+            //    foreach (var item in borderEntityData.listRoomType)
+            //    {
+            //        temp += item.ToString() + "_";
+            //    }
+            //    if (borderEntityData?.listRoomTypeID?.Count > 0)
+            //    {
+            //        foreach (var item in borderEntityData?.listRoomTypeID)
+            //        {
+            //            temp += item.ToString() + "_";
+            //        }
+            //    }
+
+            //    clone.name = modelWallSmall.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y + temp;
+            //    clone.transform.parent = GetRoomRootNode(borderEntityData.listRoomType[0]).transform; //TODO listRoomType[0]
+            //}
+            //else if (borderEntityData.entityModelType == EntityModelType.Door)
+            //{
+            //    GameObject modelWallSmall1 = LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallPrefab");
+            //    GameObject modelWallSmall2 = LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallPrefab");
+            //    //获取“门”归属与哪两个房间
+            //    if (borderEntityData?.listRoomTypeID?.Count > 0)
+            //    {
+            //        foreach (var item in borderEntityData?.listRoomTypeID)
+            //        {
+            //        }
+            //    }
+            //    //获取两个房间的位置关系
+            //}
         }
 
     }
@@ -226,6 +318,7 @@ public enum EntityModelType
     //无墙
     Null,
     Wall,//轴心点在左下侧
+    SmallWall,
     Door,
     //地砖
     Floor

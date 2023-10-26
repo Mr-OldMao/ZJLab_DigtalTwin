@@ -9,6 +9,7 @@ using static GetThingGraph;
 using static JsonAddEntity;
 using Unity.VisualScripting;
 using static GetEnvGraph;
+using static GenerateRoomItemModel;
 /// <summary>
 /// 标题：生成各个房间内所有道具(床桌椅板凳等)
 /// 功能：针对每个房间生成合理的道具，摆放位置随机且合理(1.各个房间内部物品都朝向当前房间的中心点)
@@ -112,7 +113,13 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         //SetRandomRoomInsideItemEntity(dicRoomInsideItemEntity);
 
         MainData.CacheItemsEntity.Clear();
-        SetRandomRoomInsideItemEntity(getThingGraph);
+
+        //TODO 暂时注释掉
+        //根据服务器数据设置各个房间实体物品，位置随机
+        //SetRandomRoomInsideItemEntity(getThingGraph);
+
+        //设置各个房间默认的实体物品，位置随机
+        SetDefaultRoomInsideItemEntity();
     }
 
     /// <summary>
@@ -228,14 +235,23 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     /// </summary>
     /// <param name="itemModelTypes">实体类型</param>
     /// <param name="assetName">获取指定资源填写，默认assetName为空，获取随机资源，不为空则获取指定资源，若不为空且未找到指定资源则获取随机资源</param>
+    /// <param name="isAutoInstance">自动实例化</param>
     /// <returns></returns>
     private GameObject GetItemEntity(string itemModelTypes, string assetName = "", bool isAutoInstance = true)
     {
         GameObject res = null;
         if (!string.IsNullOrEmpty(itemModelTypes))
         {
-            //改为大驼峰原则
-            string itemName = itemModelTypes.ToString().Substring(0, 1).ToUpper() + itemModelTypes.ToString().Substring(1, itemModelTypes.ToString().Length - 1).ToLower();
+            string itemName = string.Empty;
+            if (itemModelTypes == "TV" || itemModelTypes == "PC")
+            {
+                itemName = itemModelTypes;
+            }
+            else
+            {
+                //改为大驼峰原则
+                itemName = itemModelTypes.ToString().Substring(0, 1).ToUpper() + itemModelTypes.ToString().Substring(1, itemModelTypes.ToString().Length - 1).ToLower();
+            }
             res = LoadAssetsByAddressable.GetInstance.GetEntityRes(itemName, assetName);
             if (res != null && isAutoInstance)
             {
@@ -272,6 +288,102 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         }
     }
 
+    private int GetDefaultItemIDIndex = 1000;
+    /// <summary>
+    /// 获取各个房间默认物品的ID
+    /// </summary>
+    private string GetDefaultItemID
+    {
+        get
+        {
+            GetDefaultItemIDIndex++;
+            return "sim:" + GetDefaultItemIDIndex;
+        }
+    }
+
+    /// <summary>
+    /// 设置各个房间默认的实体物品，位置随机
+    /// </summary>
+    private void SetDefaultRoomInsideItemEntity()
+    {
+        //return;
+         
+        for (int i = 0; i < GenerateRoomData.GetInstance.m_ListRoomInfo.Count; i++)
+        {
+            RoomType roomTypeStr = GenerateRoomData.GetInstance.m_ListRoomInfo[i].roomType;
+            string roomIDStr = GenerateRoomData.GetInstance.m_ListRoomInfo[i].roomID;
+            //在每个房间天花板中心放置灯
+            Vector3 roomCenterPos = GenerateRoomData.GetInstance.GetRoomCenterPos(roomIDStr);
+            if (roomCenterPos != Vector3.zero)
+            {
+                PutItem(roomTypeStr, roomIDStr, "Toplamp", GetDefaultItemID, roomCenterPos, false);
+            }
+            //在每个房间放置垃圾桶
+            PutCustomItem(roomTypeStr, "Bin", GetDefaultItemID);
+        }
+
+
+        //客厅
+        PutCustomItem(RoomType.LivingRoom, "Sofa", GetDefaultItemID);
+        PutCustomItem(RoomType.LivingRoom, "TV", GetDefaultItemID);
+
+        //卧室
+        PutCustomItem(RoomType.BedRoom, "TV", GetDefaultItemID);
+        PutCustomItem(RoomType.BedRoom, "Bed", GetDefaultItemID);
+        string brDeskItemID = GetDefaultItemID;
+        Debug.Log("brDeskItemID:" + brDeskItemID);
+        PutCustomItem(RoomType.BedRoom, "Desk", brDeskItemID);
+        PutCustomItem(RoomType.BedRoom, "Chair", GetDefaultItemID, new ItemDependInfo
+        {
+            isDepend = true,
+            dependItemID = brDeskItemID,
+            dependItemName = "Desk",
+            posRelation = PosRelation.Below
+        });
+        PutCustomItem(RoomType.BedRoom, "Drink", GetDefaultItemID, new ItemDependInfo
+        {
+            isDepend = true,
+            dependItemID = brDeskItemID,
+            dependItemName = "Desk",
+            posRelation = PosRelation.On
+        });
+
+
+        //厨房 
+        PutCustomItem(RoomType.KitchenRoom, "Bigsink", GetDefaultItemID);
+
+        //卫生间
+        PutCustomItem(RoomType.BathRoom, "Bathtub", GetDefaultItemID);
+
+        //书房
+        string srDeskItemID = GetDefaultItemID;
+        Debug.Log("deskItemID:" + srDeskItemID);
+        PutCustomItem(RoomType.StudyRoom, "Desk", srDeskItemID);
+        PutCustomItem(RoomType.StudyRoom, "Sofa", srDeskItemID);
+        PutCustomItem(RoomType.StudyRoom, "Chair", GetDefaultItemID, new ItemDependInfo
+        {
+            isDepend = true,
+            dependItemID = srDeskItemID,
+            dependItemName = "Desk",
+            posRelation = PosRelation.Below
+        });
+        PutCustomItem(RoomType.StudyRoom, "Book", GetDefaultItemID, new ItemDependInfo
+        {
+            isDepend = true,
+            dependItemID = srDeskItemID,
+            dependItemName = "Desk",
+            posRelation = PosRelation.On
+        });
+        PutCustomItem(RoomType.StudyRoom, "Cabinet", GetDefaultItemID);
+        PutCustomItem(RoomType.StudyRoom, "Plant", GetDefaultItemID);
+
+        //储藏室
+        PutCustomItem(RoomType.StorageRoom, "Plant", GetDefaultItemID);
+
+    }
+
+
+
     /// <summary>
     /// 创建物品实体的放置房间容器
     /// </summary>
@@ -294,9 +406,9 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             }
             for (int j = 0; j < roomItemsData[i].relatedThing?.Length; j++)
             {
-                 roomType = roomItemsData[i].relatedThing[j].target.name;
-                 roomId = roomItemsData[i].relatedThing[j].target.id;
-                 roomName = roomType + "_" + roomId;
+                roomType = roomItemsData[i].relatedThing[j].target.name;
+                roomId = roomItemsData[i].relatedThing[j].target.id;
+                roomName = roomType + "_" + roomId;
 
                 if (ItemEntityGroupNode.Find(roomName) == null)
                 {
@@ -322,6 +434,12 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             //    + ", isDepend :" + itemDependInfo.isDepend
             //    + ",dependItemName:" + itemDependInfo?.dependItemName
             //    + ",dependItemID:" + itemDependInfo?.dependItemID);
+            string key = relatedThingArr[i].target.name + "_" + relatedThingArr[i].target.id;
+            if (MainData.CacheItemsEntity.ContainsKey(key))
+            {
+                Debug.LogError("当前实体已存在，name_id：" + key);
+                continue;
+            }
             //当前实体信息
             string entityName = relatedThingArr[i].target.name;
             //剔除Door信息
@@ -480,8 +598,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                             if (canUse)
                             {
                                 //放置后标记当前位置在当前房间已被放置其他物体不可重复放置在此
-                                Debug.Log("roomType:" + roomType + ",itemEntity:" + relatedThingArr[i].target.name + ",id:" + relatedThingArr[i].target.id);
-                                string key = relatedThingArr[i].target.name + "_" + relatedThingArr[i].target.id;
+                                Debug.Log("当前实体已放置成功 name_id：" + key + " , roomType:" + roomType);
                                 MainData.CacheItemsEntity.Add(key, clone);
                                 for (int k = 0; k < needItemModelInfoArr.Count; k++)
                                 {
@@ -499,6 +616,10 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     {
                         break;
                     }
+                    if (!canUse && curLoopCount == loopMaxCount)
+                    {
+                        Debug.LogError("当前物体放置失败，itemEntity:" + relatedThingArr[i].target.name + ",id:" + relatedThingArr[i].target.id);
+                    }
                 }
 
                 if (relatedThingArr[i].target.relatedThing?.Count > 0)
@@ -514,6 +635,63 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 物体放置在指定位置
+    /// </summary>
+    /// <param name="roomType"></param>
+    /// <param name="roomID"></param>
+    /// <param name="entityName"></param>
+    /// <param name="isCachePutPos">是否缓存实体所放置的位置</param>
+    private void PutItem(RoomType roomType, string roomID, string entityName, string entityID, Vector3 pos, bool isCachePutPos)
+    {
+        GameObject entityPrefab = LoadAssetsByAddressable.GetInstance.GetEntityRes(entityName);
+        GameObject clone = Instantiate(entityPrefab);
+        Transform parentTrans = ItemEntityGroupNode.transform.Find(roomType.ToString() + "_" + roomID);
+        if (parentTrans == null)
+        {
+            parentTrans = new GameObject(roomType.ToString() + "_" + roomID).transform;
+            parentTrans.SetParent(ItemEntityGroupNode.transform);
+        }
+        clone.transform.SetParent(parentTrans, false);
+        clone.name = entityName + "_" + entityID;
+        clone.transform.position = pos;
+    }
+
+    /// <summary>
+    /// 放置自定义物体
+    /// </summary>
+    /// <param name="roomType"></param>
+    /// <param name="itemDependInfo">当前物体所依赖的父物体</param>
+    /// <param name="itemsName"></param>
+    private void PutCustomItem(RoomType roomType, string itemName, string itemID, ItemDependInfo itemDependInfo = null)
+    {
+        string roomID = GenerateRoomData.GetInstance.GetRoomID(roomType);
+        List<string> itemResName = new List<string>() { itemName };
+
+        List<GetThingGraph_data_items_relatedThing> relatedThingData = new List<GetThingGraph_data_items_relatedThing>();
+        for (int i = 0; i < itemResName?.Count; i++)
+        {
+            relatedThingData.Add(new GetThingGraph_data_items_relatedThing
+            {
+                target = new GetThingGraph_data_items_relatedThing_target
+                {
+                    name = itemResName[i],
+                    id = itemID
+                }
+            });
+        }
+        if (itemDependInfo == null)
+        {
+            itemDependInfo = new ItemDependInfo
+            {
+                isDepend = false,
+                dependItemID = "",
+                dependItemName = "",
+            };
+        }
+        PutItem(roomType, roomID, relatedThingData, itemDependInfo);
     }
 
     //清理实体对象

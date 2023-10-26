@@ -14,7 +14,7 @@ public class CameraFreeMove : MonoBehaviour
 
     private int MouseWheelSensitivity = 5; //滚轮灵敏度设置
     private int MouseZoomMin = -20; //相机距离最小值
-    private int MouseZoomMax = 20; //相机距离最大值
+    private int MouseZoomMax = 50; //相机距离最大值
 
     private float moveSpeed = 10; //相机跟随速度（中键平移时），采用平滑模式时起作用，越大则运动越平滑
 

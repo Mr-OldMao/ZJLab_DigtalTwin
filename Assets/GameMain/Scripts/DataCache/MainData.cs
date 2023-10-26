@@ -13,6 +13,10 @@ using static GetThingGraph;
 public class MainData
 {
     /// <summary>
+    /// 当前是否使用测试数据
+    /// </summary>
+    public static bool UseTestData { get; private set; } = true;
+    /// <summary>
     /// 配置文件数据
     /// </summary>
     public static ConfigData ConfigData { get; set; }

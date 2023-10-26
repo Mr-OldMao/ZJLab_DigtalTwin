@@ -47,7 +47,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         RegisterMsgEvent();
 
         //异步加载ab资源
-        LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity", "UIForm" }, () =>
+        LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity", "UIForm" ,"Mat"}, () =>
         {
             Debug.Log("ab资源加载完毕回调");
             m_IsLoadedAssets = true;
@@ -203,7 +203,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                     {
                         curRoomType = targetRoomType,
                         curRoomID = curRoomID,
-                        roomSize = new uint[] { (uint)UnityEngine.Random.Range(4, 8), (uint)UnityEngine.Random.Range(4, 8) }
+                        roomSize = new uint[] { (uint)UnityEngine.Random.Range(6, 8), (uint)UnityEngine.Random.Range(4, 8) }
                     });
                 }
             }
@@ -506,6 +506,16 @@ public class GameLogic : SingletonByMono<GameLogic>
                 "{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:8\",\r\n            \"type\": \"POT\",\r\n            \"delChind\":0\r\n        }\r\n    ]\r\n}"
                 ;
             NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_DEL_GOODS,
+        testJson);
+        }
+
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            string testJson =
+
+                "{\r\n    \"motionId\" : \"motion://Grab_itemv\",\r\n    \"name\"     : \"Grab_itemv\",\r\n    \"stateMsg\" : \"suc\",\r\n    \"stateCode\" : 0,\r\n    \"simulatorId\" : \"\",\r\n    \"task_id\"     : null\r\n}"
+                ;
+            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_RECV,
         testJson);
         }
     }
