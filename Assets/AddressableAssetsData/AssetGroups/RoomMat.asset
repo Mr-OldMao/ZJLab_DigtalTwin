@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: RoomMat
+  m_EditorClassIdentifier: 
+  m_GroupName: RoomMat
+  m_Data:
+    m_SerializedData: []
+  m_GUID: d9583b42bad815342950ee84ae7edfb4
+  m_SerializeEntries:
+  - m_GUID: 304c81db729c1134e987e3799d9e3034
+    m_Address: Assets/GameMain/AB/Material/StorageRoomMat.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 172efcdbd5a9b684cafeca3fffed2af5
+    m_Address: Assets/GameMain/AB/Material/BedRoomMat.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: a7c1649fc4936074e93a78483a10b043
+    m_Address: Assets/GameMain/AB/Material/KitchenRoomMat.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: bbc7ce67342de9f409746c53624c9bf8
+    m_Address: Assets/GameMain/AB/Material/LivingRoomMat.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 62d7c59733a501943927569a9b98337f
+    m_Address: Assets/GameMain/AB/Material/BathRoomMat.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 70b4cb75aa18caf469eddb12eb336890
+    m_Address: Assets/GameMain/AB/Material/StudyRoomMat.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: f34c1ed1c621b5f4e81867d8d9ef8e94
+    m_Address: Assets/GameMain/AB/Material/StudyRoom_SmallWall.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 84bbb666f5e82764d9064f14eb444686
+    m_Address: Assets/GameMain/AB/Material/StorageRoom_SmallWall.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 948127c5028cf0b4d8e8c32f4d252db8
+    m_Address: Assets/GameMain/AB/Material/LivingRoom_SmallWall.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 63b21bc710a3cf049ab2c1eeec1058a7
+    m_Address: Assets/GameMain/AB/Material/KitchenRoom_SmallWall.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 3229ded507c79aa4b8dae688cf01cc1a
+    m_Address: Assets/GameMain/AB/Material/BedRoom_SmallWall.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: b8c620ff14a4ce54ea4577d70557a448
+    m_Address: Assets/GameMain/AB/Material/BathRoom_SmallWall.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 04f8d2e92caa2ae4eb1950707e666a67
+    m_Address: Assets/GameMain/AB/Material/Floor_KitchenRoom.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 9173e94633dd52d4a9c895e34f3c46fd
+    m_Address: Assets/GameMain/AB/Material/Floor_StorageRoom.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 008b244219960444eb631d536d905871
+    m_Address: Assets/GameMain/AB/Material/Floor_BedRoom.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 80726a2d8bb07a24fb8d2ff6dff5ed4e
+    m_Address: Assets/GameMain/AB/Material/Floor_StudyRoom.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 64e80efe7105f4646a499bfe9e511a4e
+    m_Address: Assets/GameMain/AB/Material/Floor_LivingRoom.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 4a2f2dd70ebb2d04cb6668366e546085
+    m_Address: Assets/GameMain/AB/Material/Floor_BathRoom.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 13b3a089d6d69ce499381abb142d0bfb, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 55bab9015cee8154aa64c74f3157ff7d, type: 2}
+    - {fileID: 11400000, guid: f36e5775ec91e61469deee9dedb56a24, type: 2}

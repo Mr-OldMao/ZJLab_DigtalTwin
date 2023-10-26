@@ -52,6 +52,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - RoomBorderLable
+  - m_GUID: 5233f5579fd160446b57b03ede12951c
+    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallPrefab.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RoomBorderLable
+  - m_GUID: 75da6b3d474d7cb4485cd58584b3d3b0
+    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallSmallPrefab.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RoomBorderLable
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 13b3a089d6d69ce499381abb142d0bfb, type: 2}
   m_SchemaSet:
