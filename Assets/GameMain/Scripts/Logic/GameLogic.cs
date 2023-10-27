@@ -23,7 +23,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     private Coroutine m_CoroutineUpadeteCameraEntityInfo = null;
     public void Init()
     {
-        Debug.Log("Init GameLogic");
+        Debugger.Log("Init GameLogic");
 
         MsgEvent.RegisterMsgEvent(MsgEventName.InitComplete, () =>
         {
@@ -49,7 +49,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         //异步加载ab资源
         LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity", "UIForm" ,"Mat"}, () =>
         {
-            Debug.Log("ab资源加载完毕回调");
+            Debugger.Log("ab资源加载完毕回调");
             m_IsLoadedAssets = true;
         });
 
@@ -212,7 +212,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         {
             if (p == null || k == null)
             {
-                Debug.LogError("generage fail , again generate...");
+                Debugger.LogError("generage fail , again generate...");
                 GenerateScene();
             }
             else
@@ -324,7 +324,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             List<BorderEntityData> doorDataArr = GenerateRoomData.GetInstance.GetDoorInfoByRoomType((RoomType)Enum.Parse(typeof(RoomType), roomName), roomID);
             foreach (BorderEntityData doorData in doorDataArr)
             {
-                Debug.Log(doorData);
+                Debugger.Log(doorData);
                 string doorID = doorData.entity?.name;
                 string doorName = roomName + "Door";
                 Transform modelTrans = doorData.entity.transform.Find("Model")?.transform;

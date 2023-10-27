@@ -186,7 +186,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 //i++;
                 continue;
             }
-            //Debug.Log(" Cur Generate RoomType:" + roomBaseInfos[i].curRoomType);
+            //Debugger.Log(" Cur Generate RoomType:" + roomBaseInfos[i].curRoomType);
             //根据房间邻接的边界信息，给出roomPosMin，roomPosMax
             List<Vector2> pos = GetRandomRoomPosByDirRelaateion(curRoom, (p) =>
             {
@@ -211,7 +211,6 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         }
         if (!isGenerateSuc)
         {
-            Debug.Log("111");
             callback(null, null);
             return;
         }
@@ -221,7 +220,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
 
         GenerateDoorData(roomBaseInfosClone, firstGenerateID, ref m_ListRoomInfo);
 
-        //Debug.Log("房间邻接的边界信息生成成功！");
+        //Debugger.Log("房间邻接的边界信息生成成功！");
         callback(listRoomBuilderInfo, m_ListRoomInfo);
     }
 
@@ -240,7 +239,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 res = roomBaseInfos[i];
             }
         }
-        Debug.Log("next generage room :" + res.curRoomType.ToString() + ", roomid : " + res.curRoomID);
+        Debugger.Log("next generage room :" + res.curRoomType.ToString() + ", roomid : " + res.curRoomID);
         return res;
     }
 
@@ -334,7 +333,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             int temp = i;
             BorderEntityData borderItemPosInfo = borderItemPosInfos.Find((p) => { return p.pos == roomInfo.listDoorPosInfo[temp].pos && p.entityAxis == roomInfo.listDoorPosInfo[temp].entityAxis; });
             borderItemPosInfo.entityModelType = roomInfo.listDoorPosInfo[temp].entityModelType;
-            //Debug.Log("更正实体类型：" + borderItemPosInfo.pos + "," + borderItemPosInfo.entityModelType);
+            //Debugger.Log("更正实体类型：" + borderItemPosInfo.pos + "," + borderItemPosInfo.entityModelType);
         }
 
         for (int i = 0; i < roomInfo.listEmptyPosInfo?.Count; i++)
@@ -342,7 +341,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             int temp = i;
             BorderEntityData borderItemPosInfo = borderItemPosInfos.Find((p) => { return p.pos == roomInfo.listEmptyPosInfo[temp].pos && p.entityAxis == roomInfo.listEmptyPosInfo[temp].entityAxis; });
             borderItemPosInfo.entityModelType = roomInfo.listEmptyPosInfo[temp].entityModelType;
-            //Debug.Log("更正实体类型：" + borderItemPosInfo.pos + "," + borderItemPosInfo.entityModelType);
+            //Debugger.Log("更正实体类型：" + borderItemPosInfo.pos + "," + borderItemPosInfo.entityModelType);
         }
         //add smallWall
         List<BorderEntityData> smallBorderEntityData = new List<BorderEntityData>();
@@ -519,7 +518,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         //根据边界信息 生成合理的随机数
         //根据上述2~4个点位信息，生成连续的1~3条线作为边界
 
-        //Debug.Log("otherPosCount：" + otherPosCount);
+        //Debugger.Log("otherPosCount：" + otherPosCount);
         int randomMin;
         int randomMax;
 
@@ -540,7 +539,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                     do
                     {
                         int randomMinX = (int)UnityEngine.Random.Range(randomMin, randomMax);
-                        //Debug.Log("down [" + randomMin + "," + randomMax + ")，randomMinX：" + randomMinX + ",curRoomType" + roomBaseInfo.curRoomType);
+                        //Debugger.Log("down [" + randomMin + "," + randomMax + ")，randomMinX：" + randomMinX + ",curRoomType" + roomBaseInfo.curRoomType);
                         minPos = new Vector2(randomMinX, otherPosLeftDown.Value.y - roomBaseInfo.roomSize[1]);
                         maxPos = new Vector2(randomMinX + roomBaseInfo.roomSize[0], otherPosLeftDown.Value.y);
                     } while (!JudgeRandomPosIsRight(minPos, maxPos) && ++curRandomCount < maxRandomCount);
@@ -553,7 +552,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                     do
                     {
                         int randomMinX = (int)UnityEngine.Random.Range(randomMin, randomMax);
-                        //Debug.Log("up [" + randomMin + "," + randomMax + ")，randomMinX：" + randomMinX + ",curRoomType" + roomBaseInfo.curRoomType + ",otherPosRightUp:" + otherPosRightUp);
+                        //Debugger.Log("up [" + randomMin + "," + randomMax + ")，randomMinX：" + randomMinX + ",curRoomType" + roomBaseInfo.curRoomType + ",otherPosRightUp:" + otherPosRightUp);
                         minPos = new Vector2(randomMinX, otherPosLeftUp.Value.y);
                         maxPos = new Vector2(randomMinX + roomBaseInfo.roomSize[0], otherPosLeftUp.Value.y + roomBaseInfo.roomSize[1]);
                     } while (!JudgeRandomPosIsRight(minPos, maxPos) && ++curRandomCount < maxRandomCount);
@@ -566,7 +565,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                     do
                     {
                         int randomMinY = (int)UnityEngine.Random.Range(randomMin, randomMax);
-                        //Debug.Log("left [" + randomMin + "," + randomMax + ")，randomMinY：" + randomMinY + ",curRoomType" + roomBaseInfo.curRoomType);
+                        //Debugger.Log("left [" + randomMin + "," + randomMax + ")，randomMinY：" + randomMinY + ",curRoomType" + roomBaseInfo.curRoomType);
                         minPos = new Vector2(otherPosLeftUp.Value.x - roomBaseInfo.roomSize[0], randomMinY);
                         maxPos = new Vector2(otherPosLeftUp.Value.x, randomMinY + roomBaseInfo.roomSize[1]);
                     } while (!JudgeRandomPosIsRight(minPos, maxPos) && ++curRandomCount < maxRandomCount);
@@ -579,12 +578,12 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                     do
                     {
                         int randomMinY = (int)UnityEngine.Random.Range(randomMin, randomMax);
-                        //Debug.Log("right [" + randomMin + "," + randomMax + ")，randomMinY：" + randomMinY + ",curRoomType" + roomBaseInfo.curRoomType);
+                        //Debugger.Log("right [" + randomMin + "," + randomMax + ")，randomMinY：" + randomMinY + ",curRoomType" + roomBaseInfo.curRoomType);
                         minPos = new Vector2(otherPosRightUp.Value.x, randomMinY);
                         maxPos = new Vector2(otherPosRightUp.Value.x + roomBaseInfo.roomSize[0], randomMinY + roomBaseInfo.roomSize[1]);
                     } while (!JudgeRandomPosIsRight(minPos, maxPos) && ++curRandomCount < maxRandomCount);
                 }
-                Debug.Log("获取当前房间随机坐标数据 roomType" + roomBaseInfo.curRoomType + ",roomID:" + roomBaseInfo.curRoomID + ", otherPosCount：" + otherPosCount);
+                Debugger.Log("获取当前房间随机坐标数据 roomType" + roomBaseInfo.curRoomType + ",roomID:" + roomBaseInfo.curRoomID + ", otherPosCount：" + otherPosCount);
                 callback(curRandomCount < maxRandomCount);
                 break;
             //case 3://2.双边限制，已知三个点位信息 TODO
@@ -592,7 +591,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             //case 4://3.三边限制，已知四个点位信息 TODO
             //    break;
             default:
-                Debug.Log("获取当前房间随机坐标数据失败 roomType" + roomBaseInfo.curRoomType + ", otherPosCount：" + otherPosCount);
+                Debugger.Log("获取当前房间随机坐标数据失败 roomType" + roomBaseInfo.curRoomType + ", otherPosCount：" + otherPosCount);
                 callback(false);
                 break;
         }
@@ -649,7 +648,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         RoomsDirRelation roomsDirRelation = targetRoomBaseInfo.targetRoomsDirRelation?.Find((p) => { return p.targetRoomType == curTargetRoomType && p.targetRoomID == curTargetRoomID; });
                         if (roomsDirRelation == null)
                         {
-                            //Debug.Log("更新邻接关系，targetRoomBaseInfo：" + targetRoomBaseInfo + "，");
+                            //Debugger.Log("更新邻接关系，targetRoomBaseInfo：" + targetRoomBaseInfo + "，");
                             targetRoomBaseInfo.targetRoomsDirRelation.Add(new RoomsDirRelation
                             {
                                 targetRoomType = roomBaseInfos[i].curRoomType,
@@ -663,17 +662,17 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                             //验证两个房间方向指向是否正确   (DirEnum)(((int)curDirEnum + 2) % 4)// 取反方向
                             if (roomsDirRelation.locationRelation != (DirEnum)(((int)curDirEnum + 2) % 4))
                             {
-                                Debug.LogError("房间邻接关系冲突,请检查！ roomTypeA:" + curTargetRoomType + ",DirA:" + curDirEnum + "，roomTypeB" + targetRoomBaseInfo.curRoomType + "，DirB：" + roomsDirRelation.locationRelation);
+                                Debugger.LogError("房间邻接关系冲突,请检查！ roomTypeA:" + curTargetRoomType + ",DirA:" + curDirEnum + "，roomTypeB" + targetRoomBaseInfo.curRoomType + "，DirB：" + roomsDirRelation.locationRelation);
                             }
                         }
                     }
                 }
                 else
                 {
-                    Debug.LogError("roomTypeModel is null ,curTargetRoomType: " + curTargetRoomType + "，curTargetRoomID：" + curTargetRoomID);
+                    Debugger.LogError("roomTypeModel is null ,curTargetRoomType: " + curTargetRoomType + "，curTargetRoomID：" + curTargetRoomID);
                     foreach (var item in roomBaseInfos[i].targetRoomsDirRelation)
                     {
-                        Debug.LogError("otherRoomType:" + item.targetRoomType + ",targetRoomID：" + item.targetRoomID + ",locationRelation: " + item.locationRelation);
+                        Debugger.LogError("otherRoomType:" + item.targetRoomType + ",targetRoomID：" + item.targetRoomID + ",locationRelation: " + item.locationRelation);
                     }
                 }
             }
@@ -711,7 +710,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             isRight = false;
         }
 
-        //Debug.Log("isRight:" + isRight + "，minPos：" + minPos + "，maxPos：" + maxPos);
+        //Debugger.Log("isRight:" + isRight + "，minPos：" + minPos + "，maxPos：" + maxPos);
         return isRight;
     }
 
@@ -731,12 +730,12 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             if (item.borderItemPosInfoX?.listRoomType?.Count > 1)
             {
                 commonWallEntityData.Add(item.borderItemPosInfoX);
-                //Debug.Log(item.borderItemPosInfoX?.pos + ",entityAxis:" + item.borderItemPosInfoX?.entityAxis + ",otherRoomType:" + item.borderItemPosInfoX?.listRoomType[0] + "," + item.borderItemPosInfoX?.listRoomType[1]);
+                //Debugger.Log(item.borderItemPosInfoX?.pos + ",entityAxis:" + item.borderItemPosInfoX?.entityAxis + ",otherRoomType:" + item.borderItemPosInfoX?.listRoomType[0] + "," + item.borderItemPosInfoX?.listRoomType[1]);
             }
             if (item.borderItemPosInfoY?.listRoomType?.Count > 1)
             {
                 commonWallEntityData.Add(item.borderItemPosInfoY);
-                //Debug.Log(item.borderItemPosInfoY?.pos + ",entityAxis:" + item.borderItemPosInfoY?.entityAxis + ",otherRoomType:" + item.borderItemPosInfoY?.listRoomType[0] + "," + item.borderItemPosInfoY?.listRoomType[1]);
+                //Debugger.Log(item.borderItemPosInfoY?.pos + ",entityAxis:" + item.borderItemPosInfoY?.entityAxis + ",otherRoomType:" + item.borderItemPosInfoY?.listRoomType[0] + "," + item.borderItemPosInfoY?.listRoomType[1]);
             }
         }
 
@@ -785,18 +784,18 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             ////log 当前房间允许放置门的随机位置
             //foreach (BorderEntityData item in listDoorRandomPosInfo)
             //{
-            //    Debug.Log("curRoomType:" + roomBaseInfos[i].curRoomType + ",允许放置门的位置：" + item.pos + ",entityAxis:" + item.entityAxis);
+            //    Debugger.Log("curRoomType:" + roomBaseInfos[i].curRoomType + ",允许放置门的位置：" + item.pos + ",entityAxis:" + item.entityAxis);
             //}
 
             //当前房间门的位置
             if (listDoorRandomPosInfo.Count == 0)
             {
-                Debug.LogError("listDoorRandomPosInfo is null");
+                Debugger.LogError("listDoorRandomPosInfo is null");
                 return;
             }
             int doorRandomIndex = UnityEngine.Random.Range(0, listDoorRandomPosInfo.Count);
             BorderEntityData doorData = listDoorRandomPosInfo[doorRandomIndex];
-            //Debug.Log("curRoomType:" + roomBaseInfos[i].curRoomType + ",doorPos：" + doorData.pos + ",entityAxis:" + doorData.entityAxis);
+            //Debugger.Log("curRoomType:" + roomBaseInfos[i].curRoomType + ",doorPos：" + doorData.pos + ",entityAxis:" + doorData.entityAxis);
 
             //替换边界信息 wall=》door
             BorderEntityData doorBorderEntityData = new BorderEntityData
@@ -1029,7 +1028,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         }
         else
         {
-            Debug.LogError("无法获取房间信息学 roomID：" + roomID);
+            Debugger.LogError("无法获取房间信息学 roomID：" + roomID);
         }
         return res;
     }
@@ -1054,7 +1053,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         }
         else
         {
-            Debug.LogError("roomID dont find , roomType : " + roomType);
+            Debugger.LogError("roomID dont find , roomType : " + roomType);
         }
         return result;
     }
@@ -1084,7 +1083,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         }
         else
         {
-            Debug.LogError("roomType dont find , roomID : " + roomID);
+            Debugger.LogError("roomType dont find , roomID : " + roomID);
         }
         return result;
     }
@@ -1096,10 +1095,10 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             //CacheRoomWallInfo(m_ListRoomInfo.ToArray());
             //GenerateDoorData(roomBaseInfosClone, ref m_ListRoomInfo);
 
-            Debug.Log(listRoomBuilderInfo);
+            Debugger.Log(listRoomBuilderInfo);
             //foreach (var item in listRoomBuilderInfo)
             //{
-            //    Debug.Log(item.pos + ",entityModelType" + item.entityModelType + ",entityAxis:" + item.entityAxis + ",otherRoomType:" + item.listRoomType[0]);
+            //    Debugger.Log(item.pos + ",entityModelType" + item.entityModelType + ",entityAxis:" + item.entityAxis + ",otherRoomType:" + item.listRoomType[0]);
 
         }
     }

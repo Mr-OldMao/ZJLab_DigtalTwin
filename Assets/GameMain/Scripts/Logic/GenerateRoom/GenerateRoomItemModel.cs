@@ -143,7 +143,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     Vector2 targetPos = new Vector2(j, k);
                     if (doorPosArr.Contains(targetPos))
                     {
-                        Debug.Log("屏蔽掉门周边的放置信息，门口不可放置物体 targetPos:" + targetPos);
+                        Debugger.Log("屏蔽掉门周边的放置信息，门口不可放置物体 targetPos:" + targetPos);
                         continue;
                     }
 
@@ -178,12 +178,12 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
 
         //foreach (var roomType in m_DicItemModelInfo.Keys)
         //{
-        //    Debug.Log("roomType:" + roomType);
+        //    Debugger.Log("roomType:" + roomType);
         //    foreach (var item in m_DicItemModelInfo[roomType])
         //    {
         //        if (doorPosArr.Contains(item.pos))
         //        {
-        //            Debug.Log("delA pos:" + item.pos + ",itemType:" + item.itemModelType);
+        //            Debugger.Log("delA pos:" + item.pos + ",itemType:" + item.itemModelType);
         //        }
         //    }
         //}
@@ -197,7 +197,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 {
                     if (doorPosArr.Contains(m_DicItemModelInfo[(RoomType)tempI][j].pos))
                     {
-                        //Debug.Log("delB pos:" + m_DicItemModelInfo[(RoomType)tempI][j].pos + ",itemType:" + m_DicItemModelInfo[(RoomType)tempI][j].itemModelType);
+                        //Debugger.Log("delB pos:" + m_DicItemModelInfo[(RoomType)tempI][j].pos + ",itemType:" + m_DicItemModelInfo[(RoomType)tempI][j].itemModelType);
                         //m_DicItemModelInfo[(RoomType)tempI].Remove(m_DicItemModelInfo[(RoomType)tempI][j]);
                         m_DicItemModelInfo[(RoomType)tempI].RemoveAt(j);
                     }
@@ -259,7 +259,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             }
             if (res == null)
             {
-                Debug.LogError("Get ItemModelEntity Fail, name:" + itemName);
+                Debugger.LogError("Get ItemModelEntity Fail, name:" + itemName);
             }
         }
         return res;
@@ -331,7 +331,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         PutCustomItem(RoomType.BedRoom, "TV", GetDefaultItemID);
         PutCustomItem(RoomType.BedRoom, "Bed", GetDefaultItemID);
         string brDeskItemID = GetDefaultItemID;
-        Debug.Log("brDeskItemID:" + brDeskItemID);
+        Debugger.Log("brDeskItemID:" + brDeskItemID);
         PutCustomItem(RoomType.BedRoom, "Desk", brDeskItemID);
         PutCustomItem(RoomType.BedRoom, "Chair", GetDefaultItemID, new ItemDependInfo
         {
@@ -357,7 +357,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
 
         //书房
         string srDeskItemID = GetDefaultItemID;
-        Debug.Log("deskItemID:" + srDeskItemID);
+        Debugger.Log("deskItemID:" + srDeskItemID);
         PutCustomItem(RoomType.StudyRoom, "Desk", srDeskItemID);
         PutCustomItem(RoomType.StudyRoom, "Sofa", srDeskItemID);
         PutCustomItem(RoomType.StudyRoom, "Chair", GetDefaultItemID, new ItemDependInfo
@@ -429,7 +429,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     {
         for (int i = 0; i < relatedThingArr.Count; i++)
         {
-            //Debug.Log("cur put item:" + relatedThingArr[i].target.name
+            //Debugger.Log("cur put item:" + relatedThingArr[i].target.name
             //    + ",id" + relatedThingArr[i].target.id
             //    + ", isDepend :" + itemDependInfo.isDepend
             //    + ",dependItemName:" + itemDependInfo?.dependItemName
@@ -437,7 +437,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             string key = relatedThingArr[i].target.name + "_" + relatedThingArr[i].target.id;
             if (MainData.CacheItemsEntity.ContainsKey(key))
             {
-                Debug.LogError("当前实体已存在，name_id：" + key);
+                Debugger.LogError("当前实体已存在，name_id：" + key);
                 continue;
             }
             //当前实体信息
@@ -479,7 +479,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 }
                 else
                 {
-                    Debug.LogError("item is null ,itemName : " + parentItemName);
+                    Debugger.LogError("item is null ,itemName : " + parentItemName);
                 }
             }
             //无放置限制
@@ -598,12 +598,12 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                             if (canUse)
                             {
                                 //放置后标记当前位置在当前房间已被放置其他物体不可重复放置在此
-                                Debug.Log("当前实体已放置成功 name_id：" + key + " , roomType:" + roomType);
+                                Debugger.Log("当前实体已放置成功 name_id：" + key + " , roomType:" + roomType);
                                 MainData.CacheItemsEntity.Add(key, clone);
                                 for (int k = 0; k < needItemModelInfoArr.Count; k++)
                                 {
                                     needItemModelInfoArr[k].itemModelType = relatedThingArr[i].target.name;
-                                    //Debug.Log("pos:" + needItemModelInfoArr[k].pos);
+                                    //Debugger.Log("pos:" + needItemModelInfoArr[k].pos);
                                 }
                                 clone.SetActive(true);
                                 break;
@@ -618,7 +618,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     }
                     if (!canUse && curLoopCount == loopMaxCount)
                     {
-                        Debug.LogError("当前物体放置失败，itemEntity:" + relatedThingArr[i].target.name + ",id:" + relatedThingArr[i].target.id);
+                        Debugger.LogError("当前物体放置失败，itemEntity:" + relatedThingArr[i].target.name + ",id:" + relatedThingArr[i].target.id);
                     }
                 }
 
@@ -699,7 +699,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     {
         for (int i = 0; i < ItemEntityGroupNode?.childCount; i++)
         {
-            //Debug.Log("DEL " + ItemEntityGroupNode?.GetChild(i));
+            //Debugger.Log("DEL " + ItemEntityGroupNode?.GetChild(i));
             int typeI = i;
             ItemEntityGroupNode.GetChild(i).gameObject.name = "del_" + ItemEntityGroupNode.GetChild(i).gameObject.name;
             ItemEntityGroupNode.GetChild(i).gameObject.SetActive(false);

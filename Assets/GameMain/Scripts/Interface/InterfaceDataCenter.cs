@@ -65,11 +65,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public void CacheGetThingGraph(string id)
     {
         string rawJsonStr = "{\"id\":\"" + id + "\"}";
-        Debug.Log("缓存场景图，物体与房间的邻接关系 " + rawJsonStr);
+        Debugger.Log("缓存场景图，物体与房间的邻接关系 " + rawJsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_GET_THING_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
         {
             MainData.getThingGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetThingGraph>(jsonStr);
-            Debug.Log("缓存场景图，物体与房间的邻接关系 jsonStr:" + jsonStr);
+            Debugger.Log("缓存场景图，物体与房间的邻接关系 jsonStr:" + jsonStr);
         }, null, rawJsonStr);
     }
 
@@ -80,14 +80,14 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public void CommitGetThingGraph(PostThingGraph items, Action callback)
     {
         string rawJsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
-        Debug.Log("提交场景图，物体与房间的邻接关系 " + rawJsonStr);
+        Debugger.Log("提交场景图，物体与房间的邻接关系 " + rawJsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_POST_THING_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
         {
-            Debug.Log("提交场景图，物体与房间关系回调 jsonStr:" + jsonStr);
+            Debugger.Log("提交场景图，物体与房间关系回调 jsonStr:" + jsonStr);
             callback?.Invoke();
         }, null, rawJsonStr, (m, n) =>
         {
-            Debug.LogError("提交场景图失败，m:" + m + ",n:" + n);
+            Debugger.LogError("提交场景图失败，m:" + m + ",n:" + n);
         });
     }
 
@@ -98,7 +98,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public void CacheGetEnvGraph(string id)
     {
         string rawJsonStr = "{\"id\":\"" + id + "\"}";
-        Debug.Log("缓存环境场景图,房间与房间的邻接关系 " + rawJsonStr);
+        Debugger.Log("缓存环境场景图,房间与房间的邻接关系 " + rawJsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_GET_ENV_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
         {
             if (MainData.UseTestData)
@@ -107,7 +107,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                 jsonStr = "{\r\n    \"code\": 200,\r\n    \"message\": \"good\",\r\n    \"success\": true,\r\n    \"data\": {\r\n        \"items\": [\r\n            {\r\n                \"id\": \"sim:1\",\r\n                \"name\": \"LivingRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:2\",\r\n                            \"name\": \"BathRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Left\"\r\n                    },\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Right\"\r\n                    },\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:4\",\r\n                            \"name\": \"KitchenRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:5\",\r\n                \"name\": \"BedRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:1\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:6\",\r\n                \"name\": \"StorageRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:7\",\r\n                \"name\": \"StudyRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Left\"\r\n                    }\r\n                ]\r\n            }\r\n        ]\r\n    }\r\n}";
             }
             MainData.getEnvGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetEnvGraph>(jsonStr);
-            Debug.Log("缓存环境场景图,房间与房间的邻接关系 jsonStr:" + jsonStr);
+            Debugger.Log("缓存环境场景图,房间与房间的邻接关系 jsonStr:" + jsonStr);
         }, null, rawJsonStr);
     }
 
@@ -119,14 +119,14 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public void ChangeProgramState(string id, ProgramState state, Action calllbackSuc = null, Action callbackFail = null)
     {
         string rawJsonStr = "{  \"id\":\"" + id + "\"  ,\"state\":\"" + state.ToString() + "\" }";
-        Debug.Log("改变仿真引擎状态 rawJsonStr:" + rawJsonStr);
+        Debugger.Log("改变仿真引擎状态 rawJsonStr:" + rawJsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_CHANGE_SIMULATOR_STATE, new Dictionary<string, string>(), (string jsonStr) =>
         {
-            Debug.Log("改变仿真引擎状态 jsonStr:" + jsonStr);
+            Debugger.Log("改变仿真引擎状态 jsonStr:" + jsonStr);
             calllbackSuc?.Invoke();
         }, null, rawJsonStr, (m, n) =>
         {
-            Debug.Log("改变仿真引擎状态接口调用失败 m:" + m + ",n:" + n);
+            Debugger.Log("改变仿真引擎状态接口调用失败 m:" + m + ",n:" + n);
             callbackFail?.Invoke();
         });
     }
@@ -170,7 +170,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         });
         //NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgSubscribedEventArgs e) =>
         //{
-        //    Debug.Log($"客户端订阅消息成功回调 ，sender：{sender}");
+        //    Debugger.Log($"客户端订阅消息成功回调 ，sender：{sender}");
         //});
     }
 
@@ -181,8 +181,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// <param name="msg"></param>
     private void ParseMQTTMsg(string topic, string msg)
     {
-        Debug.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
-        //Debug.Log($"recv mqtt callback. topic：{topic}");
+        Debugger.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
+        //Debugger.Log($"recv mqtt callback. topic：{topic}");
 
         //在非Unity主线程中调用UnityEngineApi
         PimDeWitte.UnityMainThreadDispatcher.UnityMainThreadDispatcher.Instance().Enqueue(() =>
@@ -194,11 +194,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     if (controlCommit != null)
                     {
                         MainData.controlCommit.Enqueue(controlCommit);
-                        Debug.Log("解析决策指令 topic：" + topic + ",msg：" + msg);
+                        Debugger.Log("解析决策指令 topic：" + topic + ",msg：" + msg);
                     }
                     else
                     {
-                        Debug.LogError("controlCommit is null");
+                        Debugger.LogError("controlCommit is null");
                     }
                     break;
 
@@ -226,7 +226,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     MainData.feature_People_Perceptions.Enqueue(feature_People_Perception);
                     break;
                 default:
-                    //Debug.Log($"Other Topoc :{topic}");
+                    //Debugger.Log($"Other Topoc :{topic}");
                     break;
             }
         });
@@ -240,7 +240,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     {
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
         NetworkMqtt.GetInstance.Publish(TOPIC_GLOBAL, jsonStr);
-        //Debug.Log("更新全局场景图 jsonStr:" + jsonStr);
+        //Debugger.Log("更新全局场景图 jsonStr:" + jsonStr);
     }
 
     /// <summary>

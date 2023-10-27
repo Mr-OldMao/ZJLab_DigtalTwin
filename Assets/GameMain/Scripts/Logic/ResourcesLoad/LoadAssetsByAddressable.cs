@@ -74,7 +74,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         {
             return;
         }
-        Debug.Log("Loading Assets ...");
+        Debugger.Log("Loading Assets ...");
         Init();
 
         bool loadMatComplete = false;
@@ -88,7 +88,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         }, MergeMode.Union, true).Completed += (UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle<IList<Material>> obj) =>
         {
             loadMatComplete = true;
-            Debug.Log("Loading Material Complete");
+            Debugger.Log("Loading Material Complete");
         };
 
         Addressables.LoadAssetsAsync<GameObject>(lables, (p) =>
@@ -99,12 +99,12 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         }, MergeMode.Union, true).Completed += (UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle<IList<GameObject>> obj) =>
         {
             loadPrefabComplete = true;
-            Debug.Log("Loading Prefab Complete");
+            Debugger.Log("Loading Prefab Complete");
         };
 
         UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() => { return loadMatComplete && loadPrefabComplete; }, () =>
         {
-            Debug.Log("Loading All Assets Complete");
+            Debugger.Log("Loading All Assets Complete");
             callbackLoadedComplete?.Invoke();
         });
     }
@@ -144,7 +144,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         dirPath = Application.dataPath + dirPath;
         List<string> assetsPathArr = new List<string>();
         GetAllAssetsPath(dirPath, ref assetsPathArr);
-        Debug.Log(assetsPathArr);
+        Debugger.Log(assetsPathArr);
 
         int curLoadedCount = 0;
         for (int i = 0; i < assetsPathArr.Count; i++)
@@ -179,12 +179,12 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
             }
             else
             {
-                Debug.LogError("自动解析资源类型失败，请新增");
+                Debugger.LogError("自动解析资源类型失败，请新增");
             }
         }
         UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() => { return curLoadedCount == assetsPathArr.Count; }, () =>
         {
-            Debug.Log("LoadAssetsAsyncByDirectory callbackLoadedComplete");
+            Debugger.Log("LoadAssetsAsyncByDirectory callbackLoadedComplete");
             callbackLoadedComplete?.Invoke();
         });
     }
@@ -211,7 +211,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
             }
             else
             {
-                Debug.LogError("assets exist，assetsName：" + files[tempI].FullName);
+                Debugger.LogError("assets exist，assetsName：" + files[tempI].FullName);
             }
         }
 
@@ -272,12 +272,12 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
             }
             else
             {
-                Debug.LogError("dicCacheEntityRes not exist，entityName：" + entityName);
+                Debugger.LogError("dicCacheEntityRes not exist，entityName：" + entityName);
             }
         }
         else
         {
-            Debug.LogError("dicCacheEntityRes is null");
+            Debugger.LogError("dicCacheEntityRes is null");
         }
         return res;
     }
@@ -299,7 +299,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
                 }
                 if (res == null)
                 {
-                    Debug.LogError("未找到指定资源，改用随机资源");
+                    Debugger.LogError("未找到指定资源，改用随机资源");
                     int randomIndex = UnityEngine.Random.Range(0, dicCacheAssets[entityName].items.Count);
                     res = dicCacheAssets[entityName].items[randomIndex];
                 }
@@ -312,7 +312,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
     {
         // 只能在主线程执行的语句
         // ...
-        Debug.Log(dicCacheAssets["Food"].items);
+        Debugger.Log(dicCacheAssets["Food"].items);
         yield return null;
     }
 
@@ -367,7 +367,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         }
         else
         {
-            Debug.LogError("resName not find , resName:" + resName);
+            Debugger.LogError("resName not find , resName:" + resName);
         }
         return res;
     }
@@ -395,6 +395,6 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
 
     private void GetLoadProgress(uint AllAssetsCount)
     {
-        Debug.Log("Load Assets Progress：" + (((float)m_CurLoadedCount / AllAssetsCount) * 100).ToString("#0.0") + "%");
+        Debugger.Log("Load Assets Progress：" + (((float)m_CurLoadedCount / AllAssetsCount) * 100).ToString("#0.0") + "%");
     }
 }

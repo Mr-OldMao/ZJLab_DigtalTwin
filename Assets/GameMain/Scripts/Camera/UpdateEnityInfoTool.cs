@@ -55,7 +55,7 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
                 }
                 else
                 {
-                    Debug.LogError("not Model node , key:" + key);
+                    Debugger.LogError("not Model node , key:" + key);
                 }
             }
 
@@ -105,13 +105,13 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
                 if (JudgeEntityExistCameraFOV(relatedThing))
                 {
                     MainData.CacheCameraItemsInfo.items[tempI].relatedThing.Add(relatedThing);
-                    Debug.Log($"更新相机视野范围内的实体信息 itemName:{relatedThing.target.name}" +
+                    Debugger.Log($"更新相机视野范围内的实体信息 itemName:{relatedThing.target.name}" +
                     $",id:{relatedThing.target.id}" +
                     $",pos:{relatedThing.target.position}");
                 }
                 else
                 {
-                    //Debug.Log($"更新相机视野范围内的实体信息 ,不在视野范围内 itemName:{relatedThing.target.name}");
+                    //Debugger.Log($"更新相机视野范围内的实体信息 ,不在视野范围内 itemName:{relatedThing.target.name}");
                 }
             }
         }
@@ -139,7 +139,7 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
         }
         if (!MainData.CacheItemsEntity.ContainsKey(key))
         {
-            Debug.LogError("not exist key : " + key);
+            Debugger.LogError("not exist key : " + key);
             return isExist;
         }
         GameObject targetEntity = MainData.CacheItemsEntity[key];
@@ -193,7 +193,7 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
         ////TEST
         //if (res == false)
         //{
-        //    Debug.LogError("物体未相机前方 " + obj);
+        //    Debugger.LogError("物体未相机前方 " + obj);
         //}
         return res;
     }
@@ -213,7 +213,7 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
         ////TEST
         //if (res == false)
         //{
-        //    Debug.LogError("物体到摄像机的距离未在指定范围之内 " + obj);
+        //    Debugger.LogError("物体到摄像机的距离未在指定范围之内 " + obj);
         //}
         return res;
     }
@@ -241,11 +241,11 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
         LayerMask layerMask = ~((1 << 6) | (1 << 7));//打开除了"Player","IndoorItem"之外的层;
         if (Physics.Raycast(ray, out raycastHit, 20, layerMask))
         {
-            //Debug.LogError("obj " + obj + " ray ，coll" + raycastHit.collider.name + ",parent:" + raycastHit.collider.transform.parent);
+            //Debugger.LogError("obj " + obj + " ray ，coll" + raycastHit.collider.name + ",parent:" + raycastHit.collider.transform.parent);
             if (raycastHit.collider.tag == "Wall" || raycastHit.collider.tag == "Door")
             {
-                //Debug.LogError("obj " + obj + "被墙体遮挡，coll" + raycastHit.collider.name);
-                //Debug.DrawLine(cameraListener.transform.position, raycastHit.collider.gameObject.transform.position);
+                //Debugger.LogError("obj " + obj + "被墙体遮挡，coll" + raycastHit.collider.name);
+                //Debugger.DrawLine(cameraListener.transform.position, raycastHit.collider.gameObject.transform.position);
                 res = false;
             }
             else
@@ -256,7 +256,7 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
         ////TEST
         //if (res == false)
         //{
-        //    Debug.LogError("摄像机到目标物体之间有障碍阻挡 " + obj);
+        //    Debugger.LogError("摄像机到目标物体之间有障碍阻挡 " + obj);
         //}
         return res;
     }
@@ -274,7 +274,7 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
             }
             else
             {
-                Debug.LogError("not exist key : " + key);
+                Debugger.LogError("not exist key : " + key);
             }
         }
         else

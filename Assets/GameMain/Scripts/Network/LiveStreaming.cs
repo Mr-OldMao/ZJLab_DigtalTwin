@@ -62,7 +62,7 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
     {
         m_FrameCount = MainData.ConfigData.VideoStreaming.Frame;
         renderValue = MainData.ConfigData.VideoStreaming.Quality;
-        Debug.Log($"m_FrameCount:{m_FrameCount},renderValue:{renderValue}");
+        Debugger.Log($"m_FrameCount:{m_FrameCount},renderValue:{renderValue}");
 
         CameraFirstRenderer = GameObject.Find("CameraFirstRenderer")?.GetComponent<Camera>();
         CameraThreeRenderer = GameObject.Find("CameraThreeRenderer")?.GetComponent<Camera>();
@@ -77,14 +77,14 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
 
         //firstCameraView = new RenderTexture((int)(Screen.width), (int)(Screen.height), 0);
         //firstCameraView.enableRandomWrite = true;
-        //Debug.Log("LiveStreaming.init2");
+        //Debugger.Log("LiveStreaming.init2");
         //ThreeCameraView = new RenderTexture((int)(Screen.width), (int)(Screen.height), 0);
         //ThreeCameraView.enableRandomWrite = true;
-        //Debug.Log("LiveStreaming.init3");
+        //Debugger.Log("LiveStreaming.init3");
         //CameraFirstRenderer.targetTexture = firstCameraView;
-        //Debug.Log("LiveStreaming.init4");
+        //Debugger.Log("LiveStreaming.init4");
         //CameraThreeRenderer.targetTexture = ThreeCameraView;
-        //Debug.Log("LiveStreaming.init5");
+        //Debugger.Log("LiveStreaming.init5");
 
         firstCameraView = CameraFirstRenderer.targetTexture;
         ThreeCameraView = CameraThreeRenderer.targetTexture;
@@ -123,7 +123,7 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
 
     void OnStart()
     {
-        Debug.Log("Socket创建成功");
+        Debugger.Log("Socket创建成功");
         while (thread.ThreadState == ThreadState.Running)
         {
             Socket _socket = socket.Accept();
@@ -216,7 +216,7 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
             byte[] msgBytes = GetLiveData();
             if (msgBytes == null || msgBytes.Length == 0)
             {
-                Debug.LogError("msgBytes is null");
+                Debugger.LogError("msgBytes is null");
                 return;
             }
             if (m_UseMQTT)
@@ -303,7 +303,7 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
             gc_count = 0;
             GC.Collect(2);
         }
-        //Debug.Log("发送数据:" + (float)msgBytes.Length / 1024f + "KB");
+        //Debugger.Log("发送数据:" + (float)msgBytes.Length / 1024f + "KB");
 
 
         oldPosFirstCam = CameraFirstRenderer.transform.position;
