@@ -86,6 +86,19 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         Above
     }
 
+    private int GetDefaultItemIDIndex;
+    /// <summary>
+    /// 获取各个房间默认物品的ID
+    /// </summary>
+    private string GetDefaultItemID
+    {
+        get
+        {
+            GetDefaultItemIDIndex++;
+            return "sim:" + GetDefaultItemIDIndex;
+        }
+    }
+
     private void Awake()
     {
         ItemEntityGroupNode = GameObject.Find("ItemEntityGroupNode")?.transform;
@@ -103,6 +116,8 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     /// <param name="getThingGraph">物体与房间的邻接关系数据</param>
     public void GenerateRoomItem(List<RoomInfo> roomInfos, GetThingGraph getThingGraph = null)
     {
+        GetDefaultItemIDIndex = 1000;
+
         /*根据边界信息找到各个房间的可放置坐标节点，屏蔽"门"模型前后坐标节点，避免物体堵门*/
         ChcheItemModelTypeInfo(roomInfos);
 
@@ -113,6 +128,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         //SetRandomRoomInsideItemEntity(dicRoomInsideItemEntity);
 
         MainData.CacheItemsEntity.Clear();
+        ClearItemEntity();
 
         //TODO 暂时注释掉
         //根据服务器数据设置各个房间实体物品，位置随机
@@ -269,7 +285,6 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     //随机放置各个房间的实体
     private void SetRandomRoomInsideItemEntity(GetThingGraph getThingGraph)
     {
-        ClearItemEntity();
         CreateRoomContainer();
         if (getThingGraph != null && getThingGraph.data?.items?.Count > 0)
         {
@@ -288,18 +303,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         }
     }
 
-    private int GetDefaultItemIDIndex = 1000;
-    /// <summary>
-    /// 获取各个房间默认物品的ID
-    /// </summary>
-    private string GetDefaultItemID
-    {
-        get
-        {
-            GetDefaultItemIDIndex++;
-            return "sim:" + GetDefaultItemIDIndex;
-        }
-    }
+
 
     /// <summary>
     /// 设置各个房间默认的实体物品，位置随机
@@ -307,7 +311,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     private void SetDefaultRoomInsideItemEntity()
     {
         //return;
-         
+
         for (int i = 0; i < GenerateRoomData.GetInstance.m_ListRoomInfo.Count; i++)
         {
             RoomType roomTypeStr = GenerateRoomData.GetInstance.m_ListRoomInfo[i].roomType;
@@ -316,7 +320,16 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             Vector3 roomCenterPos = GenerateRoomData.GetInstance.GetRoomCenterPos(roomIDStr);
             if (roomCenterPos != Vector3.zero)
             {
-                PutItem(roomTypeStr, roomIDStr, "Toplamp", GetDefaultItemID, roomCenterPos, false);
+                try
+                {
+                    PutItem(roomTypeStr, roomIDStr, "Toplamp", GetDefaultItemID, roomCenterPos, false);
+                }
+                catch (Exception e)
+                {
+                    Debugger.LogError("设置各个房间默认的实体物品 栈溢出,准备重新生成场景 e:" + e);
+                    UnityTool.GetInstance.DelayCoroutine(0.5f,()=> GameLogic.GetInstance.GenerateScene());
+                    return;
+                }
             }
             //在每个房间放置垃圾桶
             PutCustomItem(roomTypeStr, "Bin", GetDefaultItemID);
@@ -356,10 +369,9 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         PutCustomItem(RoomType.BathRoom, "Bathtub", GetDefaultItemID);
 
         //书房
+        PutCustomItem(RoomType.StudyRoom, "Sofa", GetDefaultItemID);
         string srDeskItemID = GetDefaultItemID;
-        Debugger.Log("deskItemID:" + srDeskItemID);
         PutCustomItem(RoomType.StudyRoom, "Desk", srDeskItemID);
-        PutCustomItem(RoomType.StudyRoom, "Sofa", srDeskItemID);
         PutCustomItem(RoomType.StudyRoom, "Chair", GetDefaultItemID, new ItemDependInfo
         {
             isDepend = true,
@@ -598,7 +610,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                             if (canUse)
                             {
                                 //放置后标记当前位置在当前房间已被放置其他物体不可重复放置在此
-                                Debugger.Log("当前实体已放置成功 name_id：" + key + " , roomType:" + roomType);
+                                Debugger.Log("当前实体已放置成功 name_id：" + key + " , roomType:" + roomType, LogTag.Free);
                                 MainData.CacheItemsEntity.Add(key, clone);
                                 for (int k = 0; k < needItemModelInfoArr.Count; k++)
                                 {
@@ -611,15 +623,18 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                         }
                         curLoopCount++;
                         curDir = (DirEnum)(((int)curPosDir + 1) % Enum.GetValues(typeof(DirEnum)).Length);
+
                     }
                     if (canUse)
                     {
                         break;
                     }
-                    if (!canUse && curLoopCount == loopMaxCount)
-                    {
-                        Debugger.LogError("当前物体放置失败，itemEntity:" + relatedThingArr[i].target.name + ",id:" + relatedThingArr[i].target.id);
-                    }
+
+                }
+                if (!canUse)
+                {
+                    Debugger.LogError("当前实体未找到合适位置放置，隐藏该实体，itemEntity:" + relatedThingArr[i].target.name + ",id:" + relatedThingArr[i].target.id, LogTag.Free);
+                    //Destroy(clone);
                 }
 
                 if (relatedThingArr[i].target.relatedThing?.Count > 0)
@@ -703,8 +718,8 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             int typeI = i;
             ItemEntityGroupNode.GetChild(i).gameObject.name = "del_" + ItemEntityGroupNode.GetChild(i).gameObject.name;
             ItemEntityGroupNode.GetChild(i).gameObject.SetActive(false);
-
-            UnityTool.GetInstance.DelayCoroutine(1f, () => Destroy(ItemEntityGroupNode.GetChild(typeI).gameObject));
+            Destroy(ItemEntityGroupNode.GetChild(typeI).gameObject);
+           // UnityTool.GetInstance.DelayCoroutine(0.1f, () => Destroy(ItemEntityGroupNode.GetChild(typeI).gameObject));
         }
     }
 }

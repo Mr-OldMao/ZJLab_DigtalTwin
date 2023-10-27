@@ -341,9 +341,9 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
             if (typeof(T) == typeof(Material))
             {
                 Material material = dicCacheAssets[resName].materials[UnityEngine.Random.Range(0, dicCacheAssets[resName].materials.Count)];
-                Material matRes = Instantiate(material);
                 if (isInstantiate)
                 {
+                    Material matRes = Instantiate(material);
                     res = matRes as T;
                 }
                 else

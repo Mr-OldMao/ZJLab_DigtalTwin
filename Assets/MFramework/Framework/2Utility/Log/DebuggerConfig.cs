@@ -1,29 +1,35 @@
 using System.Collections.Generic;
+
 namespace MFramework
 {
     /// <summary>
     /// 标题：日志系统配置
     /// 功能：对指定标签打印，修改控制台日志显示样式，缓存到日志信息到本地
     /// 作者：毛俊峰
-    /// 时间：2022.10.19
+    /// 时间：2022.10.19   2023.10.27
     /// 版本：1.0
     /// </summary>
     public class DebuggerConfig
     {
+        private static bool m_CanPrintConsoleLog = UnityEngine.PlayerPrefs.GetInt("CanPrintConsoleLog", 1) == 1;
+        private static bool m_CanPrintConsoleLogError = UnityEngine.PlayerPrefs.GetInt("CanPrintConsoleLogError", 1) == 1;
+        private static bool m_CanSaveLogDataFile = UnityEngine.PlayerPrefs.GetInt("m_CanSaveLogDataFile", 1) == 1;
         /// <summary>
         /// 是否允许控制台打印 所有非错误日志
         /// </summary>
-        public static bool CanPrintConsoleLog 
+        public static bool CanPrintConsoleLog
         {
             get
             {
-                return UnityEngine.PlayerPrefs.GetInt("CanPrintConsoleLog", 1) == 1;
+                return m_CanPrintConsoleLog;
             }
             set
             {
                 UnityEngine.PlayerPrefs.SetInt("CanPrintConsoleLog", value ? 1 : 0);
+                m_CanPrintConsoleLog = value;
             }
         }
+
         /// <summary>
         /// 允许控制台打印 错误日志
         /// </summary>
@@ -31,11 +37,12 @@ namespace MFramework
         {
             get
             {
-                return UnityEngine.PlayerPrefs.GetInt("CanPrintConsoleLogError", 1) == 1;
+                return m_CanPrintConsoleLogError;
             }
             set
             {
                 UnityEngine.PlayerPrefs.SetInt("CanPrintConsoleLogError", value ? 1 : 0);
+                m_CanPrintConsoleLogError = value;
             }
         }
 
@@ -47,7 +54,8 @@ namespace MFramework
         {
             LogTag.Temp,
             LogTag.Test,
-            LogTag.Forever
+            LogTag.Forever,
+            LogTag.Free
         };
 
         /// <summary>
@@ -64,11 +72,12 @@ namespace MFramework
         {
             get
             {
-                return UnityEngine.PlayerPrefs.GetInt("CanSaveLogDataFile", 1) == 1;
+                return m_CanSaveLogDataFile;
             }
             set
             {
                 UnityEngine.PlayerPrefs.SetInt("CanSaveLogDataFile", value ? 1 : 0);
+                m_CanSaveLogDataFile = value;
             }
         }
         /// <summary>

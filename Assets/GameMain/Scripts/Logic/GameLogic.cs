@@ -212,7 +212,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         {
             if (p == null || k == null)
             {
-                Debugger.LogError("generage fail , again generate...");
+                Debugger.Log("generage fail , again generate...");
                 GenerateScene();
             }
             else
@@ -311,6 +311,10 @@ public class GameLogic : SingletonByMono<GameLogic>
             //遍历第一层物体
             for (int j = 0; j < ItemEntityGroupNode.GetChild(i).childCount; j++)
             {
+                if (!ItemEntityGroupNode.GetChild(i).GetChild(j).gameObject.activeSelf)
+                {
+                    continue;
+                }
                 Transform curNode = ItemEntityGroupNode.GetChild(i).GetChild(j);
                 GetThingGraph_data_items_relatedThing_target target = null;
                 CacheItemDataInfo(curNode, ref target);
@@ -509,7 +513,8 @@ public class GameLogic : SingletonByMono<GameLogic>
         testJson);
         }
 
-        if (Input.GetKeyDown(KeyCode.F9))
+
+        if (Input.GetKeyDown(KeyCode.F8))
         {
             string testJson =
 
@@ -518,6 +523,35 @@ public class GameLogic : SingletonByMono<GameLogic>
             NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_RECV,
         testJson);
         }
+
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            string testJson =
+
+                @"
+{
+    ""motionId"": ""motion://Knock_on_door"",
+    ""name"": ""Knock_on_door"",
+    ""object"": ""BathRoomDoor"",
+    ""objectId"": ""DoorY_7_1"",
+    ""position"": [
+        14.0,
+        0.0,
+        8.5
+    ],
+    ""rotation"": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    ""taskId"": ""task:grab1698110424418""
+}
+                "
+                ;
+            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_RECV,
+        testJson);
+        }
+        
     }
 }
 

@@ -9,14 +9,13 @@ namespace MFramework
     /// 时间：2022.10.19
     /// 版本：1.0
     /// </summary>
-    public class Debugger : MonoBehaviour
+    public class Debugger : SingletonByMono<Debugger>
     {
         /// <summary>
         /// 日志回调(1日志index 2日志内容 3日志类型 4日志标签 5日志堆栈信息)
         /// </summary>
         public static Action<int, object, LogType, LogTag, string> logCallback;
         private static int m_CurLogIndex = 1;
-
 
         #region 对外接口
         public static void Log(object message, LogTag logTag = LogTag.Temp)
@@ -44,9 +43,13 @@ namespace MFramework
         /// <param name="logType"></param>
         private static void LogHandle(object logMsg, LogTag logTag, LogType logType)
         {
-            if (DebuggerConfig.canPrintLogTagList != null && DebuggerConfig.canPrintLogTagList.Contains(logTag))
+            bool canPrint = false;
+            if (logTag ==  LogTag.Free)
             {
-                bool canPrint = false;
+                canPrint = true;
+            }
+            else if (DebuggerConfig.canPrintLogTagList != null && DebuggerConfig.canPrintLogTagList.Contains(logTag))
+            {
                 switch (logType)
                 {
                     case LogType.Log:
@@ -61,43 +64,20 @@ namespace MFramework
                     default:
                         break;
                 }
-                if (canPrint)
-                {
-                    if (DebuggerConfig.CanSaveLogDataFile && !SaveLogData.IsListeneringWriteLog)
-                    {
-                        SaveLogData.GetInstance.ListenerWriteLog();
-                    }
-                    if (DebuggerConfig.canChangeConsolePrintStyle)
-                    {
-                        ChangeStyle(ref logMsg, logTag, logType);
-                    }
-                    Debug.unityLogger.Log(logType, logMsg);
-                    logCallback?.Invoke(m_CurLogIndex++, logMsg, logType, logTag, StackTraceUtility.ExtractStackTrace());
-                }
             }
-
-            //if (Debug.unityLogger.logEnabled)
-            //{
-            //    if (DebuggerConfig.canPrintLogTagList == null || DebuggerConfig.canPrintLogTagList.Count == 0)
-            //    {
-            //        Debug.unityLogger.logEnabled = false;
-            //        return;
-            //    }
-            //    if (!DebuggerConfig.canPrintLogTagList.Contains(logTag))
-            //    {
-            //        return;
-            //    }
-            //    if (DebuggerConfig.canSaveLogDataFile && !SaveLogData.IsListeneringWriteLog)
-            //    {
-            //        SaveLogData.GetInstance.ListenerWriteLog();
-            //    }
-            //    if (DebuggerConfig.canChangeConsolePrintStyle)
-            //    {
-            //        ChangeStyle(ref logMsg, logTag, logType);
-            //    }
-            //    Debug.unityLogger.Log(logType, logMsg);
-            //    logCallback?.Invoke(m_CurLogIndex++, logMsg, logType, logTag, StackTraceUtility.ExtractStackTrace());
-            //}
+            if (canPrint)
+            {
+                if (DebuggerConfig.CanSaveLogDataFile && !SaveLogData.IsListeneringWriteLog)
+                {
+                    SaveLogData.GetInstance.ListenerWriteLog();
+                }
+                if (DebuggerConfig.canChangeConsolePrintStyle)
+                {
+                    ChangeStyle(ref logMsg, logTag, logType);
+                }
+                Debug.unityLogger.Log(logType, logMsg);
+                logCallback?.Invoke(m_CurLogIndex++, logMsg, logType, logTag, StackTraceUtility.ExtractStackTrace());
+            }
         }
 
         /// <summary>
@@ -171,6 +151,10 @@ namespace MFramework
         /// <summary>
         /// 常驻日志
         /// </summary>
-        Forever
+        Forever,
+        /// <summary>
+        /// 不受外部打印开启与否的限制
+        /// </summary>
+        Free
     }
 }
