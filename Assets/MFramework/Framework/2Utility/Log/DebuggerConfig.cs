@@ -11,7 +11,37 @@ namespace MFramework
     public class DebuggerConfig
     {
         /// <summary>
-        /// 允许打印的日志标签
+        /// 是否允许控制台打印 所有非错误日志
+        /// </summary>
+        public static bool CanPrintConsoleLog 
+        {
+            get
+            {
+                return UnityEngine.PlayerPrefs.GetInt("CanPrintConsoleLog", 1) == 1;
+            }
+            set
+            {
+                UnityEngine.PlayerPrefs.SetInt("CanPrintConsoleLog", value ? 1 : 0);
+            }
+        }
+        /// <summary>
+        /// 允许控制台打印 错误日志
+        /// </summary>
+        public static bool CanPrintConsoleLogError
+        {
+            get
+            {
+                return UnityEngine.PlayerPrefs.GetInt("CanPrintConsoleLogError", 1) == 1;
+            }
+            set
+            {
+                UnityEngine.PlayerPrefs.SetInt("CanPrintConsoleLogError", value ? 1 : 0);
+            }
+        }
+
+
+        /// <summary>
+        /// 允许在控制台显示打印的日志标签
         /// </summary>
         public static List<LogTag> canPrintLogTagList = new List<LogTag>
         {
@@ -30,7 +60,17 @@ namespace MFramework
         /// <summary>
         /// 允许日志文件到缓存本地
         /// </summary>
-        public const bool canSaveLogDataFile = true;
+        public static bool CanSaveLogDataFile
+        {
+            get
+            {
+                return UnityEngine.PlayerPrefs.GetInt("CanSaveLogDataFile", 1) == 1;
+            }
+            set
+            {
+                UnityEngine.PlayerPrefs.SetInt("CanSaveLogDataFile", value ? 1 : 0);
+            }
+        }
         /// <summary>
         /// 允许写入硬件数据信息
         /// </summary>

@@ -44,28 +44,60 @@ namespace MFramework
         /// <param name="logType"></param>
         private static void LogHandle(object logMsg, LogTag logTag, LogType logType)
         {
-            if (Debug.unityLogger.logEnabled)
+            if (DebuggerConfig.canPrintLogTagList != null && DebuggerConfig.canPrintLogTagList.Contains(logTag))
             {
-                if (DebuggerConfig.canPrintLogTagList == null || DebuggerConfig.canPrintLogTagList.Count == 0)
+                bool canPrint = false;
+                switch (logType)
                 {
-                    Debug.unityLogger.logEnabled = false;
-                    return;
+                    case LogType.Log:
+                    case LogType.Assert:
+                    case LogType.Warning:
+                        canPrint = DebuggerConfig.CanPrintConsoleLog;
+                        break;
+                    case LogType.Error:
+                    case LogType.Exception:
+                        canPrint = DebuggerConfig.CanPrintConsoleLogError;
+                        break;
+                    default:
+                        break;
                 }
-                if (!DebuggerConfig.canPrintLogTagList.Contains(logTag))
+                if (canPrint)
                 {
-                    return;
+                    if (DebuggerConfig.CanSaveLogDataFile && !SaveLogData.IsListeneringWriteLog)
+                    {
+                        SaveLogData.GetInstance.ListenerWriteLog();
+                    }
+                    if (DebuggerConfig.canChangeConsolePrintStyle)
+                    {
+                        ChangeStyle(ref logMsg, logTag, logType);
+                    }
+                    Debug.unityLogger.Log(logType, logMsg);
+                    logCallback?.Invoke(m_CurLogIndex++, logMsg, logType, logTag, StackTraceUtility.ExtractStackTrace());
                 }
-                if (DebuggerConfig.canSaveLogDataFile && !SaveLogData.IsListeneringWriteLog)
-                {
-                    SaveLogData.GetInstance.ListenerWriteLog();
-                }
-                if (DebuggerConfig.canChangeConsolePrintStyle)
-                {
-                    ChangeStyle(ref logMsg, logTag, logType);
-                }
-                Debug.unityLogger.Log(logType, logMsg);
-                logCallback?.Invoke(m_CurLogIndex++, logMsg, logType, logTag, StackTraceUtility.ExtractStackTrace());
             }
+
+            //if (Debug.unityLogger.logEnabled)
+            //{
+            //    if (DebuggerConfig.canPrintLogTagList == null || DebuggerConfig.canPrintLogTagList.Count == 0)
+            //    {
+            //        Debug.unityLogger.logEnabled = false;
+            //        return;
+            //    }
+            //    if (!DebuggerConfig.canPrintLogTagList.Contains(logTag))
+            //    {
+            //        return;
+            //    }
+            //    if (DebuggerConfig.canSaveLogDataFile && !SaveLogData.IsListeneringWriteLog)
+            //    {
+            //        SaveLogData.GetInstance.ListenerWriteLog();
+            //    }
+            //    if (DebuggerConfig.canChangeConsolePrintStyle)
+            //    {
+            //        ChangeStyle(ref logMsg, logTag, logType);
+            //    }
+            //    Debug.unityLogger.Log(logType, logMsg);
+            //    logCallback?.Invoke(m_CurLogIndex++, logMsg, logType, logTag, StackTraceUtility.ExtractStackTrace());
+            //}
         }
 
         /// <summary>
