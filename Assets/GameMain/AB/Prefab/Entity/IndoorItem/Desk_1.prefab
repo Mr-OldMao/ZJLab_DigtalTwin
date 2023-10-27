@@ -137,12 +137,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6290524480864773231}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Desk_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6290524480864773231
 Transform:
@@ -267,6 +267,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: desk019
       objectReference: {fileID: 0}
+    - target: {fileID: 5430045792870280160, guid: b3fcb7d58a850564a999462d2d0efa5b, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5430045792870280160, guid: b3fcb7d58a850564a999462d2d0efa5b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 8300255207610192833, guid: b3fcb7d58a850564a999462d2d0efa5b, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -318,3 +326,24 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8300255207610192833, guid: b3fcb7d58a850564a999462d2d0efa5b, type: 3}
   m_PrefabInstance: {fileID: 7348992872483768489}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3361862310806610761 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5430045792870280160, guid: b3fcb7d58a850564a999462d2d0efa5b, type: 3}
+  m_PrefabInstance: {fileID: 7348992872483768489}
+  m_PrefabAsset: {fileID: 0}
+--- !u!208 &8610043732034506021
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3361862310806610761}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.314, y: 0.565, z: 0.642}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0.565, z: -0.063}
+  m_TimeToStationary: 0.5

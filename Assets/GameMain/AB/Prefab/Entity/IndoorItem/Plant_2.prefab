@@ -71,12 +71,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4520281109285280466}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Plant_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &4520281109285280466
 Transform:
@@ -323,6 +323,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: plant039
       objectReference: {fileID: 0}
+    - target: {fileID: 7566100033201744601, guid: a975917bf85eb6b498dcaca497039d37, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7566100033201744601, guid: a975917bf85eb6b498dcaca497039d37, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a975917bf85eb6b498dcaca497039d37, type: 3}
 --- !u!4 &4971901070277338793 stripped
@@ -330,3 +338,24 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6303763280828497343, guid: a975917bf85eb6b498dcaca497039d37, type: 3}
   m_PrefabInstance: {fileID: 1406472049176419094}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8828432978446299599 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7566100033201744601, guid: a975917bf85eb6b498dcaca497039d37, type: 3}
+  m_PrefabInstance: {fileID: 1406472049176419094}
+  m_PrefabAsset: {fileID: 0}
+--- !u!208 &823123986723106695
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8828432978446299599}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.104, y: 0.25500003, z: 0.061000004}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.010000001, y: -0.10700001, z: 0.002}
+  m_TimeToStationary: 0.5

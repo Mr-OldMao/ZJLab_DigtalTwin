@@ -107,12 +107,12 @@ GameObject:
   m_Component:
   - component: {fileID: 4192370177536866543}
   - component: {fileID: 4192370177536866544}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &4192370177536866543
 Transform:
@@ -262,7 +262,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7443286216490679478}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Size
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -293,7 +293,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7443286216786850617}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Toplamp_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -328,7 +328,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7443286216916022571}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -419,11 +419,40 @@ PrefabInstance:
       value: lamp011
       objectReference: {fileID: 0}
     - target: {fileID: 8339707819703678726, guid: 807d2027b75f5ff49907e49196501c45, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8339707819703678726, guid: 807d2027b75f5ff49907e49196501c45, type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8339707819703678726, guid: 807d2027b75f5ff49907e49196501c45, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 807d2027b75f5ff49907e49196501c45, type: 3}
+--- !u!1 &2360852406067090936 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8339707819703678726, guid: 807d2027b75f5ff49907e49196501c45, type: 3}
+  m_PrefabInstance: {fileID: 6016799012437189374}
+  m_PrefabAsset: {fileID: 0}
+--- !u!208 &3134939634765934644
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2360852406067090936}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.314, y: 0.29000002, z: 0.314}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: -0.28500003, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!4 &3478544042768245694 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7149943463633338688, guid: 807d2027b75f5ff49907e49196501c45, type: 3}

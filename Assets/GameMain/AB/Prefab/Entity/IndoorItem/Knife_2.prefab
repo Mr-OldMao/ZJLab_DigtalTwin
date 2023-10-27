@@ -169,12 +169,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7491423206775082688}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Knife_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &7491423206775082688
 Transform:
@@ -311,8 +311,37 @@ PrefabInstance:
       propertyPath: m_Name
       value: kitchenware035
       objectReference: {fileID: 0}
+    - target: {fileID: 5093272280114124409, guid: 04f7746cba7983d479fe737b877f4ebd, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5093272280114124409, guid: 04f7746cba7983d479fe737b877f4ebd, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 04f7746cba7983d479fe737b877f4ebd, type: 3}
+--- !u!1 &2282441451228609469 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5093272280114124409, guid: 04f7746cba7983d479fe737b877f4ebd, type: 3}
+  m_PrefabInstance: {fileID: 6413737539182554564}
+  m_PrefabAsset: {fileID: 0}
+--- !u!208 &1835073567325581594
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2282441451228609469}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.123, y: 0.008, z: 0.058000002}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.064, y: 0.008, z: -0.041}
+  m_TimeToStationary: 0.5
 --- !u!4 &7818781907428107904 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3856146670770228036, guid: 04f7746cba7983d479fe737b877f4ebd, type: 3}

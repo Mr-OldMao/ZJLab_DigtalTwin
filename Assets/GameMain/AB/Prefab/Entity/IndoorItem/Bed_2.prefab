@@ -268,8 +268,12 @@ PrefabInstance:
       value: bed015
       objectReference: {fileID: 0}
     - target: {fileID: 88602997341570336, guid: 702df50b0327cd14c865b3e661b268c1, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 88602997341570336, guid: 702df50b0327cd14c865b3e661b268c1, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 1
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 1933174325449349275, guid: 702df50b0327cd14c865b3e661b268c1, type: 3}
       propertyPath: m_RootOrder

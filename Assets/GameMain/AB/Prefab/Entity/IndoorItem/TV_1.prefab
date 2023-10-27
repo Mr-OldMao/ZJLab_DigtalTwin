@@ -231,7 +231,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1656040293193121946}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: TV_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -310,6 +310,10 @@ PrefabInstance:
     - target: {fileID: 2877559401956967530, guid: 31a023b728d72254c952ceef5d73f87e, type: 3}
       propertyPath: m_Name
       value: tv001
+      objectReference: {fileID: 0}
+    - target: {fileID: 2877559401956967530, guid: 31a023b728d72254c952ceef5d73f87e, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 2877559401956967530, guid: 31a023b728d72254c952ceef5d73f87e, type: 3}
       propertyPath: m_StaticEditorFlags

@@ -231,12 +231,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5887506399001457131}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Drink_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5887506399001457131
 Transform:
@@ -311,6 +311,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: drink003
       objectReference: {fileID: 0}
+    - target: {fileID: 8810643058463106673, guid: d228d126ee336ac4c853e447b59f07c9, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8810643058463106673, guid: d228d126ee336ac4c853e447b59f07c9, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d228d126ee336ac4c853e447b59f07c9, type: 3}
 --- !u!4 &84817310330794224 stripped
@@ -318,3 +326,24 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6056648181045136939, guid: d228d126ee336ac4c853e447b59f07c9, type: 3}
   m_PrefabInstance: {fileID: 6134146279764410075}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3415255347748690090 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8810643058463106673, guid: d228d126ee336ac4c853e447b59f07c9, type: 3}
+  m_PrefabInstance: {fileID: 6134146279764410075}
+  m_PrefabAsset: {fileID: 0}
+--- !u!208 &1228765614394962281
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3415255347748690090}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.047000002, y: 0.071, z: 0.047000002}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -0.002, y: -0.002, z: -0.003}
+  m_TimeToStationary: 0.5

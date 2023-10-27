@@ -168,7 +168,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5792890154297816571}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Size
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -199,7 +199,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5792890154657153376}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sofa_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -233,7 +233,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5792890155011154845}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -313,6 +313,10 @@ PrefabInstance:
       value: sofa032
       objectReference: {fileID: 0}
     - target: {fileID: 2155217402010836185, guid: 1f5a03a9d194e184897d716e7f323446, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2155217402010836185, guid: 1f5a03a9d194e184897d716e7f323446, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -354,6 +358,10 @@ PrefabInstance:
     - target: {fileID: 2627432680344805770, guid: be1326766cf515e4a9b1802de9729c20, type: 3}
       propertyPath: m_Name
       value: desk063
+      objectReference: {fileID: 0}
+    - target: {fileID: 2627432680344805770, guid: be1326766cf515e4a9b1802de9729c20, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 2627432680344805770, guid: be1326766cf515e4a9b1802de9729c20, type: 3}
       propertyPath: m_IsActive

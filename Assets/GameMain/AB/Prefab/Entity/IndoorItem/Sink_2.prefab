@@ -71,12 +71,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 420817669890993020}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Sink_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &420817669890993020
 Transform:
@@ -267,6 +267,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: sink004
       objectReference: {fileID: 0}
+    - target: {fileID: 7950306948269947005, guid: 28c8ed203798e3b4f9c31ac4b5ffbab5, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7950306948269947005, guid: 28c8ed203798e3b4f9c31ac4b5ffbab5, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 8227452658026066672, guid: 28c8ed203798e3b4f9c31ac4b5ffbab5, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -325,6 +333,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 28c8ed203798e3b4f9c31ac4b5ffbab5, type: 3}
+--- !u!1 &24518016938583175 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7950306948269947005, guid: 28c8ed203798e3b4f9c31ac4b5ffbab5, type: 3}
+  m_PrefabInstance: {fileID: 7926952228861746426}
+  m_PrefabAsset: {fileID: 0}
+--- !u!208 &2039637254587944159
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 24518016938583175}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.554, y: 0.39000002, z: 1.169}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -0.15200001, y: -0.006, z: -0.025}
+  m_TimeToStationary: 0.5
 --- !u!4 &2031116372481093130 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8227452658026066672, guid: 28c8ed203798e3b4f9c31ac4b5ffbab5, type: 3}

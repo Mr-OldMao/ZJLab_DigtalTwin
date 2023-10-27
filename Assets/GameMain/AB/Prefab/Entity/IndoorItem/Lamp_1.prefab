@@ -40,12 +40,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1322608997851313948}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Lamp_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1322608997851313948
 Transform:
@@ -311,8 +311,37 @@ PrefabInstance:
       propertyPath: m_Name
       value: lamp001
       objectReference: {fileID: 0}
+    - target: {fileID: 4820047718453982526, guid: acee7f3046fb91a43ae34bb55b9b1b7c, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4820047718453982526, guid: acee7f3046fb91a43ae34bb55b9b1b7c, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: acee7f3046fb91a43ae34bb55b9b1b7c, type: 3}
+--- !u!1 &732703720412185921 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4820047718453982526, guid: acee7f3046fb91a43ae34bb55b9b1b7c, type: 3}
+  m_PrefabInstance: {fileID: 5246458246476542079}
+  m_PrefabAsset: {fileID: 0}
+--- !u!208 &5027391264308957768
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 732703720412185921}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.16600001, y: 0.23200001, z: 0.093}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -0.009000001, y: 0.003, z: 0.002}
+  m_TimeToStationary: 0.5
 --- !u!4 &7208959745047975958 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3225834401095739497, guid: acee7f3046fb91a43ae34bb55b9b1b7c, type: 3}

@@ -200,12 +200,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4779403184986336555}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cabinet_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &4779403184986336555
 Transform:
@@ -311,6 +311,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: cabinet002
       objectReference: {fileID: 0}
+    - target: {fileID: 8027704379488029773, guid: 582c8caf9081a314c9add828f278a979, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8027704379488029773, guid: 582c8caf9081a314c9add828f278a979, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 582c8caf9081a314c9add828f278a979, type: 3}
 --- !u!4 &6262030679927294955 stripped
@@ -318,3 +326,24 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5384577432715036426, guid: 582c8caf9081a314c9add828f278a979, type: 3}
   m_PrefabInstance: {fileID: 2044334187619192033}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8302048934252101804 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8027704379488029773, guid: 582c8caf9081a314c9add828f278a979, type: 3}
+  m_PrefabInstance: {fileID: 2044334187619192033}
+  m_PrefabAsset: {fileID: 0}
+--- !u!208 &5708121771798292605
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8302048934252101804}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.67200005, y: 1.019, z: 0.28}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.001, y: 0.132, z: 0.010000001}
+  m_TimeToStationary: 0.5

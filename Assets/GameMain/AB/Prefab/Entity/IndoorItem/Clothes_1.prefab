@@ -196,12 +196,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2539237107287403298}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Clothes_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2539237107287403298
 Transform:
@@ -267,6 +267,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: clothes001
       objectReference: {fileID: 0}
+    - target: {fileID: 484590055696795093, guid: 8b66e227487014d4b8106fca93f8dbd6, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 484590055696795093, guid: 8b66e227487014d4b8106fca93f8dbd6, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 1398628379973450949, guid: 8b66e227487014d4b8106fca93f8dbd6, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -318,3 +326,24 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1398628379973450949, guid: 8b66e227487014d4b8106fca93f8dbd6, type: 3}
   m_PrefabInstance: {fileID: 4600598975153989799}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4134586422653545842 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 484590055696795093, guid: 8b66e227487014d4b8106fca93f8dbd6, type: 3}
+  m_PrefabInstance: {fileID: 4600598975153989799}
+  m_PrefabAsset: {fileID: 0}
+--- !u!208 &6115267572282530084
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4134586422653545842}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.066, y: 0.46400002, z: 0.29000002}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.020000001, y: -0.171, z: 0.007}
+  m_TimeToStationary: 0.5
