@@ -145,8 +145,9 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                 case GameLaunch.Scenes.MainScene1:
                     NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS, TOPIC_DEL_GOODS);
                     //TEST
-                    NetworkMqtt.GetInstance.Subscribe(TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA, TOPIC_RECV, TOPIC_ROOMINFODATA
-                        );
+                    NetworkMqtt.GetInstance.Subscribe(
+                        //TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA, 
+                        TOPIC_RECV, TOPIC_ROOMINFODATA);
                     break;
                 case GameLaunch.Scenes.MainScene2:
                     NetworkMqtt.GetInstance.Subscribe(TOPIC_PEOPLE_PERCEPTION, TOPIC_ROBOT_POS);
@@ -321,6 +322,14 @@ public class ControlResult
     /// 任务id，具有唯⼀性
     /// </summary>
     public string task_id;
+    /// <summary>
+    /// 场景ID
+    /// </summary>
+    public string sceneID = MainData.IDScene;
+    /// <summary>
+    /// 当前所在的房间，房间类型
+    /// </summary>
+    public string targetRommType;
 }
 
 /// <summary>

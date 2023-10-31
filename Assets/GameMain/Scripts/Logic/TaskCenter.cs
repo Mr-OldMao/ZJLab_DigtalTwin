@@ -127,7 +127,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 task_id = GetCurExecuteTask.task_id,
                 simulatorId = "",
                 stateCode = 0,
-                stateMsg = "suc"
+                stateMsg = "suc",
+                targetRommType = GetTargetRoomType().ToString()
             };
             InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
             IsExecuteTask = false;
@@ -212,6 +213,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PutDown");
                     break;
                 //打开门
+                case Order.Open_Door_Inside:
+                case Order.Open_Door_Outside:
                 case Order.Close_Door_Outside:
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Outside");
                     break;
@@ -321,11 +324,21 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             task_id = GetCurExecuteTask.task_id,
             simulatorId = "",
             stateCode = stateCode,
-            stateMsg = "dont arrive target pos"
+            stateMsg = "dont arrive target pos",
+            targetRommType = GetTargetRoomType().ToString()
         };
         InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
         IsExecuteTask = false;
         GetCurExecuteTask = null;
+    }
+
+    /// <summary>
+    /// 当前所在的房间，房间类型
+    /// </summary>
+    /// <returns></returns>
+    private RoomType GetTargetRoomType()
+    {
+        return default;
     }
 
     private void Update()
@@ -362,6 +375,8 @@ public enum RobotTaskState
 
 class Order
 {
+    public const string Open_Door_Inside = "Open_Door_Inside";
+    public const string Open_Door_Outside = "Open_Door_Outside";
     public const string Close_Door_Inside = "Close_Door_Inside";
     public const string Close_Door_Outside = "Close_Door_Outside";
     public const string Drink = "Drink";
