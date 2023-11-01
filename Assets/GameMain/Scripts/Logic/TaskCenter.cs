@@ -29,8 +29,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         }
         set
         {
-            //监听“门”碰撞事件
-            GameLogic.GetInstance.ListenerDoorCollEvent(value);
+            ////监听“门”碰撞事件
+            //GameLogic.GetInstance.ListenerDoorCollEvent(value);
             m_CanExecuteTask = value;
         }
     }
@@ -49,7 +49,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// <summary>
     /// 执行任务限制用时
     /// </summary>
-    private const float m_TaskLimitTime = 10f;
+    private const float m_TaskLimitTime = 30f;
     /// <summary>
     /// 执行当前任务用时
     /// </summary>
@@ -58,6 +58,11 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// 限时任务协程
     /// </summary>
     private Coroutine m_CorLimitTask;
+
+    /// <summary>
+    /// 缓存“拿”某物体时，当前的父对象，便于“放”时回到之前父对象下
+    /// </summary>
+    private Dictionary<GameObject, Transform> m_DicCacheGrabParent = new Dictionary<GameObject, Transform>();
     public void Init()
     {
         if (m_AIRobotMove == null)
@@ -86,6 +91,9 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         m_RobotAnimCenter.PlayAnimByBool("IsMoving", false);
         m_AIRobotMove.curRobotState = AIRobotMove.RobotBaseState.Idel;
 
+        ////监听“门”碰撞事件
+        //GameLogic.GetInstance.ListenerAllDoorOpenEvent(true);
+
 
         IsExecuteTask = true;
         GetCurExecuteTask = controlCommit;
@@ -99,11 +107,11 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             m_AIRobotMove.Move(targetPos);
 
             //限时，未在指定时间内到达指定位置视为无法到达
-            m_CorLimitTask = UnityTool.GetInstance.DelayCoroutine(m_TaskLimitTime, () => TaskExecuteFail());
+            m_CorLimitTask = UnityTool.GetInstance.DelayCoroutine(m_TaskLimitTime, () => TaskExecuteFail(targetPos));
         }
         else
         {
-            TaskExecuteFail();
+            TaskExecuteFail(targetPos);
         }
     }
 
@@ -125,7 +133,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 motionId = GetCurExecuteTask.motionId,
                 name = GetCurExecuteTask.name,
                 task_id = GetCurExecuteTask.task_id,
-                simulatorId = "",
+                simulatorId = GetCurExecuteTask.simulatorId,
                 stateCode = 0,
                 stateMsg = "suc",
                 targetRommType = GetTargetRoomType().ToString()
@@ -150,10 +158,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         //解析指令名称
         string orderStr = GetCurExecuteTask.name;
 
-
         Debug.Log("到达指定位置 机器人与物体交互，播放动画  orderStr :" + orderStr);
-
-        
 
         if (m_RobotAnimCenter != null)
         {
@@ -162,8 +167,6 @@ public class TaskCenter : SingletonByMono<TaskCenter>
 
             //“拿取”“放下”交互对象实体
             GameObject grabObj = null;
-            //有且仅在 “拿取”“放下”物品 任务时传递当前物品的父对象实体，其他任务传null
-            GameObject grabOldParentNode = null;
             switch (orderStr)
             {
                 //拿取
@@ -173,10 +176,15 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     grabObj = MainData.CacheItemsEntity[objName1];
                     if (grabObj != null)
                     {
-                        grabOldParentNode = grabObj.transform.parent.gameObject;
+                        //当前物品的父对象实体
+                        Transform grabOldParentNode = grabObj.transform.parent;
                         grabObj.transform.parent = m_RobotAnimCenter.RobotHandleNode;
                         grabObj.transform.localPosition = Vector3.zero;
                         grabObj.transform.localRotation = Quaternion.Euler(Vector3.zero);
+                        if (!m_DicCacheGrabParent.ContainsKey(grabObj))
+                        {
+                            m_DicCacheGrabParent.Add(grabObj, grabOldParentNode);
+                        }
                         foreach (var item in grabObj.transform.Finds<Transform>("Model"))
                         {
                             item.transform.localPosition = Vector3.zero;
@@ -201,26 +209,31 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     //物品父节点放置在机器人手中
                     string objName2 = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
                     grabObj = MainData.CacheItemsEntity[objName2];
-                    if (grabObj != null)
-                    {
-                        grabOldParentNode = grabObj.transform.parent.gameObject;
-                        grabObj.transform.parent = m_RobotAnimCenter.RobotHandleNode;
-                    }
-                    else
-                    {
-                        Debug.LogError("obj is null ,objName: " + objName2);
-                    }
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PutDown");
                     break;
                 //打开门
                 case Order.Open_Door_Inside:
                 case Order.Open_Door_Outside:
-                case Order.Close_Door_Outside:
+                    GameLogic.GetInstance.ListenerAllDoorOpenEvent(true);
+
+                    Debugger.Log("openDoor", LogTag.Free);
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Outside");
                     break;
                 //关闭门
                 case Order.Close_Door_Inside:
+                case Order.Close_Door_Outside:
+                    GameLogic.GetInstance.ListenerAllDoorCloseEvent(true);
+                    Debugger.Log("closeDoor", LogTag.Free);
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Inside");
+                    //UnityTool.GetInstance.DelayCoroutine(1f, () =>
+                    //{
+                    //    m_RobotAnimCenter.PlayAnimByBool("CanInteraction", true);
+                    //    m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Inside");
+                    //    m_RobotAnimCenter.PlayAnimByBool("CanInteraction", false);
+                    //}
+                    //);
+
+                    
                     break;
                 //擦桌子
                 case Order.Robot_CleanTable:
@@ -272,22 +285,27 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     break;
             }
             m_RobotAnimCenter.PlayAnimByBool("CanInteraction", false);
+            //UnityTool.GetInstance.DelayCoroutine(0.5f, () => m_RobotAnimCenter.PlayAnimByBool("CanInteraction", false));
             if (animSecond > 0)
             {
                 UnityTool.GetInstance.DelayCoroutine(animSecond, () =>
                 {
                     Debug.Log("play anim complete , orderStr :" + orderStr);
                     //取消物品父节点放置在机器人手中
-                    if (grabObj != null && grabOldParentNode != null)
+                    if (orderStr == Order.Grab_item_pull)
                     {
-                        grabObj.transform.parent = grabOldParentNode.transform;
-                        foreach (var item in grabObj.GetComponentsInChildren<MeshCollider>())
+                        if (m_DicCacheGrabParent.ContainsKey(grabObj))
                         {
-                            item.enabled = true;
-                        }
-                        foreach (var item in grabObj.GetComponentsInChildren<NavMeshObstacle>())
-                        {
-                            item.enabled = true;
+                            grabObj.transform.parent = m_DicCacheGrabParent[grabObj].transform;
+                            foreach (var item in grabObj.GetComponentsInChildren<MeshCollider>())
+                            {
+                                item.enabled = true;
+                            }
+                            foreach (var item in grabObj.GetComponentsInChildren<NavMeshObstacle>())
+                            {
+                                item.enabled = true;
+                            }
+                            m_DicCacheGrabParent.Remove(grabObj);
                         }
                     }
                     animCompleteCallback?.Invoke();
@@ -308,9 +326,9 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// 任务执行失败回调
     /// </summary>
     /// <param name="stateCode"></param>
-    private void TaskExecuteFail(int stateCode = 2)
+    private void TaskExecuteFail(Vector3 targetPos, int stateCode = 2)
     {
-        Debug.LogError("无法导航到目标位置");
+        Debug.LogError("无法导航到目标位置 targetPos:" + targetPos);
 
         //改变机器人状态
         m_RobotAnimCenter.PlayAnimByBool("IsMoving", false);
@@ -322,9 +340,9 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             motionId = GetCurExecuteTask.motionId,
             name = GetCurExecuteTask.name,
             task_id = GetCurExecuteTask.task_id,
-            simulatorId = "",
+            simulatorId = GetCurExecuteTask.simulatorId,
             stateCode = stateCode,
-            stateMsg = "dont arrive target pos",
+            stateMsg = "dont arrive target pos , targetPos:" + targetPos,
             targetRommType = GetTargetRoomType().ToString()
         };
         InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
@@ -363,6 +381,49 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         if (IsExecuteTask)
         {
             m_CurTaskExeTime += Time.deltaTime;
+        }
+    }
+
+    public void TestSendOrder(string orderName, string objName, string objID)
+    {
+        GameObject objModel = GameObject.Find(objName + "_" + objID)?.transform.Find("Model").gameObject;
+        if (objModel == null)
+        {
+            Debugger.LogError("not find item , item :" + objName + "_" + objID);
+            return;
+        }
+        string msg =
+            @"
+{
+    ""motionId"": ""motion://Knock_on_door"",
+    ""name"": """ + orderName + "\"," + @"
+    ""objectName"": """ + objName + "\"," + @"
+
+    ""objectId"": "
++ "\"" + objID + "\"," +
+@"""position"": ["
+
+  + objModel.transform.position.x + "," + objModel.transform.position.y + "," + objModel.transform.position.z +
+
+@"],
+    ""rotation"": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    ""taskId"": ""task:grab1698110424418""
+}
+                ";
+        Debugger.Log(msg);
+        ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
+        if (controlCommit != null)
+        {
+            MainData.controlCommit.Enqueue(controlCommit);
+            Debugger.Log("enqueue suc ,msg：" + msg);
+        }
+        else
+        {
+            Debugger.LogError("controlCommit is null");
         }
     }
 

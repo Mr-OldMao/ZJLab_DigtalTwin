@@ -136,6 +136,21 @@ public class AIRobotMove : MonoBehaviour
 
         MsgEvent.RegisterMsgEvent(MsgEventName.DoorAnimEnd, () =>
         {
+            float dis = Vector3.Distance(transform.position, targetPoint.transform.position);
+            Debugger.Log("curPos:" + transform.position + "  targetPos:" + targetPoint.transform.position + ",dis " + dis);
+            if (dis < 0.5f)
+            {
+                Debugger.Log("目标点太近无法移动");
+                if (TaskCenter.GetInstance.GetCurExecuteTask == null
+            || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Close_Door_Inside
+            || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Close_Door_Outside
+            || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Open_Door_Inside
+            || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Open_Door_Outside)
+                {
+                    return;
+                }
+            }
+
             Move(targetPoint);
         });
 
@@ -161,6 +176,7 @@ public class AIRobotMove : MonoBehaviour
         {
             if (curRobotState != RobotBaseState.Moving)
             {
+                Debug.Log("movemovemovemovemove");
                 MsgEvent.SendMsg(MsgEventName.RobotMoveBegin);
                 m_NavMeshAgent.isStopped = false;
                 m_NavMeshAgent.SetDestination(targetPoint);
@@ -218,11 +234,12 @@ public class AIRobotMove : MonoBehaviour
         }
 
         //判断目标点是否有障碍物
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(targetPos, out hit, 1.0f, NavMesh.AllAreas))
-        {
-            res2 = true;
-        }
+        res2 = true;
+        //NavMeshHit hit;
+        //if (NavMesh.SamplePosition(targetPos, out hit, 1.0f, NavMesh.AllAreas))
+        //{
+        //    res2 = true;
+        //}
 
         return res1 && res2;
     }
@@ -258,6 +275,8 @@ public class AIRobotMove : MonoBehaviour
         //Debug.Log("coll " + collision.collider.name);
         if (collision.collider.gameObject.name == "TargetPoint")
         {
+            transform.LookAt(targetPoint);
+
             MsgEvent.SendMsg(MsgEventName.RobotMoveEnd);
             MsgEvent.SendMsg(MsgEventName.RobotArriveTargetPos);
         }

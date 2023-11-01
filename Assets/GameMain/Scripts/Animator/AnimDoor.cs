@@ -1,7 +1,5 @@
 using MFramework;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -18,11 +16,18 @@ public class AnimDoor : MonoBehaviour
 
     private NavMeshObstacle m_NavMeshObstacle;
 
-    public bool CanListenerDoorColl
+    public bool CanOpenDoor
     {
         get;
         set;
     } = false;
+
+    public bool CanCloseDoor
+    {
+        get;
+        set;
+    } = false;
+
 
     public DoorState CurDoorState
     {
@@ -34,7 +39,8 @@ public class AnimDoor : MonoBehaviour
     {
         Opened,
         Opening,
-        Closed
+        Closed,
+        Closeding
     }
     private void Awake()
     {
@@ -58,57 +64,78 @@ public class AnimDoor : MonoBehaviour
                 case "CollDown":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        if (CanListenerDoorColl)
+                        if (tag != "Player") return;
+                        //只要当前任务指令不是“敲门”,且不是指令所想要敲的那扇门“敲门”，都默认经过门口，机器人开门，门打开
+                        if (TaskCenter.GetInstance.GetCurExecuteTask == null
+                                || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door)
+                        //|| Vector3.Distance(GameObject.FindObjectOfType<AIRobotMove>().targetPoint.position
+                        //, GameObject.FindObjectOfType<AIRobotMove>().transform.position) > 3f)
                         {
-                            //Debug.Log("CollDown" + p.gameObject.tag);
-                            if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
-                            {
-                                Debug.Log("CollDown" + p.gameObject.tag);
-                                PlayDoorAnim("OpenDoorUp", true);
-                            } 
+                            CanOpenDoor = true;
+                            TryPlayAnim("OpenDoorUp", p.gameObject.tag, "CollDown");
                         }
+                    };
+                    m_ListenerCollider1Arr[i].callbackTriggerStay += (p) =>
+                    {
+                        if (tag != "Player") return;
+                        TryPlayAnim("OpenDoorUp", p.gameObject.tag, "CollDown");
                     };
                     break;
                 case "CollUp":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        if (CanListenerDoorColl)
+                        if (tag != "Player") return;
+                        if (TaskCenter.GetInstance.GetCurExecuteTask == null
+                            || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door)
+                        //|| Vector3.Distance(GameObject.FindObjectOfType<AIRobotMove>().targetPoint.position
+                        //, GameObject.FindObjectOfType<AIRobotMove>().transform.position) > 3f)
                         {
-                            //Debug.Log("CollUp" + p.gameObject.tag);
-                            if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
-                            {
-                                Debug.Log("CollUp" + p.gameObject.tag);
-                                PlayDoorAnim("OpenDoorDown", true);
-                            }
+                            CanOpenDoor = true;
+                            TryPlayAnim("OpenDoorDown", p.gameObject.tag, "CollUp");
                         }
+                    };
+                    m_ListenerCollider1Arr[i].callbackTriggerStay += (p) =>
+                    {
+                        if (tag != "Player") return;
+                        TryPlayAnim("OpenDoorDown", p.gameObject.tag, "CollUp");
                     };
                     break;
                 case "CollLeft":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        if (CanListenerDoorColl)
+                        if (tag != "Player") return;
+                        if (TaskCenter.GetInstance.GetCurExecuteTask == null
+                                || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door)
+                        //|| Vector3.Distance(GameObject.FindObjectOfType<AIRobotMove>().targetPoint.position
+                        //, GameObject.FindObjectOfType<AIRobotMove>().transform.position) > 3f)
                         {
-                            //Debug.Log("CollLeft" + p.gameObject.tag);
-                            if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
-                            {
-                                Debug.Log("CollLeft" + p.gameObject.tag);
-                                PlayDoorAnim("OpenDoorRight", true);
-                            }
+                            CanOpenDoor = true;
+                            TryPlayAnim("OpenDoorRight", p.gameObject.tag, "CollLeft");
                         }
+                    };
+                    m_ListenerCollider1Arr[i].callbackTriggerStay += (p) =>
+                    {
+                        if (tag != "Player") return;
+                        TryPlayAnim("OpenDoorRight", p.gameObject.tag, "CollLeft");
                     };
                     break;
                 case "CollRight":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        if (CanListenerDoorColl)
+                        if (tag != "Player") return;
+                        if (TaskCenter.GetInstance.GetCurExecuteTask == null
+                            || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door)
+                            //|| Vector3.Distance(GameObject.FindObjectOfType<AIRobotMove>().targetPoint.position
+                            //, GameObject.FindObjectOfType<AIRobotMove>().transform.position) > 3f)
                         {
-                            //Debug.Log("CollRight" + p.gameObject.tag);
-                            if (CurDoorState == DoorState.Closed && p.gameObject.tag == "Player")
-                            {
-                                Debug.Log("CollRight" + p.gameObject.tag);
-                                PlayDoorAnim("OpenDoorLeft", true);
-                            } 
+                            CanOpenDoor = true;
+                            TryPlayAnim("OpenDoorLeft", p.gameObject.tag, "CollRight");
                         }
+                    };
+                    m_ListenerCollider1Arr[i].callbackTriggerStay += (p) =>
+                    {
+                        if (tag != "Player") return;
+                        TryPlayAnim("OpenDoorLeft", p.gameObject.tag, "CollRight");
                     };
                     break;
                 default:
@@ -118,25 +145,51 @@ public class AnimDoor : MonoBehaviour
         }
     }
 
-    private void PlayDoorAnim(string name, bool isOpen)
+    private void TryPlayAnim(string animName, string tag, string selfName)
     {
-        if (m_AnimDoor.GetBool(name) == isOpen)
+        if (CanOpenDoor)
+        {
+            if (CurDoorState == DoorState.Closed)
+            {
+                Debug.Log("selfName:" + selfName);
+                PlayDoorAnim(animName, true);
+            }
+        }
+        if (CanCloseDoor)
+        {
+            if (CurDoorState == DoorState.Opened)
+            {
+                Debug.Log("selfName:" + selfName);
+                PlayDoorAnim(animName, false);
+            }
+        }
+    }
+
+    private void PlayDoorAnim(string animName, bool isOpenDoor)
+    {
+        if (m_AnimDoor.GetBool(animName) == isOpenDoor)
         {
             return;
         }
-        CurDoorState = DoorState.Opening;
+        if (CurDoorState == DoorState.Opening || CurDoorState == DoorState.Closeding)
+        {
+            return;
+        }
+        CurDoorState = isOpenDoor ? DoorState.Opening : DoorState.Closeding;
         m_NavMeshObstacle.enabled = true;
         MsgEvent.SendMsg(MsgEventName.DoorAnimBegin);
         UnityTool.GetInstance.DelayCoroutine(0.2f, () =>
         {
-            m_AnimDoor.SetBool(name, isOpen);
-            
+            m_AnimDoor.SetBool(animName, isOpenDoor);
+
         });
-        UnityTool.GetInstance.DelayCoroutine(1.2f, () =>
+        UnityTool.GetInstance.DelayCoroutine(1.5f, () =>
         {
             Debug.Log("doorAnim player complete");
-            CurDoorState = isOpen ? DoorState.Opened : DoorState.Closed;
-            m_NavMeshObstacle.enabled = isOpen;
+            CurDoorState = isOpenDoor ? DoorState.Opened : DoorState.Closed;
+            m_NavMeshObstacle.enabled = isOpenDoor;
+            CanOpenDoor = false;
+            CanCloseDoor = false;
             MsgEvent.SendMsg(MsgEventName.DoorAnimEnd);
         });
     }

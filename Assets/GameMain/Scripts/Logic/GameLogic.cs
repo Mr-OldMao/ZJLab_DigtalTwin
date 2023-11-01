@@ -161,11 +161,18 @@ public class GameLogic : SingletonByMono<GameLogic>
         });
     }
 
-    public void ListenerDoorCollEvent(bool canListener)
+    public void ListenerAllDoorOpenEvent(bool canListener)
     {
         foreach (var item in GameObject.FindObjectsOfType<AnimDoor>())
         {
-            item.CanListenerDoorColl = canListener;
+            item.CanOpenDoor = canListener;
+        }
+    }
+    public void ListenerAllDoorCloseEvent(bool canListener)
+    {
+        foreach (var item in GameObject.FindObjectsOfType<AnimDoor>())
+        {
+            item.CanCloseDoor = canListener;
         }
     }
     #endregion
@@ -240,7 +247,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     public void GenerateScene()
     {
         staticModelRootNode.transform.position = Vector3.zero;
-        ListenerDoorCollEvent(false);
+        // ListenerAllDoorOpenEvent(false);
         //生成场景中所有房间和物品
         GenerateEntity(() =>
         {
@@ -538,42 +545,21 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         if (Input.GetKeyDown(KeyCode.F9))
         {
-            GameObject obj = GameObject.Find("Bin_sim:1002")?.transform.Find("Model").gameObject;
-            string msg =
-
-                @"
-{
-    ""motionId"": ""motion://Knock_on_door"",
-    ""name"": ""Knock_on_door"",
-    ""object"": ""BathRoomDoor"",
-    ""objectId"": "
-+ "\"" + obj.name + "\"," +
-@"""position"": ["
-
-      + obj.transform.position.x + "," + obj.transform.position.y + "," + obj.transform.position.z +
-
-    @"],
-    ""rotation"": [
-        0.0,
-        0.0,
-        0.0
-    ],
-    ""taskId"": ""task:grab1698110424418""
-}
-                ";
-            Debugger.Log(msg);
-            ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
-            if (controlCommit != null)
-            {
-                MainData.controlCommit.Enqueue(controlCommit);
-                Debugger.Log("enqueue suc ,msg：" + msg);
-            }
-            else
-            {
-                Debugger.LogError("controlCommit is null");
-            }
+            //TaskCenter.GetInstance.TestSendOrder(Order.Grab_item, "Book", "sim:1027");
+            //TaskCenter.GetInstance.TestSendOrder(Order.Open_Door_Inside, "DoorX", testDoorID);
         }
-
+        if (Input.GetKeyDown(KeyCode.F10))
+        {
+            //TaskCenter.GetInstance.TestSendOrder(Order.Grab_item_pull, "Book", "sim:1027");
+            //TaskCenter.GetInstance.TestSendOrder(Order.Close_Door_Inside, "DoorX", testDoorID);
+            //TaskCenter.GetInstance.TestSendOrder(Order.Robot_CleanTable, "Desk", "sim:1025");
+        }
+        if (Input.GetKeyDown(KeyCode.F11))
+        {
+            //TaskCenter.GetInstance.TestSendOrder(Order.Press_Button, "TV", "sim:1016");
+            //TaskCenter.GetInstance.TestSendOrder(Order.Knock_on_door, "DoorX", testDoorID);
+        }
     }
+    public string testDoorID;
 }
 

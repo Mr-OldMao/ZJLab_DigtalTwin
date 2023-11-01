@@ -121,18 +121,16 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         /*根据边界信息找到各个房间的可放置坐标节点，屏蔽"门"模型前后坐标节点，避免物体堵门*/
         ChcheItemModelTypeInfo(roomInfos);
 
-        ////拿到当前房间所需要放置的道具实体，实体名称、实体大小
-        //Dictionary<RoomType, List<ItemDependInfo>> dicRoomInsideItemEntity = GetRoomInsideItemEntity(roomInfos, getThingGraph);
-
-        ////根据当前实体大小等信息找到合适的位置放置
-        //SetRandomRoomInsideItemEntity(dicRoomInsideItemEntity);
-
         MainData.CacheItemsEntity.Clear();
         ClearItemEntity();
 
         //TODO 暂时注释掉
-        //根据服务器数据设置各个房间实体物品，位置随机
-        //SetRandomRoomInsideItemEntity(getThingGraph);
+        if (!MainData.UseTestData)
+        {
+            //根据服务器数据设置各个房间实体物品，位置随机
+            SetRandomRoomInsideItemEntity(getThingGraph);
+        }
+        
 
         //设置各个房间默认的实体物品，位置随机
         SetDefaultRoomInsideItemEntity();
