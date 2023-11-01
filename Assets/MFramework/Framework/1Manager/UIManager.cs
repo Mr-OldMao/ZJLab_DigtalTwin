@@ -131,6 +131,7 @@ namespace MFramework
                 cloneRect.anchorMin = Vector2.zero;
                 cloneRect.anchorMax = Vector2.one;
                 cloneRect.pivot = new Vector2(0.5f, 0.5f);
+                cloneRect.localScale = Vector3.one;
                 //为UI窗体添加指定UIFormBase的派生类
                 UIFormLogicScript = UIForm.AddComponent<T>();
                 //缓存至资源池
