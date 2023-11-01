@@ -150,7 +150,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.2901961, g: 0.2901961, b: 0.2901961, a: 0}
+  m_BackGroundColor: {r: 0.023529412, g: 0.023529412, b: 0.023529412, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -319,7 +319,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.2901961, g: 0.2901961, b: 0.2901961, a: 0}
+  m_BackGroundColor: {r: 0.023529412, g: 0.023529412, b: 0.023529412, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -422,7 +422,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.2901961, g: 0.2901961, b: 0.2901961, a: 0}
+  m_BackGroundColor: {r: 0.023529412, g: 0.023529412, b: 0.023529412, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -542,7 +542,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.20784314, g: 0.20784314, b: 0.20784314, a: 0}
+  m_BackGroundColor: {r: 0.023529412, g: 0.023529412, b: 0.023529412, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

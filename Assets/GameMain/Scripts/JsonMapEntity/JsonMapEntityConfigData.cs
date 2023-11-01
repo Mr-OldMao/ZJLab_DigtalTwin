@@ -4,11 +4,16 @@
 /// 创建时间：2023/9/18 16:37:08
 /// </summary>
 public class ConfigData
-{  
-	public ConfigData_HttpConfig HttpConfig;
+{
+    public ConfigData_CoreConfig CoreConfig;
+    public ConfigData_HttpConfig HttpConfig;
 	public ConfigData_MqttConfig MqttConfig;
     public ConfigData_VideoStreaming VideoStreaming;
 
+    public class ConfigData_CoreConfig
+    {
+        public string SceneID;
+    }
     public class ConfigData_HttpConfig
 	{
 		public string IP;

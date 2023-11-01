@@ -683,30 +683,33 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     private void PutCustomItem(RoomType roomType, string itemName, string itemID, ItemDependInfo itemDependInfo = null)
     {
         string roomID = GenerateRoomData.GetInstance.GetRoomID(roomType);
-        List<string> itemResName = new List<string>() { itemName };
+        if (!string.IsNullOrEmpty(roomID))
+        {
+            List<string> itemResName = new List<string>() { itemName };
 
-        List<GetThingGraph_data_items_relatedThing> relatedThingData = new List<GetThingGraph_data_items_relatedThing>();
-        for (int i = 0; i < itemResName?.Count; i++)
-        {
-            relatedThingData.Add(new GetThingGraph_data_items_relatedThing
+            List<GetThingGraph_data_items_relatedThing> relatedThingData = new List<GetThingGraph_data_items_relatedThing>();
+            for (int i = 0; i < itemResName?.Count; i++)
             {
-                target = new GetThingGraph_data_items_relatedThing_target
+                relatedThingData.Add(new GetThingGraph_data_items_relatedThing
                 {
-                    name = itemResName[i],
-                    id = itemID
-                }
-            });
-        }
-        if (itemDependInfo == null)
-        {
-            itemDependInfo = new ItemDependInfo
+                    target = new GetThingGraph_data_items_relatedThing_target
+                    {
+                        name = itemResName[i],
+                        id = itemID
+                    }
+                });
+            }
+            if (itemDependInfo == null)
             {
-                isDepend = false,
-                dependItemID = "",
-                dependItemName = "",
-            };
+                itemDependInfo = new ItemDependInfo
+                {
+                    isDepend = false,
+                    dependItemID = "",
+                    dependItemName = "",
+                };
+            }
+            PutItem(roomType, roomID, relatedThingData, itemDependInfo);
         }
-        PutItem(roomType, roomID, relatedThingData, itemDependInfo);
     }
 
     //清理实体对象

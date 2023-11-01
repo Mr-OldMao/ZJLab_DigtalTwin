@@ -47,7 +47,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         RegisterMsgEvent();
 
         //异步加载ab资源
-        LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity", "UIForm" ,"Mat"}, () =>
+        LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity", "UIForm", "Mat" }, () =>
         {
             Debugger.Log("ab资源加载完毕回调");
             m_IsLoadedAssets = true;
@@ -55,6 +55,18 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         new ReadConfigFile(() =>
         {
+            if (!string.IsNullOrEmpty(MainData.ConfigData.CoreConfig?.SceneID))
+            {
+                MainData.IDScene = MainData.ConfigData.CoreConfig?.SceneID;
+                Debugger.Log("change IDScene");
+            }
+            Debugger.Log("SceneID:" + MainData.IDScene
+                + ",Http_IP:" + MainData.ConfigData.HttpConfig.IP
+                + ",Http_Port:" + MainData.ConfigData.HttpConfig.Port
+                + ",Mqtt_IP" + MainData.ConfigData.MqttConfig.ClientIP
+                + ",Vs_Frame" + MainData.ConfigData.VideoStreaming.Frame
+                + ",Vs_Quality" + MainData.ConfigData.VideoStreaming.Quality,
+                LogTag.Free);
             //接入网络通信
             NetworkHTTP();
             NetworkMQTT();
@@ -526,19 +538,21 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         if (Input.GetKeyDown(KeyCode.F9))
         {
-            string testJson =
+            GameObject obj = GameObject.Find("Bin_sim:1002")?.transform.Find("Model").gameObject;
+            string msg =
 
                 @"
 {
     ""motionId"": ""motion://Knock_on_door"",
     ""name"": ""Knock_on_door"",
     ""object"": ""BathRoomDoor"",
-    ""objectId"": ""DoorY_7_1"",
-    ""position"": [
-        14.0,
-        0.0,
-        8.5
-    ],
+    ""objectId"": "
++ "\"" + obj.name + "\"," +
+@"""position"": ["
+
+      + obj.transform.position.x + "," + obj.transform.position.y + "," + obj.transform.position.z +
+
+    @"],
     ""rotation"": [
         0.0,
         0.0,
@@ -546,12 +560,20 @@ public class GameLogic : SingletonByMono<GameLogic>
     ],
     ""taskId"": ""task:grab1698110424418""
 }
-                "
-                ;
-            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_RECV,
-        testJson);
+                ";
+            Debugger.Log(msg);
+            ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
+            if (controlCommit != null)
+            {
+                MainData.controlCommit.Enqueue(controlCommit);
+                Debugger.Log("enqueue suc ,msg：" + msg);
+            }
+            else
+            {
+                Debugger.LogError("controlCommit is null");
+            }
         }
-        
+
     }
 }
 
