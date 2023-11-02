@@ -19,11 +19,12 @@ public class GameLogic : SingletonByMono<GameLogic>
     public GameObject staticModelRootNode = null;
     private Coroutine m_CoroutineUpadeteSceneEntityInfo = null;
     private Coroutine m_CoroutineUpadeteCameraEntityInfo = null;
-
+    private GameObject m_Debugger;
     public void Init()
     {
         Debugger.Log("Init GameLogic");
-
+        m_Debugger = GameObject.Find("Debugger");
+        m_Debugger?.SetActive(false);
         MsgEvent.RegisterMsgEvent(MsgEventName.InitComplete, () =>
         {
             this.EnterMainScene();
@@ -569,11 +570,10 @@ public class GameLogic : SingletonByMono<GameLogic>
         }
         if (Input.GetKeyDown(KeyCode.F12))
         {
-            string testJson =
-
-                System.DateTime.Now.ToString("yyyyMMdd HHmmss")
-                ;
-            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_WEB_SEND,testJson);
+            if (m_Debugger != null)
+            {
+                m_Debugger.SetActive(!m_Debugger.gameObject.activeSelf);
+            }
         }
     }
     public string testDoorID;
