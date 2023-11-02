@@ -239,7 +239,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 res = roomBaseInfos[i];
             }
         }
-        Debugger.Log("next generage room :" + res.curRoomType.ToString() + ", roomid : " + res.curRoomID);
+        //Debugger.Log("next generage room :" + res.curRoomType.ToString() + ", roomid : " + res.curRoomID, LogTag.Test);
         return res;
     }
 
@@ -583,7 +583,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         maxPos = new Vector2(otherPosRightUp.Value.x + roomBaseInfo.roomSize[0], randomMinY + roomBaseInfo.roomSize[1]);
                     } while (!JudgeRandomPosIsRight(minPos, maxPos) && ++curRandomCount < maxRandomCount);
                 }
-                Debugger.Log("获取当前房间随机坐标数据 roomType" + roomBaseInfo.curRoomType + ",roomID:" + roomBaseInfo.curRoomID + ", otherPosCount：" + otherPosCount);
+                //Debugger.Log("获取当前房间随机坐标数据 roomType" + roomBaseInfo.curRoomType + ",roomID:" + roomBaseInfo.curRoomID + ", otherPosCount：" + otherPosCount, LogTag.Test);
                 callback(curRandomCount < maxRandomCount);
                 break;
             //case 3://2.双边限制，已知三个点位信息 TODO

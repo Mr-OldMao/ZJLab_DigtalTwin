@@ -13,6 +13,7 @@ public class ConfigData
     public class ConfigData_CoreConfig
     {
         public string SceneID;
+        public int UseTestData;
     }
     public class ConfigData_HttpConfig
 	{

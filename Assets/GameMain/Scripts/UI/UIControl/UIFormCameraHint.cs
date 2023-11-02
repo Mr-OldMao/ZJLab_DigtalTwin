@@ -77,7 +77,7 @@ public class UIFormCameraHint : UIFormBase
         switch (cameraType)
         {
             case CameraControl.CameraType.Top:
-                des = "上帝视角";
+                des = "顶视图";
                 break;
             case CameraControl.CameraType.Three:
                 des = "第三人称视角";

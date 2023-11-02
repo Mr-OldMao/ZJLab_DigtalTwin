@@ -55,6 +55,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         new ReadConfigFile(() =>
         {
+            MainData.UseTestData = MainData.ConfigData.CoreConfig?.UseTestData == 1;
             if (!string.IsNullOrEmpty(MainData.ConfigData.CoreConfig?.SceneID))
             {
                 MainData.IDScene = MainData.ConfigData.CoreConfig?.SceneID;

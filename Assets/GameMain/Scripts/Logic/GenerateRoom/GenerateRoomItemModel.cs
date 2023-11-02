@@ -130,7 +130,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             //根据服务器数据设置各个房间实体物品，位置随机
             SetRandomRoomInsideItemEntity(getThingGraph);
         }
-        
+
 
         //设置各个房间默认的实体物品，位置随机
         SetDefaultRoomInsideItemEntity();
@@ -325,7 +325,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 catch (Exception e)
                 {
                     Debugger.LogError("设置各个房间默认的实体物品 栈溢出,准备重新生成场景 e:" + e);
-                    UnityTool.GetInstance.DelayCoroutine(0.5f,()=> GameLogic.GetInstance.GenerateScene());
+                    UnityTool.GetInstance.DelayCoroutine(0.5f, () => GameLogic.GetInstance.GenerateScene());
                     return;
                 }
             }
@@ -495,6 +495,11 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             //无放置限制
             else
             {
+                if (!m_DicItemModelInfo.ContainsKey(roomType))
+                {
+                    Debugger.LogError("cur roomType notFind , roomType:" + roomType);
+                    continue;
+                }
                 //找到当前房间所有可放置的位置信息
                 List<ItemModelInfo> itemModelInfos = m_DicItemModelInfo[roomType];
 
@@ -720,7 +725,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             ItemEntityGroupNode.GetChild(i).gameObject.name = "del_" + ItemEntityGroupNode.GetChild(i).gameObject.name;
             ItemEntityGroupNode.GetChild(i).gameObject.SetActive(false);
             Destroy(ItemEntityGroupNode.GetChild(typeI).gameObject);
-           // UnityTool.GetInstance.DelayCoroutine(0.1f, () => Destroy(ItemEntityGroupNode.GetChild(typeI).gameObject));
+            // UnityTool.GetInstance.DelayCoroutine(0.1f, () => Destroy(ItemEntityGroupNode.GetChild(typeI).gameObject));
         }
     }
 }
