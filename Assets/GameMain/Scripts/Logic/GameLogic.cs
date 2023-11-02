@@ -6,8 +6,6 @@ using System;
 using static GetEnvGraph;
 using static GetThingGraph;
 using static GenerateRoomBorderModel;
-using Unity.VisualScripting;
-using UnityEngine.AI;
 using System.Collections;
 /// <summary>
 /// 标题：程序逻辑入口
@@ -21,6 +19,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     public GameObject staticModelRootNode = null;
     private Coroutine m_CoroutineUpadeteSceneEntityInfo = null;
     private Coroutine m_CoroutineUpadeteCameraEntityInfo = null;
+
     public void Init()
     {
         Debugger.Log("Init GameLogic");
@@ -52,7 +51,6 @@ public class GameLogic : SingletonByMono<GameLogic>
             Debugger.Log("ab资源加载完毕回调");
             m_IsLoadedAssets = true;
         });
-
         new ReadConfigFile(() =>
         {
             MainData.UseTestData = MainData.ConfigData.CoreConfig?.UseTestData == 1;
@@ -61,15 +59,24 @@ public class GameLogic : SingletonByMono<GameLogic>
                 MainData.IDScene = MainData.ConfigData.CoreConfig?.SceneID;
                 Debugger.Log("change IDScene");
             }
-            Debugger.Log("SceneID:" + MainData.IDScene
-                + ",Http_IP:" + MainData.ConfigData.HttpConfig.IP
-                + ",Http_Port:" + MainData.ConfigData.HttpConfig.Port
-                + ",Mqtt_IP" + MainData.ConfigData.MqttConfig.ClientIP
-                + ",Vs_Frame" + MainData.ConfigData.VideoStreaming.Frame
-                + ",Vs_Quality" + MainData.ConfigData.VideoStreaming.Quality,
-                LogTag.Free);
+            if (MainData.ConfigData.CoreConfig.SendEntityInfoHZ <= 0)
+            {
+                MainData.ConfigData.CoreConfig.SendEntityInfoHZ = 3f;
+            }
+            Debugger.Log("MainDataDisplay   SceneID：" + MainData.IDScene
+                + ",UseTestData：" + MainData.UseTestData
+                + ",SendEntityInfoHZ：" + MainData.ConfigData.CoreConfig.SendEntityInfoHZ
+                + ",Http_IP：" + MainData.ConfigData.HttpConfig.IP
+                + ",Http_Port：" + MainData.ConfigData.HttpConfig.Port
+                + ",Mqtt_IP：" + MainData.ConfigData.MqttConfig.ClientIP
+                + ",Vs_Frame：" + MainData.ConfigData.VideoStreaming.Frame
+                + ",Vs_Quality：" + MainData.ConfigData.VideoStreaming.Quality,
+                LogTag.Forever);
             //接入网络通信
             NetworkHTTP();
+
+            Debugger.Log("initNetworkMQTTNetworkMQTT", LogTag.Forever);
+
             NetworkMQTT();
         });
 
@@ -467,7 +474,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         while (true)
         {
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(MainData.ConfigData.CoreConfig.SendEntityInfoHZ);
             UpdateEnityInfoTool.GetInstance.UpdateSceneEntityInfo();
             InterfaceDataCenter.GetInstance.SendMQTTUpdateScenes(MainData.CacheSceneItemsInfo);
         }
@@ -479,7 +486,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         while (true)
         {
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(MainData.ConfigData.CoreConfig.SendEntityInfoHZ);
 
             UpdateEnityInfoTool.GetInstance.UpdateCameraFOVEntityInfo();
             InterfaceDataCenter.GetInstance.SendMQTTUpdateCamera(MainData.CacheCameraItemsInfo);
@@ -557,8 +564,16 @@ public class GameLogic : SingletonByMono<GameLogic>
         }
         if (Input.GetKeyDown(KeyCode.F11))
         {
-            //TaskCenter.GetInstance.TestSendOrder(Order.Press_Button, "TV", "sim:1016");
+            TaskCenter.GetInstance.TestSendOrder(Order.Press_Button, "TV", "sim:1016");
             //TaskCenter.GetInstance.TestSendOrder(Order.Knock_on_door, "DoorX", testDoorID);
+        }
+        if (Input.GetKeyDown(KeyCode.F12))
+        {
+            string testJson =
+
+                System.DateTime.Now.ToString("yyyyMMdd HHmmss")
+                ;
+            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_WEB_SEND,testJson);
         }
     }
     public string testDoorID;

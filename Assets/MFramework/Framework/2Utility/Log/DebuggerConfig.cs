@@ -53,9 +53,8 @@ namespace MFramework
         public static List<LogTag> canPrintLogTagList = new List<LogTag>
         {
             LogTag.Temp,
-            LogTag.Test,
-            LogTag.Forever,
-            LogTag.Free
+            //LogTag.Test,
+            LogTag.Forever
         };
 
         /// <summary>

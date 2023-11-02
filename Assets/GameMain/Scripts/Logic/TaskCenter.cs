@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MFramework;
@@ -169,6 +168,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             GameObject grabObj = null;
             switch (orderStr)
             {
+                case Order.MOVE:
+                    break;
                 //拿取
                 case Order.Grab_item:
                     //物品父节点放置在机器人手中
@@ -216,14 +217,14 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case Order.Open_Door_Outside:
                     GameLogic.GetInstance.ListenerAllDoorOpenEvent(true);
 
-                    Debugger.Log("openDoor", LogTag.Free);
+                    Debugger.Log("openDoor", LogTag.Forever);
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Outside");
                     break;
                 //关闭门
                 case Order.Close_Door_Inside:
                 case Order.Close_Door_Outside:
                     GameLogic.GetInstance.ListenerAllDoorCloseEvent(true);
-                    Debugger.Log("closeDoor", LogTag.Free);
+                    Debugger.Log("closeDoor", LogTag.Forever);
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Inside");
                     //UnityTool.GetInstance.DelayCoroutine(1f, () =>
                     //{
@@ -233,7 +234,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     //}
                     //);
 
-                    
+
                     break;
                 //擦桌子
                 case Order.Robot_CleanTable:
@@ -365,15 +366,48 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     }
 
     /// <summary>
+    /// 新增一条指令到队列
+    /// </summary>
+    /// <param name="controlCommitJsonStr"></param>
+    public void AddOrder(string controlCommitJsonStr)
+    {
+        ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(controlCommitJsonStr);
+        bool isRight = true;
+        //判断当前指令是否合法
+        if (controlCommit != null && !string.IsNullOrEmpty(controlCommit.task_id))
+        {
+            if (controlCommit.simulatorId == MainData.IDScene)
+            {
+                isRight = false;
+                Debugger.LogError("新增决策指令失败,仿真实例id，curSceneID：" + MainData.IDScene + ",OrderIDL" + controlCommit.simulatorId + ",json：" + controlCommitJsonStr);
+            }
+            else if (MainData.ControlCommitCompletedList.Find((p) => { return p.task_id == controlCommit.task_id; }) != null)
+            {
+                isRight = false;
+                Debugger.LogError("新增决策指令失败,已完成过当前决策指令，task_id：" + controlCommit.task_id + ",json：" + controlCommitJsonStr);
+            }
+        }
+        else
+        {
+            Debugger.LogError("新增决策指令失败,controlCommit is nill");
+        }
+        if (isRight)
+        {
+            MainData.ControlCommit.Enqueue(controlCommit);
+            Debugger.Log("新增决策指令成功 , json：" + controlCommitJsonStr, LogTag.Forever);
+        }
+    }
+
+    /// <summary>
     /// 监听任务
     /// </summary>
     public void ListenerTask()
     {
         if (CanExecuteTask && !IsExecuteTask)
         {
-            if (MainData.controlCommit?.Count > 0)
+            if (MainData.ControlCommit?.Count > 0)
             {
-                ControlCommit controlCommit = MainData.controlCommit.Dequeue();
+                ControlCommit controlCommit = MainData.ControlCommit.Dequeue();
                 ParseOrderExcute(controlCommit);
 
             }
@@ -418,7 +452,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
         if (controlCommit != null)
         {
-            MainData.controlCommit.Enqueue(controlCommit);
+            MainData.ControlCommit.Enqueue(controlCommit);
             Debugger.Log("enqueue suc ,msg：" + msg);
         }
         else
@@ -462,6 +496,7 @@ class Order
     public const string Push_Loop = "Push_Loop";
     public const string Push_Start = "Push_Start";
     public const string IDLE = "IDLE";
+    public const string MOVE = "MOVE";
 
     public const string Robot_CleanTable = "Robot_CleanTable";
 }

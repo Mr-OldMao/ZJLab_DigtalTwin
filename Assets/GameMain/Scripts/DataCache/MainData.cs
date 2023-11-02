@@ -49,11 +49,13 @@ public class MainData
     public static Dictionary<string, GameObject> CacheItemsEntity = new Dictionary<string, GameObject>();
 
     /// <summary>
-    /// 指令控制数据
+    /// 需要执行的指令控制数据队列
     /// </summary>
-    public static Queue<ControlCommit> controlCommit { get; set; } = new Queue<ControlCommit>();
-
-
+    public static Queue<ControlCommit> ControlCommit { get; set; } = new Queue<ControlCommit>();
+    /// <summary>
+    /// 已经完成的指令队列
+    /// </summary>
+    public static List<ControlResult> ControlCommitCompletedList { get; set; } = new List<ControlResult>();
 
     /// <summary>
     /// 机器人坐标信息

@@ -73,7 +73,7 @@ public class GameLaunch : SingletonByMono<GameLaunch>
                     default:
                         break;
                 }
-                Debug.Log("iswebgl:" + NetworkMqtt.GetInstance.IsWebgl);
+                Debugger.Log("iswebgl:" + NetworkMqtt.GetInstance.IsWebgl, LogTag.Forever);
                 GameLogic.GetInstance.Init();
                 break;
             case Scenes.MainScene2:

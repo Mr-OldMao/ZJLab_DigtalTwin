@@ -48,6 +48,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public const string TOPIC_ADD_GOODS = "simulator/addGoods";
     //删除房间实体模型
     public const string TOPIC_DEL_GOODS = "simulator/delGoods";
+
+    //测试从Web端 接收服务器控制指令
+    public const string TOPIC_WEB_SEND = "simulator/web/send";
+    //测试 发控制结果给Web端
+    public const string TOPIC_WEB_RECV = "simulator/web/recv";
     #endregion
 
     #region 数字孪生
@@ -146,7 +151,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS, TOPIC_DEL_GOODS);
                     //TEST
                     NetworkMqtt.GetInstance.Subscribe(
-                        TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA, 
+                        TOPIC_WEB_SEND, TOPIC_WEB_RECV,
+                        TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA,
                         TOPIC_RECV, TOPIC_ROOMINFODATA);
                     break;
                 case GameLaunch.Scenes.MainScene2:
@@ -163,16 +169,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
             clientIP = MainData.ConfigData?.MqttConfig.ClientIP, //"10.5.24.28",
             clientPort = NetworkMqtt.GetInstance.IsWebgl ? 8083 : 1883
         });
-
         //监听消息回调
         NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
         {
             ParseMQTTMsg(topic, msg);
         });
-        //NetworkMqtt.GetInstance.AddListener((object sender, MqttMsgSubscribedEventArgs e) =>
-        //{
-        //    Debugger.Log($"客户端订阅消息成功回调 ，sender：{sender}");
-        //});
     }
 
     /// <summary>
@@ -190,19 +191,10 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         {
             switch (topic)
             {
+                case TOPIC_WEB_SEND:
                 case TOPIC_SEND:
-                    ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
-                    if (controlCommit != null)
-                    {
-                        MainData.controlCommit.Enqueue(controlCommit);
-                        Debugger.Log("解析决策指令 topic：" + topic + ",msg：" + msg);
-                    }
-                    else
-                    {
-                        Debugger.LogError("controlCommit is null");
-                    }
+                    TaskCenter.GetInstance.AddOrder(msg);
                     break;
-
                 case TOPIC_CHANGESTATE:
                     ChangeStateData changeStateData = JsonTool.GetInstance.JsonToObjectByLitJson<ChangeStateData>(msg);
                     string id = changeStateData.id;
@@ -262,12 +254,15 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 
 
     /// <summary>
-    /// 发送控制结果
+    /// 发送指令完成情况
     /// </summary>
     /// <param name="controlResult"></param>
     public void SendMQTTControlResult(ControlResult controlResult)
     {
+        MainData.ControlCommitCompletedList.Add(controlResult);
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(controlResult);
+
+        NetworkMqtt.GetInstance.Publish(TOPIC_WEB_RECV, jsonStr);
         NetworkMqtt.GetInstance.Publish(TOPIC_RECV, jsonStr);
     }
 
@@ -315,17 +310,13 @@ public class ControlResult
     /// </summary>
     public int stateCode;
     /// <summary>
-    /// 仿真实例id，具有唯⼀性
+    /// 仿真实例id，具有唯⼀性,即场景ID
     /// </summary>
-    public string simulatorId;
+    public string simulatorId = MainData.IDScene;
     /// <summary>
     /// 任务id，具有唯⼀性
     /// </summary>
     public string task_id;
-    /// <summary>
-    /// 场景ID
-    /// </summary>
-    public string sceneID = MainData.IDScene;
     /// <summary>
     /// 当前所在的房间，房间类型
     /// </summary>

@@ -613,7 +613,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                             if (canUse)
                             {
                                 //放置后标记当前位置在当前房间已被放置其他物体不可重复放置在此
-                                Debugger.Log("当前实体已放置成功 name_id：" + key + " , roomType:" + roomType, LogTag.Free);
+                                Debugger.Log("当前实体已放置成功 name_id：" + key + " , roomType:" + roomType, LogTag.Forever);
                                 MainData.CacheItemsEntity.Add(key, clone);
                                 for (int k = 0; k < needItemModelInfoArr.Count; k++)
                                 {
@@ -636,7 +636,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 }
                 if (!canUse)
                 {
-                    Debugger.LogError("当前实体未找到合适位置放置，隐藏该实体，itemEntity:" + relatedThingArr[i].target.name + ",id:" + relatedThingArr[i].target.id, LogTag.Free);
+                    Debugger.LogError("当前实体未找到合适位置放置，隐藏该实体，itemEntity:" + relatedThingArr[i].target.name + ",id:" + relatedThingArr[i].target.id, LogTag.Forever);
                     //Destroy(clone);
                 }
 

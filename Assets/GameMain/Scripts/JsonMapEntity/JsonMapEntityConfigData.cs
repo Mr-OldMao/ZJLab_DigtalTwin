@@ -14,6 +14,10 @@ public class ConfigData
     {
         public string SceneID;
         public int UseTestData;
+        /// <summary>
+        /// 发送视觉感知实体信息频率, n秒/次
+        /// </summary>
+        public float SendEntityInfoHZ;
     }
     public class ConfigData_HttpConfig
 	{

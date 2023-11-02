@@ -44,7 +44,7 @@ namespace MFramework
         private static void LogHandle(object logMsg, LogTag logTag, LogType logType)
         {
             bool canPrint = false;
-            if (logTag ==  LogTag.Free)
+            if (logTag ==  LogTag.Forever)
             {
                 canPrint = true;
             }
@@ -149,12 +149,8 @@ namespace MFramework
         /// </summary>
         Test,
         /// <summary>
-        /// 常驻日志
+        /// 常驻日志 不受外部打印开启与否的限制
         /// </summary>
-        Forever,
-        /// <summary>
-        /// 不受外部打印开启与否的限制
-        /// </summary>
-        Free
+        Forever
     }
 }

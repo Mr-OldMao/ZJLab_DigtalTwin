@@ -107,7 +107,7 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
                     MainData.CacheCameraItemsInfo.items[tempI].relatedThing.Add(relatedThing);
                     Debugger.Log($"更新相机视野范围内的实体信息 itemName:{relatedThing.target.name}" +
                     $",id:{relatedThing.target.id}" +
-                    $",pos:{relatedThing.target.position}");
+                    $",pos:{relatedThing.target.position}", LogTag.Test);
                 }
                 else
                 {
