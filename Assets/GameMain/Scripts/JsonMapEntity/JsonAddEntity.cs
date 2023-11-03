@@ -5,7 +5,7 @@
 /// </summary>
 public class JsonAddEntity
 {
-    public string idScene = MainData.IDScene;
+    public string idScene = MainData.SceneID;
     public JsonAddEntity_entityInfo[] entityInfo;
 	public class JsonAddEntity_entityInfo
 	{

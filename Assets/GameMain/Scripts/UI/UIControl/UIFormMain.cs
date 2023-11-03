@@ -116,7 +116,7 @@ public class UIFormMain : UIFormBase
     {
         if (string.IsNullOrEmpty(id))
         {
-            id = MainData.IDScene;
+            id = MainData.SceneID;
         }
         InterfaceDataCenter.GetInstance.ChangeProgramState(id, programState);
         switch (programState)

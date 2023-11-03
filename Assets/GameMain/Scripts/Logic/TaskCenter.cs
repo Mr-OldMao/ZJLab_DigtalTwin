@@ -376,10 +376,10 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         //判断当前指令是否合法
         if (controlCommit != null && !string.IsNullOrEmpty(controlCommit.task_id))
         {
-            if (controlCommit.simulatorId == MainData.IDScene)
+            if (controlCommit.simulatorId == MainData.SceneID)
             {
                 isRight = false;
-                Debugger.LogError("新增决策指令失败,仿真实例id，curSceneID：" + MainData.IDScene + ",OrderIDL" + controlCommit.simulatorId + ",json：" + controlCommitJsonStr);
+                Debugger.LogError("新增决策指令失败,仿真实例id，curSceneID：" + MainData.SceneID + ",OrderIDL" + controlCommit.simulatorId + ",json：" + controlCommitJsonStr);
             }
             else if (MainData.ControlCommitCompletedList.Find((p) => { return p.task_id == controlCommit.task_id; }) != null)
             {

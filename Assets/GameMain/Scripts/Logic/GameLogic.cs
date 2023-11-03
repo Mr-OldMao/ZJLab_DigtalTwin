@@ -23,14 +23,13 @@ public class GameLogic : SingletonByMono<GameLogic>
     public void Init()
     {
         Debugger.Log("Init GameLogic");
-        m_Debugger = GameObject.Find("Debugger");
-        m_Debugger?.SetActive(false);
+        HideDebugger();
         MsgEvent.RegisterMsgEvent(MsgEventName.InitComplete, () =>
         {
             this.EnterMainScene();
         });
 #if UNITY_EDITOR
-        MainDataTool.GetInstance.InitMainDataParam("test");
+        MainDataTool.GetInstance.InitMainDataParam("test",1);
 #endif
     }
 
@@ -57,14 +56,14 @@ public class GameLogic : SingletonByMono<GameLogic>
             MainData.UseTestData = MainData.ConfigData.CoreConfig?.UseTestData == 1;
             if (!string.IsNullOrEmpty(MainData.ConfigData.CoreConfig?.SceneID))
             {
-                MainData.IDScene = MainData.ConfigData.CoreConfig?.SceneID;
+                MainData.SceneID = MainData.ConfigData.CoreConfig?.SceneID;
                 Debugger.Log("change IDScene");
             }
             if (MainData.ConfigData.CoreConfig.SendEntityInfoHZ <= 0)
             {
                 MainData.ConfigData.CoreConfig.SendEntityInfoHZ = 3f;
             }
-            Debugger.Log("MainDataDisplay   SceneID：" + MainData.IDScene
+            Debugger.Log("MainDataDisplay   SceneID：" + MainData.SceneID
                 + ",UseTestData：" + MainData.UseTestData
                 + ",SendEntityInfoHZ：" + MainData.ConfigData.CoreConfig.SendEntityInfoHZ
                 + ",Http_IP：" + MainData.ConfigData.HttpConfig.IP
@@ -105,8 +104,8 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     private void NetworkHTTP()
     {
-        InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.IDScene);
-        InterfaceDataCenter.GetInstance.CacheGetEnvGraph(MainData.IDScene);
+        InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.SceneID);
+        InterfaceDataCenter.GetInstance.CacheGetEnvGraph(MainData.SceneID);
     }
 
     private void NetworkMQTT()
@@ -315,7 +314,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         MainData.CacheSceneItemsInfo = new PostThingGraph
         {
             items = items,
-            id = MainData.IDScene,
+            id = MainData.SceneID,
         };
         Transform ItemEntityGroupNode = GenerateRoomItemModel.GetInstance.ItemEntityGroupNode;
         //遍历所有房间
@@ -495,7 +494,14 @@ public class GameLogic : SingletonByMono<GameLogic>
     }
     #endregion
 
+    #region Other
+    private void HideDebugger()
+    {
+        m_Debugger = GameObject.Find("Debugger");
+        m_Debugger?.SetActive(false);
+    }
 
+    #endregion
 
     private void OnDestroy()
     {

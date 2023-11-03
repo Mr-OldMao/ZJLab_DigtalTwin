@@ -70,11 +70,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public void CacheGetThingGraph(string id)
     {
         string rawJsonStr = "{\"id\":\"" + id + "\"}";
-        Debugger.Log("缓存场景图，物体与房间的邻接关系 " + rawJsonStr);
+        Debugger.Log("尝试获取缓存场景图，物体与房间的邻接关系 " + rawJsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_GET_THING_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
         {
             MainData.getThingGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetThingGraph>(jsonStr);
-            Debugger.Log("缓存场景图，物体与房间的邻接关系 jsonStr:" + jsonStr);
+            Debugger.Log("已获取场景图，缓存物体与房间的邻接关系 jsonStr:" + jsonStr);
         }, null, rawJsonStr);
     }
 
@@ -312,7 +312,7 @@ public class ControlResult
     /// <summary>
     /// 仿真实例id，具有唯⼀性,即场景ID
     /// </summary>
-    public string simulatorId = MainData.IDScene;
+    public string simulatorId = MainData.SceneID;
     /// <summary>
     /// 任务id，具有唯⼀性
     /// </summary>

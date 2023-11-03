@@ -16,15 +16,21 @@ public class MainData
     /// 当前是否使用测试数据
     /// </summary>
     public static bool UseTestData { get; set; } = true;
+
     /// <summary>
     /// 配置文件数据
     /// </summary>
     public static ConfigData ConfigData { get; set; }
 
     /// <summary>
+    /// 是否生成新场景实例，T-生成随机新场景实例    F-读档，获取历史场景实例数据，根据SceneID获取历史房间布局数据以及物体位置数据
+    /// </summary>
+    public static bool IsGenerateNewScene { get; set; }
+
+    /// <summary>
     /// 场景ID 接口参数ID
     /// </summary>
-    public static string IDScene = string.Empty;
+    public static string SceneID = string.Empty;
 
     /// <summary>
     /// 物体与房间的邻接关系数据
