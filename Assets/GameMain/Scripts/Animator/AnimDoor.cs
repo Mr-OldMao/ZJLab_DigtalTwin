@@ -64,7 +64,7 @@ public class AnimDoor : MonoBehaviour
                 case "CollDown":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        if (tag != "Player") return;
+                        if (p.gameObject.tag != "Player") return;
                         //只要当前任务指令不是“敲门”,且不是指令所想要敲的那扇门“敲门”，都默认经过门口，机器人开门，门打开
                         if (TaskCenter.GetInstance.GetCurExecuteTask == null
                                 || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door)
@@ -77,14 +77,14 @@ public class AnimDoor : MonoBehaviour
                     };
                     m_ListenerCollider1Arr[i].callbackTriggerStay += (p) =>
                     {
-                        if (tag != "Player") return;
+                        if (p.gameObject.tag != "Player") return;
                         TryPlayAnim("OpenDoorUp", p.gameObject.tag, "CollDown");
                     };
                     break;
                 case "CollUp":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        if (tag != "Player") return;
+                        if (p.gameObject.tag != "Player") return;
                         if (TaskCenter.GetInstance.GetCurExecuteTask == null
                             || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door)
                         //|| Vector3.Distance(GameObject.FindObjectOfType<AIRobotMove>().targetPoint.position
@@ -96,14 +96,14 @@ public class AnimDoor : MonoBehaviour
                     };
                     m_ListenerCollider1Arr[i].callbackTriggerStay += (p) =>
                     {
-                        if (tag != "Player") return;
+                        if (p.gameObject.tag != "Player") return;
                         TryPlayAnim("OpenDoorDown", p.gameObject.tag, "CollUp");
                     };
                     break;
                 case "CollLeft":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        if (tag != "Player") return;
+                        if (p.gameObject.tag != "Player") return;
                         if (TaskCenter.GetInstance.GetCurExecuteTask == null
                                 || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door)
                         //|| Vector3.Distance(GameObject.FindObjectOfType<AIRobotMove>().targetPoint.position
@@ -115,14 +115,14 @@ public class AnimDoor : MonoBehaviour
                     };
                     m_ListenerCollider1Arr[i].callbackTriggerStay += (p) =>
                     {
-                        if (tag != "Player") return;
+                        if (p.gameObject.tag != "Player") return;
                         TryPlayAnim("OpenDoorRight", p.gameObject.tag, "CollLeft");
                     };
                     break;
                 case "CollRight":
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
-                        if (tag != "Player") return;
+                        if (p.gameObject.tag != "Player") return;
                         if (TaskCenter.GetInstance.GetCurExecuteTask == null
                             || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door)
                             //|| Vector3.Distance(GameObject.FindObjectOfType<AIRobotMove>().targetPoint.position
@@ -134,7 +134,7 @@ public class AnimDoor : MonoBehaviour
                     };
                     m_ListenerCollider1Arr[i].callbackTriggerStay += (p) =>
                     {
-                        if (tag != "Player") return;
+                        if (p.gameObject.tag != "Player") return;
                         TryPlayAnim("OpenDoorLeft", p.gameObject.tag, "CollRight");
                     };
                     break;

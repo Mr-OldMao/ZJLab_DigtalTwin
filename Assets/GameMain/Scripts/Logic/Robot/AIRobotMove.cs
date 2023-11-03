@@ -136,22 +136,25 @@ public class AIRobotMove : MonoBehaviour
 
         MsgEvent.RegisterMsgEvent(MsgEventName.DoorAnimEnd, () =>
         {
-            float dis = Vector3.Distance(transform.position, targetPoint.transform.position);
-            Debugger.Log("curPos:" + transform.position + "  targetPos:" + targetPoint.transform.position + ",dis " + dis);
-            if (dis < 0.5f)
+            //继续移动
+            if (TaskCenter.GetInstance.GetCurExecuteTask != null)
             {
-                Debugger.Log("目标点太近无法移动");
-                if (TaskCenter.GetInstance.GetCurExecuteTask == null
-            || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Close_Door_Inside
-            || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Close_Door_Outside
-            || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Open_Door_Inside
-            || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Open_Door_Outside)
+                float dis = Vector3.Distance(transform.position, targetPoint.transform.position);
+                Debugger.Log("curPos:" + transform.position + "  targetPos:" + targetPoint.transform.position + ",dis " + dis);
+                if (dis < 0.5f)
                 {
-                    return;
+                    Debugger.Log("目标点太近无法移动");
+                    if (TaskCenter.GetInstance.GetCurExecuteTask == null
+                || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Close_Door_Inside
+                || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Close_Door_Outside
+                || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Open_Door_Inside
+                || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Open_Door_Outside)
+                    {
+                        return;
+                    }
                 }
+                Move(targetPoint);
             }
-
-            Move(targetPoint);
         });
 
         MsgEvent.RegisterMsgEvent(MsgEventName.GenerateSceneComplete, () =>

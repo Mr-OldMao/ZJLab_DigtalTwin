@@ -556,18 +556,17 @@ public class GameLogic : SingletonByMono<GameLogic>
         {
             //TaskCenter.GetInstance.TestSendOrder(Order.Grab_item, "Book", "sim:1027");
             //TaskCenter.GetInstance.TestSendOrder(Order.Open_Door_Inside, "DoorX", testDoorID);
-        }
-        if (Input.GetKeyDown(KeyCode.F10))
-        {
             //TaskCenter.GetInstance.TestSendOrder(Order.Grab_item_pull, "Book", "sim:1027");
             //TaskCenter.GetInstance.TestSendOrder(Order.Close_Door_Inside, "DoorX", testDoorID);
             //TaskCenter.GetInstance.TestSendOrder(Order.Robot_CleanTable, "Desk", "sim:1025");
-        }
-        if (Input.GetKeyDown(KeyCode.F11))
-        {
             TaskCenter.GetInstance.TestSendOrder(Order.Press_Button, "TV", "sim:1016");
             //TaskCenter.GetInstance.TestSendOrder(Order.Knock_on_door, "DoorX", testDoorID);
         }
+        if (Input.GetKeyDown(KeyCode.F10))
+        {
+           
+        }
+
         if (Input.GetKeyDown(KeyCode.F12))
         {
             if (m_Debugger != null)
