@@ -30,7 +30,9 @@ public class UIFormMain : UIFormBase
     [SerializeField]
     private Button btnRobotRelocation;
     [SerializeField]
-    private Button btnRegenerateScene;
+    private Button btnRegenerateScene; 
+    [SerializeField]
+    private Button btnSave;
     [SerializeField]
     private Toggle tgeLive;
 
@@ -44,6 +46,7 @@ public class UIFormMain : UIFormBase
     public Text TxtCameraFree { get => txtCameraFree; set => txtCameraFree = value; }
     public Button BtnRobotRelocation { get => btnRobotRelocation; set => btnRobotRelocation = value; }
     public Button BtnRegenerateScene { get => btnRegenerateScene; set => btnRegenerateScene = value; }
+    public Button BtnSave { get => btnSave; set => btnSave = value; }
     public Toggle TgeLive { get => tgeLive; set => tgeLive = value; }
     
 
@@ -70,6 +73,7 @@ public class UIFormMain : UIFormBase
         txtCameraFree = transform.Find<Text>("txtCameraFree");
         btnRobotRelocation = transform.Find<Button>("btnRobotRelocation");
         btnRegenerateScene = transform.Find<Button>("btnRegenerateScene");
+        btnSave = transform.Find<Button>("btnSave");
         tgeLive = transform.Find<Toggle>("tgeLive");
 
         tgeLive.isOn = false;
@@ -104,6 +108,10 @@ public class UIFormMain : UIFormBase
         btnRegenerateScene.onClick.AddListenerCustom(() =>
         {
             GameLogic.GetInstance.GenerateScene();
+        });
+        btnSave.onClick.AddListenerCustom(() =>
+        {
+            DataSave.GetInstance.Save();
         });
         tgeLive.onValueChanged.AddListenerCustom((ison) =>
         {

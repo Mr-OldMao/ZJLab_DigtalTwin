@@ -47,7 +47,8 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
             if (targetObj != null)
             {
                 //更新实体位置信息
-                Transform modelTrans = targetObj.transform.Find("Model");
+                //Transform modelTrans = targetObj.transform.Find("Model");
+                Transform modelTrans = targetObj.transform;
                 if (modelTrans != null)
                 {
                     relatedThingArr[tempJ].target.position = new float[] { modelTrans.position.x, modelTrans.position.y, modelTrans.position.z };

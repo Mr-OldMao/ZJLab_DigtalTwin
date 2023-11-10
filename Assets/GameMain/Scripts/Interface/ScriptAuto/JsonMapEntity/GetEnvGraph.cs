@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 /// <summary>
 /// Json映射的实体类 以下代码自动生成
 /// 接口地址：
@@ -22,14 +23,17 @@ public class GetEnvGraph
 	/// 
 	/// </summary>
 	public GetEnvGraph_data data;
+	[Serializable]
 	public class GetEnvGraph_data
 	{
 		/// <summary>
 		/// 
 		/// </summary>
 		public GetEnvGraph_data_items[] items;
-	}
-	public class GetEnvGraph_data_items
+        public string idScene = MainData.SceneID;
+    }
+    [Serializable]
+    public class GetEnvGraph_data_items
 	{
 		/// <summary>
 		/// 
@@ -44,7 +48,8 @@ public class GetEnvGraph
 		/// </summary>
 		public GetEnvGraph_data_items_relatedThing[] relatedThing;
 	}
-	public class GetEnvGraph_data_items_relatedThing
+    [Serializable]
+    public class GetEnvGraph_data_items_relatedThing
 	{
         /// <summary>
         /// 另⼀个具有空间关系的物体
@@ -55,7 +60,8 @@ public class GetEnvGraph
 		/// </summary>
 		public string relationship;
 	}
-	public class GetEnvGraph_data_items_relatedThing_target
+    [Serializable]
+    public class GetEnvGraph_data_items_relatedThing_target
 	{
 		/// <summary>
 		/// 

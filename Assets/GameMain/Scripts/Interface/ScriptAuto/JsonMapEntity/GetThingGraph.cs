@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using static GetThingGraph;
 /// <summary>
 /// Json映射的实体类 以下代码自动生成
@@ -30,6 +31,7 @@ public class GetThingGraph
 		/// </summary>
 		public List<GetThingGraph_data_items> items;
 	}
+	[Serializable]
 	public class GetThingGraph_data_items
 	{
         /// <summary>
@@ -57,6 +59,7 @@ public class GetThingGraph
         /// </summary>
         public bool dynamic;
 	}
+	[Serializable]
 	public class GetThingGraph_data_items_relatedThing
 	{
         /// <summary>
@@ -68,6 +71,7 @@ public class GetThingGraph
         /// </summary>
         public string relationship;
 	}
+	[Serializable]
 	public class GetThingGraph_data_items_relatedThing_target
 	{
 		/// <summary>
@@ -96,6 +100,7 @@ public class GetThingGraph
         public bool dynamic;
 	}
 }
+[Serializable]
 public class PostThingGraph
 {
     public List<GetThingGraph_data_items> items;

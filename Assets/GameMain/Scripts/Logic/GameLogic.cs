@@ -7,6 +7,7 @@ using static GetEnvGraph;
 using static GetThingGraph;
 using static GenerateRoomBorderModel;
 using System.Collections;
+using System.IO;
 /// <summary>
 /// 标题：程序逻辑入口
 /// 功能：程序主逻辑
@@ -24,13 +25,66 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         Debugger.Log("Init GameLogic");
         HideDebugger();
-        MsgEvent.RegisterMsgEvent(MsgEventName.InitComplete, () =>
-        {
-            this.EnterMainScene();
-        });
+        MsgEvent.RegisterMsgEvent(MsgEventName.InitComplete, InitCompleteEventCallback);
 #if UNITY_EDITOR
-        MainDataTool.GetInstance.InitMainDataParam("test",1);
+        MainDataTool.GetInstance.InitMainDataParam("test|1");
 #endif
+    }
+
+    /// <summary>
+    /// 初始化数据完毕后回调
+    /// </summary>
+    private void InitCompleteEventCallback()
+    {
+        //优先级 本地读档 > 服务器读档 > 不读当
+        //根据配置文件判定是否需要读档本地文件
+        if (!string.IsNullOrEmpty(MainData.ConfigData.CoreConfig.LocalReadFileName))
+        {
+            MainData.CanReadFile = true;
+            Debugger.Log("尝试本地读档 CoreConfig.LocalReadFileName：" + MainData.ConfigData.CoreConfig.LocalReadFileName, LogTag.Forever);
+            string localReadFilePath = Application.streamingAssetsPath + "/" + MainData.ConfigData.CoreConfig.LocalReadFileName;
+            if (File.Exists(localReadFilePath))
+            {
+                //读取本地数据
+                DataRead.GetInstance.ReadAllDataByLocalFile(Application.streamingAssetsPath, MainData.ConfigData.CoreConfig.LocalReadFileName, (b) =>
+                {
+                    if (b)
+                    {
+                        Debugger.Log("本地读档成功! SceneID:" + MainData.SceneID, LogTag.Forever);
+                        this.EnterMainScene();
+                    }
+                    else
+                    {
+                        Debugger.LogError("本地读档失败，请检查文件内容是否合法 CoreConfig.LocalReadFileName：" + MainData.ConfigData.CoreConfig.LocalReadFileName);
+                    }
+                });
+            }
+            else
+            {
+                Debugger.LogError("本地读档失败，配置文件Config.json中LocalReadFileName字段写入文件名不存在../StreamingAssets/目录下，请检查文件是否存在 CoreConfig.LocalReadFileName：" + MainData.ConfigData.CoreConfig.LocalReadFileName);
+            }
+        }
+        else if (MainData.CanReadFile)
+        {
+            Debugger.Log("尝试从服务器读档", LogTag.Forever);
+            //根据SceneID从服务器读取数据
+            DataRead.GetInstance.ReadAllDataByServerSceneID((b) =>
+            {
+                if (b)
+                {
+                    this.EnterMainScene();
+                }
+                else
+                {
+                    Debugger.LogError("从服务器读档失败，无法进入场景");
+                }
+            });
+        }
+        else
+        {
+            Debugger.Log("不读档，生成随机场景实例", LogTag.Forever);
+            this.EnterMainScene();
+        }
     }
 
     private void OnDisable()
@@ -51,34 +105,10 @@ public class GameLogic : SingletonByMono<GameLogic>
             Debugger.Log("ab资源加载完毕回调");
             m_IsLoadedAssets = true;
         });
-        new ReadConfigFile(() =>
-        {
-            MainData.UseTestData = MainData.ConfigData.CoreConfig?.UseTestData == 1;
-            if (!string.IsNullOrEmpty(MainData.ConfigData.CoreConfig?.SceneID))
-            {
-                MainData.SceneID = MainData.ConfigData.CoreConfig?.SceneID;
-                Debugger.Log("change IDScene");
-            }
-            if (MainData.ConfigData.CoreConfig.SendEntityInfoHZ <= 0)
-            {
-                MainData.ConfigData.CoreConfig.SendEntityInfoHZ = 3f;
-            }
-            Debugger.Log("MainDataDisplay   SceneID：" + MainData.SceneID
-                + ",UseTestData：" + MainData.UseTestData
-                + ",SendEntityInfoHZ：" + MainData.ConfigData.CoreConfig.SendEntityInfoHZ
-                + ",Http_IP：" + MainData.ConfigData.HttpConfig.IP
-                + ",Http_Port：" + MainData.ConfigData.HttpConfig.Port
-                + ",Mqtt_IP：" + MainData.ConfigData.MqttConfig.ClientIP
-                + ",Vs_Frame：" + MainData.ConfigData.VideoStreaming.Frame
-                + ",Vs_Quality：" + MainData.ConfigData.VideoStreaming.Quality,
-                LogTag.Forever);
-            //接入网络通信
-            NetworkHTTP();
 
-            Debugger.Log("initNetworkMQTTNetworkMQTT", LogTag.Forever);
-
-            NetworkMQTT();
-        });
+        //接入网络通信
+        NetworkHTTP();
+        NetworkMQTT();
 
         //等待ab资源加载完毕，以及http接口获取的场景数据，解析生成场景实体
         UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() =>
@@ -121,6 +151,19 @@ public class GameLogic : SingletonByMono<GameLogic>
             //原点偏移至场景左下角
             Vector2 originOffset = GetOriginOffset();
             staticModelRootNode.transform.position = new Vector3(originOffset.x, 0, originOffset.y);
+            //GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.position = new Vector3(originOffset.x, 0, originOffset.y);
+            if (MainData.CanReadFile )
+            {
+                GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.position = Vector3.zero;
+                MainData.ReadingFile = false;
+                MainData.CanReadFile = false;
+                Debugger.Log("读档生成场景实例完成", LogTag.Forever);
+            }
+            else
+            {
+                GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.parent = staticModelRootNode.transform;
+                GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.localPosition = Vector3.zero;
+            }
 
             //生成机器人实体
             GenerateRobot();
@@ -186,55 +229,77 @@ public class GameLogic : SingletonByMono<GameLogic>
     #endregion
 
     #region Generate
+
+    public void GenerateScene()
+    {
+        staticModelRootNode.transform.position = Vector3.zero;
+        //生成场景中所有房间和物品
+        GenerateEntity(() =>
+        {
+            MsgEvent.SendMsg(MsgEventName.GenerateSceneComplete);
+        });
+    }
+
     private void GenerateEntity(Action generateCompleteCallback)
     {
         //写入各个房间之间的邻接关系
         List<RoomBaseInfo> roomBaseInfos = new List<RoomBaseInfo>();
-        for (int i = 0; i < MainData.getEnvGraph?.data?.items.Length; i++)
+        if (!MainData.CanReadFile)
         {
-            GetEnvGraph_data_items roomRelation = MainData.getEnvGraph?.data?.items[i];
-            RoomBaseInfo roomBaseInfo = new RoomBaseInfo();
-            roomBaseInfos.Add(roomBaseInfo);
-
-            roomBaseInfo.curRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.name);
-            roomBaseInfo.roomSize = new uint[] { (uint)UnityEngine.Random.Range(4, 8), (uint)UnityEngine.Random.Range(4, 8) };
-            roomBaseInfo.targetRoomsDirRelation = new List<RoomsDirRelation>();
-            roomBaseInfo.curRoomID = roomRelation.id;
-            //当前房间与其他房间邻接关系
-            for (int j = 0; j < roomRelation.relatedThing?.Length; j++)
+            for (int i = 0; i < MainData.getEnvGraph?.data?.items.Length; i++)
             {
-                RoomType targetRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.relatedThing[j].target.name);
-                roomBaseInfo.targetRoomsDirRelation.Add(new RoomsDirRelation
-                {
-                    targetRoomType = targetRoomType,
-                    locationRelation = (DirEnum)Enum.Parse(typeof(DirEnum), roomRelation.relatedThing[j].relationship),
-                    isCommonWall = true,
-                    targetRoomID = roomRelation.relatedThing[j].target.id
-                });
+                GetEnvGraph_data_items roomRelation = MainData.getEnvGraph?.data?.items[i];
+                RoomBaseInfo roomBaseInfo = new RoomBaseInfo();
+                roomBaseInfos.Add(roomBaseInfo);
 
+                roomBaseInfo.curRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.name);
+                roomBaseInfo.roomSize = new uint[] { (uint)UnityEngine.Random.Range(4, 8), (uint)UnityEngine.Random.Range(4, 8) };
+                roomBaseInfo.targetRoomsDirRelation = new List<RoomsDirRelation>();
+                roomBaseInfo.curRoomID = roomRelation.id;
+                //当前房间与其他房间邻接关系
+                for (int j = 0; j < roomRelation.relatedThing?.Length; j++)
+                {
+                    RoomType targetRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.relatedThing[j].target.name);
+                    roomBaseInfo.targetRoomsDirRelation.Add(new RoomsDirRelation
+                    {
+                        targetRoomType = targetRoomType,
+                        locationRelation = (DirEnum)Enum.Parse(typeof(DirEnum), roomRelation.relatedThing[j].relationship),
+                        isCommonWall = true,
+                        targetRoomID = roomRelation.relatedThing[j].target.id
+                    });
+
+
+                }
 
             }
-
-        }
-        //补充各个房间之间的邻接关系
-        for (int i = 0; i < MainData.getEnvGraph?.data?.items.Length; i++)
-        {
-            GetEnvGraph_data_items roomRelation = MainData.getEnvGraph?.data?.items[i];
-            for (int j = 0; j < roomRelation.relatedThing?.Length; j++)
+            //补充各个房间之间的邻接关系
+            for (int i = 0; i < MainData.getEnvGraph?.data?.items.Length; i++)
             {
-                RoomType targetRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.relatedThing[j].target.name);
-                string curRoomID = roomRelation.relatedThing[j].target.id;
-                if (roomBaseInfos.Find((p) => { return p.curRoomType == targetRoomType && p.curRoomID == curRoomID; }) == null)
+                GetEnvGraph_data_items roomRelation = MainData.getEnvGraph?.data?.items[i];
+                for (int j = 0; j < roomRelation.relatedThing?.Length; j++)
                 {
-                    roomBaseInfos.Add(new RoomBaseInfo
+                    RoomType targetRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.relatedThing[j].target.name);
+                    string curRoomID = roomRelation.relatedThing[j].target.id;
+                    if (roomBaseInfos.Find((p) => { return p.curRoomType == targetRoomType && p.curRoomID == curRoomID; }) == null)
                     {
-                        curRoomType = targetRoomType,
-                        curRoomID = curRoomID,
-                        roomSize = new uint[] { (uint)UnityEngine.Random.Range(6, 8), (uint)UnityEngine.Random.Range(4, 8) }
-                    });
+                        roomBaseInfos.Add(new RoomBaseInfo
+                        {
+                            curRoomType = targetRoomType,
+                            curRoomID = curRoomID,
+                            roomSize = new uint[] { (uint)UnityEngine.Random.Range(6, 8), (uint)UnityEngine.Random.Range(4, 8) }
+                        });
+                    }
                 }
             }
         }
+        else
+        {
+            roomBaseInfos = DataRead.GetInstance.ReadRoomBaseInfos();
+        }
+
+
+
+
         GenerateRoomData.GetInstance.GenerateRandomRoomInfoData(roomBaseInfos, (p, k) =>
         {
             if (p == null || k == null)
@@ -245,22 +310,11 @@ public class GameLogic : SingletonByMono<GameLogic>
             else
             {
                 GenerateRoomBorderModel.GetInstance.GenerateRoomBorder();
-                GenerateRoomItemModel.GetInstance.GenerateRoomItem(k, MainData.getThingGraph);
+                GenerateRoomItemModel.GetInstance.GenerateRoomItem(k, MainData.getThingGraph.data.items);
                 generateCompleteCallback?.Invoke();
             }
         });
-    }
 
-
-    public void GenerateScene()
-    {
-        staticModelRootNode.transform.position = Vector3.zero;
-        // ListenerAllDoorOpenEvent(false);
-        //生成场景中所有房间和物品
-        GenerateEntity(() =>
-        {
-            MsgEvent.SendMsg(MsgEventName.GenerateSceneComplete);
-        });
     }
 
 
@@ -476,6 +530,10 @@ public class GameLogic : SingletonByMono<GameLogic>
         {
             yield return new WaitForSeconds(MainData.ConfigData.CoreConfig.SendEntityInfoHZ);
             UpdateEnityInfoTool.GetInstance.UpdateSceneEntityInfo();
+
+            //存档
+            DataSave.GetInstance.SaveGetThingGraph_data_items(MainData.CacheSceneItemsInfo);
+
             InterfaceDataCenter.GetInstance.SendMQTTUpdateScenes(MainData.CacheSceneItemsInfo);
         }
     }
@@ -570,7 +628,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         }
         if (Input.GetKeyDown(KeyCode.F10))
         {
-           
+
         }
 
         if (Input.GetKeyDown(KeyCode.F12))

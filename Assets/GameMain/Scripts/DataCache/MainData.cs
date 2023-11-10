@@ -23,10 +23,15 @@ public class MainData
     public static ConfigData ConfigData { get; set; }
 
     /// <summary>
-    /// 是否生成新场景实例，T-生成随机新场景实例    F-读档，获取历史场景实例数据，根据SceneID获取历史房间布局数据以及物体位置数据
+    /// 是否正在读档
+    /// 是否读档生成场景实例，T-读档，获取历史场景实例数据，根据SceneID获取历史房间布局数据以及物体位置数据    F-生成随机新场景实例
     /// </summary>
-    public static bool IsGenerateNewScene { get; set; }
+    public static bool ReadingFile { get; set; }
 
+    /// <summary>
+    /// 是否允许读档
+    /// </summary>
+    public static bool CanReadFile { get; set; } = false;
     /// <summary>
     /// 场景ID 接口参数ID
     /// </summary>
@@ -63,6 +68,11 @@ public class MainData
     /// </summary>
     public static List<ControlResult> ControlCommitCompletedList { get; set; } = new List<ControlResult>();
 
+
+
+
+    #region 数字孪生
+
     /// <summary>
     /// 机器人坐标信息
     /// </summary>
@@ -70,5 +80,6 @@ public class MainData
     /// <summary>
     /// 访客坐标信息
     /// </summary>
-    public static Queue<Feature_People_Perception> feature_People_Perceptions { get; set; } = new Queue<Feature_People_Perception> { };
+    public static Queue<Feature_People_Perception> feature_People_Perceptions { get; set; } = new Queue<Feature_People_Perception> { }; 
+    #endregion
 }

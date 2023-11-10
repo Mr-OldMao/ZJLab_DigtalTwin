@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MFramework;
+using System;
 
 /// <summary>
 /// 标题：房间边界模型(墙壁、门、地砖)自动生成器
@@ -29,7 +30,7 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
     /// </summary>
     private Dictionary<RoomType, GameObject> m_DicRoomEntity;
 
-
+    [Serializable]
     public class RoomInfo
     {
         public RoomType roomType;
@@ -70,9 +71,14 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
     /// <summary>
     /// 具体边界实体数据信息
     /// </summary>
+    [Serializable]
     public class BorderEntityData
     {
         public GameObject entity = null;
+        ///// <summary>
+        ///// 实体的材质ID [1,10]
+        ///// </summary>
+        //public int matID;
         public Vector2 pos;
         public EntityModelType entityModelType;
         /// <summary>

@@ -15,6 +15,10 @@ public class ConfigData
         public string SceneID;
         public int UseTestData;
         /// <summary>
+        /// //读档根据本地json文件来生成房间布局以及物体，为空则从服务端获取相关数据，不为空则填写文件名xxx.json(../StreamingAssets/xxx.json)
+        /// </summary>
+        public string LocalReadFileName;
+        /// <summary>
         /// 发送视觉感知实体信息频率, n秒/次
         /// </summary>
         public float SendEntityInfoHZ;

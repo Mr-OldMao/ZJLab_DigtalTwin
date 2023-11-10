@@ -4,6 +4,7 @@ using static GenerateRoomBorderModel;
 using MFramework;
 using System.Linq;
 using System;
+using static GenerateRoomData;
 
 /// <summary>
 /// 标题：生成房间信息数据，为生成房间模型服务
@@ -38,6 +39,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     /// <summary>
     /// 房间基础信息
     /// </summary>
+    [Serializable]
     public class RoomBaseInfo
     {
         public RoomType curRoomType;
@@ -58,6 +60,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     /// <summary>
     /// 当前房间与目标房间之间的方位关系
     /// </summary>
+    [Serializable]
     public class RoomsDirRelation
     {
         /// <summary>
@@ -114,114 +117,141 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             roomBaseInfosClone.Add(roomBaseInfos[i]);
         }
 
-        bool isGenerateSuc = true;
+        bool isGenerateSuc = GetListRoomInfo(roomBaseInfos);
 
-        m_ListRoomInfo = new List<RoomInfo>();
-
-        //随机生成所有房间顺序：首先生成客厅房间，其次是邻接关系最多的房间，到最好邻接关系最少的房间
-        //找到客厅房间放置在坐标系，房间左下角在原点，向第一象限延申
-        RoomBaseInfo livingRoomBaseInfo = roomBaseInfos.Find((p) => { return p.curRoomType == RoomType.LivingRoom; });
-        string firstGenerateID = livingRoomBaseInfo.curRoomID;
-        RoomInfo livingRoomInfo = new RoomInfo
+        if (isGenerateSuc)
         {
-            roomType = livingRoomBaseInfo.curRoomType,
-            roomSize = livingRoomBaseInfo.roomSize,
-            roomPosMin = new Vector2(0, 0),
-            roomPosMax = new Vector2(livingRoomBaseInfo.roomSize[0], livingRoomBaseInfo.roomSize[1]),
-            listDoorPosInfo = null, //TODO
-            listEmptyPosInfo = null, //TODO
-            roomID = firstGenerateID,
-        };
-        m_ListRoomInfo.Add(livingRoomInfo);
-        UpdateRoomBuilderInfo(livingRoomInfo);
-        roomBaseInfos.Remove(livingRoomBaseInfo);
-
-        int loopCpuntMax = 30;
-        int curLoopCount = 0;
-
-        //遍历其他房间
-        for (int i = 0; roomBaseInfos.Count > 0;)
-        {
-            //寻找邻接关系最多的房间
-            RoomBaseInfo curRoom = FindNextRoom(roomBaseInfos);
-
-
-            curLoopCount++;
-            //容错 避免死循环
-            if (curLoopCount > loopCpuntMax)
-            {
-                callback(null, null);
-                return;
-            }
-            //邻接的房间是否全部都已生成，未完成则先创建其他的房间
-            bool isExist = true;
-            if (i >= roomBaseInfos.Count)
-            {
-                i = 0;
-            }
-            foreach (var item in curRoom.targetRoomsDirRelation)
-            {
-                //如果当前房间有邻接房间已创建，则允许该当前房间创建
-                if (m_ListRoomInfo.Find((p) => { return p.roomType == item.targetRoomType; }) != null)
-                {
-                    isExist = true;
-                    break;
-                }
-                else
-                {
-                    isExist = false;
-                    //当前房间所邻接的房间未创建时，优先创建所邻接的房间
-                    for (int j = 0; j < roomBaseInfos.Count; j++)
-                    {
-                        if (roomBaseInfos[j].curRoomType == item.targetRoomType)
-                        {
-                            i = j;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (!isExist)
-            {
-                //i++;
-                continue;
-            }
-            //Debugger.Log(" Cur Generate RoomType:" + roomBaseInfos[i].curRoomType);
-            //根据房间邻接的边界信息，给出roomPosMin，roomPosMax
-            List<Vector2> pos = GetRandomRoomPosByDirRelaateion(curRoom, (p) =>
-            {
-                if (!p)
-                {
-                    isGenerateSuc = false;
-                }
-            });
-            RoomInfo roomInfo = new RoomInfo
-            {
-                roomType = curRoom.curRoomType,
-                roomSize = curRoom.roomSize,
-                roomPosMin = pos[0],
-                roomPosMax = pos[1],
-                listDoorPosInfo = null, //TODO
-                listEmptyPosInfo = null, //TODO
-                roomID = curRoom.curRoomID
-            };
-            m_ListRoomInfo.Add(roomInfo);
-            UpdateRoomBuilderInfo(roomInfo);
-            roomBaseInfos.Remove(curRoom);
+            //存档
+            DataSave.GetInstance.SaveRoomInfos(m_ListRoomInfo);
+            DataSave.GetInstance.SaveListRoomBuilderInfo(listRoomBuilderInfo);
+            DataSave.GetInstance.SaveRoomBaseInfos(roomBaseInfosClone);
         }
-        if (!isGenerateSuc)
+        else
         {
             callback(null, null);
             return;
         }
-
-
         CacheRoomWallInfo(m_ListRoomInfo.ToArray());
 
-        GenerateDoorData(roomBaseInfosClone, firstGenerateID, ref m_ListRoomInfo);
+        RoomBaseInfo livingRoomBaseInfo = roomBaseInfosClone.Find((p) => { return p.curRoomType == RoomType.LivingRoom; });
+        string firstGenerateID = livingRoomBaseInfo.curRoomID;
+
+        if (!MainData.CanReadFile)
+        {
+            GenerateDoorData(roomBaseInfosClone, firstGenerateID, ref m_ListRoomInfo);
+        }
 
         //Debugger.Log("房间邻接的边界信息生成成功！");
         callback(listRoomBuilderInfo, m_ListRoomInfo);
+    }
+
+    //获取将要建造的房间信息
+    private bool GetListRoomInfo(List<RoomBaseInfo> roomBaseInfos)
+    {
+        bool getSuc = true;
+        m_ListRoomInfo = new List<RoomInfo>();
+        if (!MainData.CanReadFile)
+        {
+            //随机生成所有房间顺序：首先生成客厅房间，其次是邻接关系最多的房间，到最好邻接关系最少的房间
+            //找到客厅房间放置在坐标系，房间左下角在原点，向第一象限延申
+            RoomBaseInfo livingRoomBaseInfo = roomBaseInfos.Find((p) => { return p.curRoomType == RoomType.LivingRoom; });
+            string firstGenerateID = livingRoomBaseInfo.curRoomID;
+            RoomInfo livingRoomInfo = new RoomInfo
+            {
+                roomType = livingRoomBaseInfo.curRoomType,
+                roomSize = livingRoomBaseInfo.roomSize,
+                roomPosMin = new Vector2(0, 0),
+                roomPosMax = new Vector2(livingRoomBaseInfo.roomSize[0], livingRoomBaseInfo.roomSize[1]),
+                listDoorPosInfo = null, //TODO
+                listEmptyPosInfo = null, //TODO
+                roomID = firstGenerateID,
+            };
+            m_ListRoomInfo.Add(livingRoomInfo);
+            UpdateRoomBuilderInfo(livingRoomInfo);
+            roomBaseInfos.Remove(livingRoomBaseInfo);
+
+            int loopCpuntMax = 30;
+            int curLoopCount = 0;
+
+            //遍历其他房间
+            for (int i = 0; roomBaseInfos.Count > 0;)
+            {
+                //寻找邻接关系最多的房间
+                RoomBaseInfo curRoom = FindNextRoom(roomBaseInfos);
+
+
+                curLoopCount++;
+                //容错 避免死循环
+                if (curLoopCount > loopCpuntMax)
+                {
+                    getSuc = false;
+                    return getSuc;
+                }
+                //邻接的房间是否全部都已生成，未完成则先创建其他的房间
+                bool isExist = true;
+                if (i >= roomBaseInfos.Count)
+                {
+                    i = 0;
+                }
+                foreach (var item in curRoom.targetRoomsDirRelation)
+                {
+                    //如果当前房间有邻接房间已创建，则允许该当前房间创建
+                    if (m_ListRoomInfo.Find((p) => { return p.roomType == item.targetRoomType; }) != null)
+                    {
+                        isExist = true;
+                        break;
+                    }
+                    else
+                    {
+                        isExist = false;
+                        //当前房间所邻接的房间未创建时，优先创建所邻接的房间
+                        for (int j = 0; j < roomBaseInfos.Count; j++)
+                        {
+                            if (roomBaseInfos[j].curRoomType == item.targetRoomType)
+                            {
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!isExist)
+                {
+                    //i++;
+                    continue;
+                }
+                //Debugger.Log(" Cur Generate RoomType:" + roomBaseInfos[i].curRoomType);
+                //根据房间邻接的边界信息，给出roomPosMin，roomPosMax
+                List<Vector2> pos = GetRandomRoomPosByDirRelaateion(curRoom, (p) =>
+                {
+                    if (!p)
+                    {
+                        getSuc = false;
+                    }
+                });
+                RoomInfo roomInfo = new RoomInfo
+                {
+                    roomType = curRoom.curRoomType,
+                    roomSize = curRoom.roomSize,
+                    roomPosMin = pos[0],
+                    roomPosMax = pos[1],
+                    listDoorPosInfo = null, //TODO
+                    listEmptyPosInfo = null, //TODO
+                    roomID = curRoom.curRoomID
+                };
+                m_ListRoomInfo.Add(roomInfo);
+                UpdateRoomBuilderInfo(roomInfo);
+                roomBaseInfos.Remove(curRoom);
+            }
+        }
+        else
+        {
+            //读档
+            m_ListRoomInfo = DataRead.GetInstance.ReadRoomInfos();
+            listRoomBuilderInfo = DataRead.GetInstance.ReadListRoomBuilderInfo();
+            getSuc = m_ListRoomInfo != null && listRoomBuilderInfo != null;
+        }
+        return getSuc;
     }
 
     /// <summary>

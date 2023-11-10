@@ -2,7 +2,9 @@ using MFramework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityGameFramework.Runtime;
+using static GetEnvGraph;
 using static GetThingGraph;
 /// <summary>
 /// 标题：接口数据管理中心
@@ -69,13 +71,37 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// <param name="id">仿真引擎实例的id号码</param>
     public void CacheGetThingGraph(string id)
     {
-        string rawJsonStr = "{\"id\":\"" + id + "\"}";
-        Debugger.Log("尝试获取缓存场景图，物体与房间的邻接关系 " + rawJsonStr);
-        MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_GET_THING_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
+        if (!MainData.CanReadFile)
         {
-            MainData.getThingGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetThingGraph>(jsonStr);
-            Debugger.Log("已获取场景图，缓存物体与房间的邻接关系 jsonStr:" + jsonStr);
-        }, null, rawJsonStr);
+            string rawJsonStr = "{\"id\":\"" + id + "\"}";
+            Debugger.Log("尝试获取缓存场景图，物体与房间的邻接关系 " + rawJsonStr);
+            MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_GET_THING_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
+            {
+                MainData.getThingGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetThingGraph>(jsonStr);
+                Debugger.Log("已获取场景图，缓存物体与房间的邻接关系 jsonStr:" + jsonStr);
+                //存档
+                DataSave.GetInstance.SaveGetThingGraph_data_items(new PostThingGraph
+                {
+                    id = MainData.SceneID,
+                    idScene = MainData.SceneID,
+                    items = MainData.getThingGraph.data.items
+                });
+            }, null, rawJsonStr);
+        }
+        else
+        {
+            //读档
+            PostThingGraph postThingGraph = DataRead.GetInstance.ReadGetThingGraph_data_items();
+            MainData.getThingGraph = new GetThingGraph
+            {
+                data = new GetThingGraph_data
+                {
+                    items = postThingGraph.items
+                }
+            };
+        }
+
+
     }
 
     /// <summary>
@@ -94,6 +120,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         {
             Debugger.LogError("提交场景图失败，m:" + m + ",n:" + n);
         });
+
+
     }
 
     /// <summary>
@@ -104,16 +132,36 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     {
         string rawJsonStr = "{\"id\":\"" + id + "\"}";
         Debugger.Log("缓存环境场景图,房间与房间的邻接关系 " + rawJsonStr);
-        MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_GET_ENV_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
+
+        if (!MainData.CanReadFile)
         {
-            if (MainData.UseTestData)
+            MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_GET_ENV_GRAPH, new Dictionary<string, string>(), (string jsonStr) =>
             {
-                //Test测试数据
-                jsonStr = "{\r\n    \"code\": 200,\r\n    \"message\": \"good\",\r\n    \"success\": true,\r\n    \"data\": {\r\n        \"items\": [\r\n            {\r\n                \"id\": \"sim:1\",\r\n                \"name\": \"LivingRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:2\",\r\n                            \"name\": \"BathRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Left\"\r\n                    },\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Right\"\r\n                    },\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:4\",\r\n                            \"name\": \"KitchenRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:5\",\r\n                \"name\": \"BedRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:1\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:6\",\r\n                \"name\": \"StorageRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:7\",\r\n                \"name\": \"StudyRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Left\"\r\n                    }\r\n                ]\r\n            }\r\n        ]\r\n    }\r\n}";
-            }
-            MainData.getEnvGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetEnvGraph>(jsonStr);
-            Debugger.Log("缓存环境场景图,房间与房间的邻接关系 jsonStr:" + jsonStr);
-        }, null, rawJsonStr);
+                if (MainData.UseTestData)
+                {
+                    //Test测试数据
+                    jsonStr = "{\r\n    \"code\": 200,\r\n    \"message\": \"good\",\r\n    \"success\": true,\r\n    \"data\": {\r\n        \"items\": [\r\n            {\r\n                \"id\": \"sim:1\",\r\n                \"name\": \"LivingRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:2\",\r\n                            \"name\": \"BathRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Left\"\r\n                    },\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Right\"\r\n                    },\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:4\",\r\n                            \"name\": \"KitchenRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:5\",\r\n                \"name\": \"BedRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:1\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:6\",\r\n                \"name\": \"StorageRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:7\",\r\n                \"name\": \"StudyRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Left\"\r\n                    }\r\n                ]\r\n            }\r\n        ]\r\n    }\r\n}";
+                }
+                MainData.getEnvGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetEnvGraph>(jsonStr);
+                Debugger.Log("缓存环境场景图,房间与房间的邻接关系 jsonStr:" + jsonStr);
+                //存档
+                DataSave.GetInstance.SaveGetEnvGraph_data(new GetEnvGraph.GetEnvGraph_data
+                {
+                    items = MainData.getEnvGraph.data.items,
+                    idScene = MainData.SceneID
+                });
+            }, null, rawJsonStr);
+        }
+        else
+        {
+            //读档
+            GetEnvGraph_data getEnvGraph_Data = DataRead.GetInstance.ReadGetEnvGraph_data();
+            MainData.getEnvGraph = new GetEnvGraph
+            {
+                data = getEnvGraph_Data,
+                message = "读档"
+            };
+        }
     }
 
     /// <summary>
@@ -131,10 +179,58 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
             calllbackSuc?.Invoke();
         }, null, rawJsonStr, (m, n) =>
         {
-            Debugger.Log("改变仿真引擎状态接口调用失败 m:" + m + ",n:" + n);
+            Debugger.LogError("改变仿真引擎状态接口调用失败 m:" + m + ",n:" + n);
             callbackFail?.Invoke();
         });
     }
+
+    /// <summary>
+    /// 存档
+    /// </summary>
+    public void SaveFileData(string jsonData, Action calllbackSuc = null, Action callbackFail = null)
+    {
+        string path = "http://10.101.80.74:8080/simulation/history/add";
+
+        ////Test
+        //path = "http://zhrdnk.natappfree.cc/simulation/history/add";
+
+        Debugger.Log("尝试发起线上存档 path:" + path);
+        string rawJsonStr = jsonData;
+        MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, path, new Dictionary<string, string> { }, (string jsonStr) =>
+        {
+            Debugger.Log("存档成功 jsonStr:" + jsonStr);
+            calllbackSuc?.Invoke();
+        }, null, rawJsonStr, (m, n) =>
+        {
+            Debugger.LogError("存档失败 m:" + m + ",n:" + n);
+            callbackFail?.Invoke();
+        });
+    }
+
+    /// <summary>
+    /// 读档
+    /// </summary>
+    public void ReadFileData(string sceneID, Action<ReadFileData> calllbackSuc = null, Action callbackFail = null)
+    {
+        string path = "http://10.101.80.74:8080/simulation/history/getInfo?id=" + sceneID;
+
+        ////Test
+        //path = "http://zhrdnk.natappfree.cc/simulation/history/getInfo?id=" + sceneID;
+
+        Debugger.Log("尝试读档 " + path);
+        string rawJsonStr = path;
+        MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Get, path, new Dictionary<string, string>(), (string jsonStr) =>
+        {
+            Debugger.Log("读档接口回调 jsonStr:");
+            ReadFileData readFileData = JsonUtility.FromJson<ReadFileData>(jsonStr);
+            calllbackSuc?.Invoke(readFileData);
+        }, null, rawJsonStr, (m, n) =>
+        {
+            Debugger.LogError("读档失败 m:" + m + ",n:" + n);
+            callbackFail?.Invoke();
+        });
+    }
+
     #endregion
 
 
