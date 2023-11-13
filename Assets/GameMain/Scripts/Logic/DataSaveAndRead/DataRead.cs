@@ -57,21 +57,6 @@ public class DataRead : SingletonByMono<DataRead>
                     Debugger.LogError("解析服务器读档失败，e：" + e);
                     callback.Invoke(false);
                 }
-                //if (string.IsNullOrEmpty(readFileData?.data.dataPackageInfo))
-                //{
-                //    Debugger.LogError("尝试服务器读档失败，readFileData.data.msg is null");
-                //    callback.Invoke(false);
-                //    return;
-                //}
-                //string msgJson = readFileData.data;
-                //msgJson = msgJson.Replace(@"\", "");
-                ////msgJson = msgJson.Substring(1, msgJson.Length - 1);
-                //Debugger.Log("尝试服务器读档 msgJson：" + msgJson);
-
-                ////List<DataPackageInfo> dataPackageInfos = JsonUtility.FromJson<List<DataPackageInfo>>(msgJson);
-                ////DataPackage dataPackageInfos1 = JsonUtility.FromJson<DataPackage>(msgJson);
-                //Serialization<DataPackageInfo> serialization = JsonUtility.FromJson<Serialization<DataPackageInfo>>(msgJson);
-                ////Debugger.Log("尝试服务器读档 dataPackageInfos：" + dataPackageInfos);
             }
             catch (Exception e)
             {

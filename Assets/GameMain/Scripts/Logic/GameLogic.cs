@@ -76,7 +76,8 @@ public class GameLogic : SingletonByMono<GameLogic>
                 }
                 else
                 {
-                    Debugger.LogError("从服务器读档失败，无法进入场景");
+                    Debugger.LogError("从服务器读档失败，无法进入场景，即将不读档，生成随机场景实例");
+                    this.EnterMainScene();
                 }
             });
         }
@@ -578,8 +579,11 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         if (Input.GetKey(KeyCode.F2))
         {
-            GameObject obj = GameObject.Find("TargetPoint");
-            UpdateEnityInfoTool.GetInstance.JudgeRayObstacle(obj);
+            string testJson =
+                 "{\"test\":\""+System.DateTime.Now.ToString("HHmmss")+"\"}";
+
+            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_SEND,
+                testJson);
         }
 
         if (Input.GetKeyDown(KeyCode.F4))

@@ -31,7 +31,7 @@ public class MainData
     /// <summary>
     /// 是否允许读档
     /// </summary>
-    public static bool CanReadFile { get; set; } = false;
+    public static bool CanReadFile { get; set; } = true;
     /// <summary>
     /// 场景ID 接口参数ID
     /// </summary>

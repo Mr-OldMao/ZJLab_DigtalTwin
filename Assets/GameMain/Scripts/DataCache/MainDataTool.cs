@@ -57,41 +57,6 @@ public class MainDataTool : SingletonByMono<MainDataTool>
             MsgEvent.SendMsg(MsgEventName.InitComplete);
         });
     }
-
-    ///// <summary>
-    ///// h5外部调用，用于初始化场景id
-    ///// </summary>
-    //public void InitMainDataParam(string id, int canReadFile)
-    //{
-    //    MainData.SceneID = id;
-    //    MainData.CanReadFile = canReadFile == 1;
-    //    MainData.ReadingFile = canReadFile == 1;
-    //    Debug.Log("[Unity] InitMainDataParam , SceneID:" + MainData.SceneID + ",CanReadFile:" + MainData.CanReadFile);
-    //    new ReadConfigFile(() =>
-    //    {
-    //        MainData.UseTestData = MainData.ConfigData.CoreConfig?.UseTestData == 1;
-    //        if (!string.IsNullOrEmpty(MainData.ConfigData.CoreConfig?.SceneID))
-    //        {
-    //            MainData.SceneID = MainData.ConfigData.CoreConfig?.SceneID;
-    //            Debugger.Log("change IDScene");
-    //        }
-    //        if (MainData.ConfigData.CoreConfig.SendEntityInfoHZ <= 0)
-    //        {
-    //            MainData.ConfigData.CoreConfig.SendEntityInfoHZ = 3f;
-    //        }
-    //        Debugger.Log("MainDataDisplay   SceneID：" + MainData.SceneID
-    //            + ",UseTestData：" + MainData.UseTestData
-    //            + ",SendEntityInfoHZ：" + MainData.ConfigData.CoreConfig.SendEntityInfoHZ
-    //            + ",Http_IP：" + MainData.ConfigData.HttpConfig.IP
-    //            + ",Http_Port：" + MainData.ConfigData.HttpConfig.Port
-    //            + ",Mqtt_IP：" + MainData.ConfigData.MqttConfig.ClientIP
-    //            + ",Vs_Frame：" + MainData.ConfigData.VideoStreaming.Frame
-    //            + ",Vs_Quality：" + MainData.ConfigData.VideoStreaming.Quality,
-    //            LogTag.Forever);
-    //        MsgEvent.SendMsg(MsgEventName.InitComplete);
-    //    });
-    //}
-
     #region 场景中新增指定实体
     /// <summary>
     /// 生成实体放置到指定位置

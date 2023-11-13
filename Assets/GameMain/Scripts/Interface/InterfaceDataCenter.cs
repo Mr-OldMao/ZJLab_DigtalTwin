@@ -36,7 +36,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     //更新相机视⻆场景图
     private const string TOPIC_CAMERA = "/simulator/thingGraph/camera";
     //接收服务器控制指令
-    private const string TOPIC_SEND = "simulator/send";
+    public const string TOPIC_SEND = "simulator/send";
     //发控制结果给服务器
     public const string TOPIC_RECV = "simulator/recv";
 

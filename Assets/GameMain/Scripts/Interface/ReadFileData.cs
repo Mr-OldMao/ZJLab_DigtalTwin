@@ -11,13 +11,4 @@ public class ReadFileData
 	public string msg;
 	public DataPackage data;
 	public bool succ;
-	//[Serializable]
-	//public class ReadFileData_data
-	//{
-	//	public string dataPackageInfo;
-	//	//public int createTime;
-	//	//public string sceneId;
-	//	//public int id;
-	//	//public string saveTime;
-	//}
 }
