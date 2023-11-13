@@ -191,8 +191,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     {
         string path = "http://10.101.80.74:8080/simulation/history/add";
 
-        ////Test
-        //path = "http://zhrdnk.natappfree.cc/simulation/history/add";
+        //Test
+        //path = "http://6ziygv.natappfree.cc/simulation/history/add";
 
         Debugger.Log("尝试发起线上存档 path:" + path);
         string rawJsonStr = jsonData;
@@ -212,19 +212,24 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// </summary>
     public void ReadFileData(string sceneID, Action<ReadFileData> calllbackSuc = null, Action callbackFail = null)
     {
-        string path = "http://10.101.80.74:8080/simulation/history/getInfo?id=" + sceneID;
+        string path = "http://10.101.80.74:8080/simulation/history/getInfo";
 
-        ////Test
-        //path = "http://zhrdnk.natappfree.cc/simulation/history/getInfo?id=" + sceneID;
+        //Test
+        //path = "http://6ziygv.natappfree.cc/simulation/history/getInfo";
 
         Debugger.Log("尝试读档 " + path);
-        string rawJsonStr = path;
-        MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Get, path, new Dictionary<string, string>(), (string jsonStr) =>
+        //string rawJsonStr = path;
+        MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Get, path, new Dictionary<string, string>()
+        {
+            {
+                "id",sceneID
+            }
+        }, (string jsonStr) =>
         {
             Debugger.Log("读档接口回调 jsonStr:");
             ReadFileData readFileData = JsonUtility.FromJson<ReadFileData>(jsonStr);
             calllbackSuc?.Invoke(readFileData);
-        }, null, rawJsonStr, (m, n) =>
+        }, null, "", (m, n) =>
         {
             Debugger.LogError("读档失败 m:" + m + ",n:" + n);
             callbackFail?.Invoke();

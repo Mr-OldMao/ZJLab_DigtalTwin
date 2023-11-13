@@ -11,7 +11,7 @@
     "CoreConfig": {
         "SceneID": "", 	//唯一标识当前仿真程序，为空则从Web前端获取此ID，不为空则使用当前ID
         "UseTestData":1,	//是否使用测试数据，0-不使用 1-使用
-        "LocalReadFileName":"",	//本地读档的文件名称xxx.json，根据本地json文件来生成房间布局以及物体，为空则不为本地读档，从服务端获取相关数据，不为空则为本地读档，需填写文件名xxx.json(../StreamingAssets/xxx.json)，测试：SaveScene_test_20231110.json
+        "LocalReadFileName":"",	//本地读档的文件名称xxx.json，根据本地json文件来生成房间布局以及物体，为空则不从本地读档，从服务端获取相关数据，不为空则为本地读档，需填写文件名xxx.json(../StreamingAssets/xxx.json)，测试：SaveScene_test_20231110.json
         "SendEntityInfoHZ": 10.0	//发送视觉感知实体信息频率, n秒/次
     },
     "HttpConfig": {
@@ -48,7 +48,7 @@
 
 ### 优先级
 
-若本地读档和服务器读档同时开启时，本地读档优先级更高
+本地读档 >服务器读档
 
 
 
