@@ -172,7 +172,8 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         MsgEvent.RegisterMsgEvent(MsgEventName.GenerateSceneComplete, () =>
         {
-            //LoadUIHintWindows.GetInstance.LoadHintBorderNotBtn(new string[] { "场景生成完毕！" }, 2f);
+            UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show("场景生成完毕！");
+
 
             MainData.IsFirstGenerate = false;
             //原点偏移至场景左下角
@@ -354,6 +355,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                 {
                     m_CurAgainGenerateSceneCount = 0;
                     Debugger.LogError("again generate fail!");
+                    UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams { txtHintContent = "重新生成场景失败，请重试" , colorHintContent = Color.red});
                 }
             }
             else

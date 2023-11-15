@@ -109,34 +109,6 @@ namespace MFramework
                 return default;
             }
             T UIFormLogicScript = GetUIFormLogicScript<T>();
-            if (UIFormLogicScript == null)
-            {
-                //根据当前项目运行模式 获取UI窗体资源实体
-                LoadMode resType = GameLaunch.GetInstance.LaunchModel == LaunchModel.EditorModel ? LoadMode.ResEditor : LoadMode.ResAssetBundleAsset;
-                //Debug.Log("resType " + resType + "," + GameLaunch.GetInstance.LaunchModel + "," + LaunchModel.EditorModel + "," + (GameLaunch.GetInstance.LaunchModel == LaunchModel.EditorModel));
-                //GameObject UIForm = ResManager.LoadSync<GameObject>(uiFormName, resType);
-                string[] uiFormNameSplit = uiFormName.Split(new char[] { '/', '.' });
-                string assetName = uiFormNameSplit[uiFormNameSplit.Length - 2];
-                GameObject UIForm = Instantiate(LoadAssetsByAddressable.GetInstance.GetEntityRes(assetName));
-
-                //修改UI窗体名称
-                UIForm.name = assetName;
-                //设置UI窗体位置
-                RectTransform cloneRect = UIForm.GetComponent<RectTransform>();
-                Transform parent = UIRoot.transform.Find(uILayerType.ToString());
-                cloneRect.SetParent(parent);
-                cloneRect.offsetMax = Vector3.zero;
-                cloneRect.offsetMin = Vector3.zero;
-                cloneRect.anchoredPosition3D = Vector3.zero;
-                cloneRect.anchorMin = Vector2.zero;
-                cloneRect.anchorMax = Vector2.one;
-                cloneRect.pivot = new Vector2(0.5f, 0.5f);
-                cloneRect.localScale = Vector3.one;
-                //为UI窗体添加指定UIFormBase的派生类
-                UIFormLogicScript = UIForm.AddComponent<T>();
-                //缓存至资源池
-                m_DicUIPanelInfoContainer.Add(assetName, new UIFormInfo(UIForm, UIFormLogicScript));
-            }
             UIFormLogicScript.Show();
             return UIFormLogicScript;
         }
@@ -193,15 +165,51 @@ namespace MFramework
         /// <returns></returns>
         public T GetUIFormLogicScript<T>() where T : UIFormBase
         {
+            T UIFormLogicScript = null;
             if (m_DicUIPanelInfoContainer.ContainsKey(typeof(T).Name))
             {
-                return m_DicUIPanelInfoContainer[typeof(T).Name].UIFormLogicScript as T;
+                UIFormLogicScript = m_DicUIPanelInfoContainer[typeof(T).Name].UIFormLogicScript as T;
             }
             else
             {
-                Debug.Log("GetPanelLogic Fail，name：" + typeof(T).Name);
-                return null;
+                UIFormConfig.UIEntityConfigInfo uiEntityConfigInfo = m_UIFormConfig.GetUIFormConfigData<T>();
+                if (uiEntityConfigInfo != null)
+                {
+                    string uiFormName = uiEntityConfigInfo.uiFormEntityName;
+                    UILayerType uILayerType = uiEntityConfigInfo.uiLayerType;
+
+                    //根据当前项目运行模式 获取UI窗体资源实体
+                    LoadMode resType = GameLaunch.GetInstance.LaunchModel == LaunchModel.EditorModel ? LoadMode.ResEditor : LoadMode.ResAssetBundleAsset;
+                    //Debug.Log("resType " + resType + "," + GameLaunch.GetInstance.LaunchModel + "," + LaunchModel.EditorModel + "," + (GameLaunch.GetInstance.LaunchModel == LaunchModel.EditorModel));
+                    //GameObject UIForm = ResManager.LoadSync<GameObject>(uiFormName, resType);
+                    string[] uiFormNameSplit = uiFormName.Split(new char[] { '/', '.' });
+                    string assetName = uiFormNameSplit[uiFormNameSplit.Length - 2];
+                    GameObject UIForm = Instantiate(LoadAssetsByAddressable.GetInstance.GetEntityRes(assetName));
+
+                    //修改UI窗体名称
+                    UIForm.name = assetName;
+                    //设置UI窗体位置
+                    RectTransform cloneRect = UIForm.GetComponent<RectTransform>();
+                    Transform parent = UIRoot.transform.Find(uILayerType.ToString());
+                    cloneRect.SetParent(parent);
+                    cloneRect.offsetMax = Vector3.zero;
+                    cloneRect.offsetMin = Vector3.zero;
+                    cloneRect.anchoredPosition3D = Vector3.zero;
+                    cloneRect.anchorMin = Vector2.zero;
+                    cloneRect.anchorMax = Vector2.one;
+                    cloneRect.pivot = new Vector2(0.5f, 0.5f);
+                    cloneRect.localScale = Vector3.one;
+                    //为UI窗体添加指定UIFormBase的派生类
+                    UIFormLogicScript = UIForm.AddComponent<T>();
+                    //缓存至资源池
+                    m_DicUIPanelInfoContainer.Add(assetName, new UIFormInfo(UIForm, UIFormLogicScript));
+                }
+                else
+                {
+                    Debugger.LogError("GetPanelLogic Fail，name：" + typeof(T).Name);
+                }
             }
+            return UIFormLogicScript;
         }
 
 

@@ -30,7 +30,7 @@ public class UIFormMain : UIFormBase
     [SerializeField]
     private Button btnRobotRelocation;
     [SerializeField]
-    private Button btnRegenerateScene; 
+    private Button btnRegenerateScene;
     [SerializeField]
     private Button btnSave;
     [SerializeField]
@@ -48,7 +48,7 @@ public class UIFormMain : UIFormBase
     public Button BtnRegenerateScene { get => btnRegenerateScene; set => btnRegenerateScene = value; }
     public Button BtnSave { get => btnSave; set => btnSave = value; }
     public Toggle TgeLive { get => tgeLive; set => tgeLive = value; }
-    
+
 
     protected override void Awake()
     {
@@ -107,6 +107,11 @@ public class UIFormMain : UIFormBase
         });
         btnRegenerateScene.onClick.AddListenerCustom(() =>
         {
+            UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
+            {
+                txtHintContent = "正在生成场景，请稍等...",
+                delayCloseUIFormTime = -1
+            });
             GameLogic.GetInstance.GenerateScene();
         });
         btnSave.onClick.AddListenerCustom(() =>
@@ -120,7 +125,7 @@ public class UIFormMain : UIFormBase
 
     }
 
-    public void OnClickStateBtn(ProgramState programState,string id = "")
+    public void OnClickStateBtn(ProgramState programState, string id = "")
     {
         if (string.IsNullOrEmpty(id))
         {
@@ -141,7 +146,7 @@ public class UIFormMain : UIFormBase
             case ProgramState.stop:
                 MsgEvent.SendMsg(MsgEventName.RobotMoveEnd);
                 TaskCenter.GetInstance.CanExecuteTask = false;
-               //FindObjectOfType<AIRobotMove>().
+                //FindObjectOfType<AIRobotMove>().
                 break;
         }
     }
