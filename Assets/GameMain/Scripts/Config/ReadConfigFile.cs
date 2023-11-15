@@ -16,11 +16,24 @@ public class ReadConfigFile
 
     private void Read(Action actionCompleteCallback)
     {
-        FileIOTxt fileIOTxt = new FileIOTxt(Application.streamingAssetsPath, "Config.json");
-        fileIOTxt.ReadWebgl<string>((configJson) =>
-       {
-           MainData.ConfigData = JsonTool.GetInstance.JsonToObjectByLitJson<ConfigData>(configJson);
-           actionCompleteCallback?.Invoke();
-       });
+
+        // FileIOTxt fileIOTxt = new FileIOTxt(Application.streamingAssetsPath, "Config.json");
+        // fileIOTxt.ReadWebgl<string>((configJson) =>
+        //{
+        //    MainData.ConfigData = JsonTool.GetInstance.JsonToObjectByLitJson<ConfigData>(configJson);
+        //    actionCompleteCallback?.Invoke();
+        //});
+
+        string path = "file://" + Application.streamingAssetsPath + "/" + "Config.json";
+        Debugger.Log("Try Read Config ,path: " + path, LogTag.Forever);
+        UnityTool.GetInstance.DownLoadAssetsByURL<string>(path, (configJson) =>
+        {
+            MainData.ConfigData = JsonTool.GetInstance.JsonToObjectByLitJson<ConfigData>(configJson);
+            actionCompleteCallback?.Invoke();
+            Debugger.Log("Read Config suc", LogTag.Forever);
+        }, () =>
+        {
+            Debugger.LogError("Read Config fail");
+        });
     }
 }

@@ -18,6 +18,11 @@ public class MainData
     public static bool UseTestData { get; set; } = true;
 
     /// <summary>
+    /// 是否为首次启动程序创建场景
+    /// </summary>
+    public static bool IsFirstGenerate { get; set; } = true;
+
+    /// <summary>
     /// 配置文件数据
     /// </summary>
     public static ConfigData ConfigData { get; set; }

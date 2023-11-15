@@ -21,13 +21,27 @@ public class GameLogic : SingletonByMono<GameLogic>
     private Coroutine m_CoroutineUpadeteSceneEntityInfo = null;
     private Coroutine m_CoroutineUpadeteCameraEntityInfo = null;
     private GameObject m_Debugger;
+
+    private int m_CurAgainGenerateSceneCount = 0;
     public void Init()
     {
         Debugger.Log("Init GameLogic");
         HideDebugger();
         MsgEvent.RegisterMsgEvent(MsgEventName.InitComplete, InitCompleteEventCallback);
-#if UNITY_EDITOR
-        MainDataTool.GetInstance.InitMainDataParam("test|1");
+
+        string paramStr = string.Empty;
+#if UNITY_EDITOR 
+        paramStr = "test|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";
+        MainDataTool.GetInstance.InitMainDataParam(paramStr);
+
+#else
+#if UNITY_STANDALONE_LINUX
+        paramStr = "test|1";//"LinuxPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";
+        MainDataTool.GetInstance.InitMainDataParam(paramStr);
+#elif UNITY_STANDALONE_WIN
+        paramStr = "test|1";//"WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";
+        MainDataTool.GetInstance.InitMainDataParam(paramStr);
+#endif
 #endif
     }
 
@@ -77,6 +91,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                 else
                 {
                     Debugger.LogError("从服务器读档失败，无法进入场景，即将不读档，生成随机场景实例");
+                    //MainData.CanReadFile = false;
                     this.EnterMainScene();
                 }
             });
@@ -108,7 +123,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         });
 
         //接入网络通信
-        NetworkHTTP();
+        SendNetworkHTTP();
         NetworkMQTT();
 
         //等待ab资源加载完毕，以及http接口获取的场景数据，解析生成场景实体
@@ -133,10 +148,18 @@ public class GameLogic : SingletonByMono<GameLogic>
         }
     }
 
-    private void NetworkHTTP()
+    /// <summary>
+    /// 发送请求获取房间布局信息，物体位置信息
+    /// </summary>
+    /// <param name="callbackSuc"></param>
+    private void SendNetworkHTTP(Action callbackSuc = null)
     {
-        InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.SceneID);
-        InterfaceDataCenter.GetInstance.CacheGetEnvGraph(MainData.SceneID);
+        bool getThingGraph = false;
+        bool getEnvGraph = false;
+
+        InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.SceneID, () => getThingGraph = true);
+        InterfaceDataCenter.GetInstance.CacheGetEnvGraph(MainData.SceneID, () => getEnvGraph = true);
+        UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() => { return getThingGraph && getEnvGraph; }, () => callbackSuc?.Invoke());
     }
 
     private void NetworkMQTT()
@@ -149,11 +172,14 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         MsgEvent.RegisterMsgEvent(MsgEventName.GenerateSceneComplete, () =>
         {
+            //LoadUIHintWindows.GetInstance.LoadHintBorderNotBtn(new string[] { "场景生成完毕！" }, 2f);
+
+            MainData.IsFirstGenerate = false;
             //原点偏移至场景左下角
             Vector2 originOffset = GetOriginOffset();
             staticModelRootNode.transform.position = new Vector3(originOffset.x, 0, originOffset.y);
             //GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.position = new Vector3(originOffset.x, 0, originOffset.y);
-            if (MainData.CanReadFile )
+            if (MainData.CanReadFile)
             {
                 GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.position = Vector3.zero;
                 MainData.ReadingFile = false;
@@ -233,16 +259,30 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     public void GenerateScene()
     {
-        staticModelRootNode.transform.position = Vector3.zero;
-        //生成场景中所有房间和物品
-        GenerateEntity(() =>
+        if (!MainData.IsFirstGenerate)
         {
-            MsgEvent.SendMsg(MsgEventName.GenerateSceneComplete);
-        });
+            SendNetworkHTTP(() =>
+            {
+                //生成场景中所有房间和物品
+                GenerateEntity(() =>
+                {
+                    MsgEvent.SendMsg(MsgEventName.GenerateSceneComplete);
+                });
+            });
+        }
+        else
+        {
+            //生成场景中所有房间和物品
+            GenerateEntity(() =>
+            {
+                MsgEvent.SendMsg(MsgEventName.GenerateSceneComplete);
+            });
+        }
     }
 
     private void GenerateEntity(Action generateCompleteCallback)
     {
+        staticModelRootNode.transform.position = Vector3.zero;
         //写入各个房间之间的邻接关系
         List<RoomBaseInfo> roomBaseInfos = new List<RoomBaseInfo>();
         if (!MainData.CanReadFile)
@@ -306,16 +346,24 @@ public class GameLogic : SingletonByMono<GameLogic>
             if (p == null || k == null)
             {
                 Debugger.Log("generage fail , again generate...");
-                GenerateScene();
+                if (++m_CurAgainGenerateSceneCount < 500)
+                {
+                    GenerateEntity(generateCompleteCallback);
+                }
+                else
+                {
+                    m_CurAgainGenerateSceneCount = 0;
+                    Debugger.LogError("again generate fail!");
+                }
             }
             else
             {
+                m_CurAgainGenerateSceneCount = 0;
                 GenerateRoomBorderModel.GetInstance.GenerateRoomBorder();
                 GenerateRoomItemModel.GetInstance.GenerateRoomItem(k, MainData.getThingGraph.data.items);
                 generateCompleteCallback?.Invoke();
             }
         });
-
     }
 
 
@@ -529,13 +577,14 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         while (true)
         {
-            yield return new WaitForSeconds(MainData.ConfigData.CoreConfig.SendEntityInfoHZ);
+
             UpdateEnityInfoTool.GetInstance.UpdateSceneEntityInfo();
 
             //存档
             DataSave.GetInstance.SaveGetThingGraph_data_items(MainData.CacheSceneItemsInfo);
 
             InterfaceDataCenter.GetInstance.SendMQTTUpdateScenes(MainData.CacheSceneItemsInfo);
+            yield return new WaitForSeconds(MainData.ConfigData.CoreConfig.SendEntityInfoHZ);
         }
     }
     /// <summary>
@@ -580,7 +629,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         if (Input.GetKey(KeyCode.F2))
         {
             string testJson =
-                 "{\"test\":\""+System.DateTime.Now.ToString("HHmmss")+"\"}";
+                 "{\"test\":\"" + System.DateTime.Now.ToString("HHmmss") + "\"}";
 
             NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_SEND,
                 testJson);

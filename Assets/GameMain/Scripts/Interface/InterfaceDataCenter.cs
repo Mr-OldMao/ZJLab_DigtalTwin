@@ -69,7 +69,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// 缓存场景图，物体与房间的邻接关系
     /// </summary>
     /// <param name="id">仿真引擎实例的id号码</param>
-    public void CacheGetThingGraph(string id)
+    public void CacheGetThingGraph(string id, Action callbackSuc = null)
     {
         if (!MainData.CanReadFile)
         {
@@ -79,29 +79,35 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
             {
                 MainData.getThingGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetThingGraph>(jsonStr);
                 Debugger.Log("已获取场景图，缓存物体与房间的邻接关系 jsonStr:" + jsonStr);
-                //存档
-                DataSave.GetInstance.SaveGetThingGraph_data_items(new PostThingGraph
-                {
-                    id = MainData.SceneID,
-                    idScene = MainData.SceneID,
-                    items = MainData.getThingGraph.data.items
-                });
+                ////存档
+                //DataSave.GetInstance.SaveGetThingGraph_data_items(new PostThingGraph
+                //{
+                //    id = MainData.SceneID,
+                //    idScene = MainData.SceneID,
+                //    items = MainData.getThingGraph.data.items
+                //});
+                callbackSuc?.Invoke();
             }, null, rawJsonStr);
         }
         else
         {
             //读档
             PostThingGraph postThingGraph = DataRead.GetInstance.ReadGetThingGraph_data_items();
-            MainData.getThingGraph = new GetThingGraph
+            if (postThingGraph != null)
             {
-                data = new GetThingGraph_data
+                MainData.getThingGraph = new GetThingGraph
                 {
-                    items = postThingGraph.items
-                }
-            };
+                    data = new GetThingGraph_data
+                    {
+                        items = postThingGraph.items
+                    }
+                };
+            }
+            else
+            {
+                Debugger.LogError("读档失败 postThingGraph is null");
+            }
         }
-
-
     }
 
     /// <summary>
@@ -128,7 +134,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// 缓存环境场景图,房间与房间的邻接关系
     /// </summary>
     /// <param name="id">仿真引擎实例的id号码</param>
-    public void CacheGetEnvGraph(string id)
+    public void CacheGetEnvGraph(string id,Action callbackSuc = null)
     {
         string rawJsonStr = "{\"id\":\"" + id + "\"}";
         Debugger.Log("缓存环境场景图,房间与房间的邻接关系 " + rawJsonStr);
@@ -150,6 +156,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     items = MainData.getEnvGraph.data.items,
                     idScene = MainData.SceneID
                 });
+                callbackSuc?.Invoke();
             }, null, rawJsonStr);
         }
         else
