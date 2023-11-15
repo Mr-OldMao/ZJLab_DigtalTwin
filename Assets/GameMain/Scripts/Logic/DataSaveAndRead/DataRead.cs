@@ -79,7 +79,7 @@ public class DataRead : SingletonByMono<DataRead>
         //bool parseSuc = ParseJsonData(jsonData);
         //callback(parseSuc);
 
-        string path = rootPath + "/" + fileName;
+        string path = "file://" + rootPath + "/" + fileName;
         UnityTool.GetInstance.DownLoadAssetsByURL<string>(path, (jsonData) =>
         {
             bool parseSuc = TryParseLocalJsonData(jsonData);
