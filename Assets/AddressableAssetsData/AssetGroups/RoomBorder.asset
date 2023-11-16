@@ -17,16 +17,6 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: fe4526e47d9b61c42ae3fe6f745dae67
   m_SerializeEntries:
-  - m_GUID: 905a52fed825fd444a4a05b8bbe0e535
-    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallX.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - RoomBorderLable
-  - m_GUID: f1455f6b87b0ddf46a4233f901e772f4
-    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallY.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - RoomBorderLable
   - m_GUID: 0bced528cb33967439891443073b85d7
     m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/DoorX.prefab
     m_ReadOnly: 0
@@ -42,16 +32,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - RoomBorderLable
-  - m_GUID: 1c0591807fc5cb84ea03375045b26154
-    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallSmallX.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - RoomBorderLable
-  - m_GUID: 46e75d9fca0bc834aa006f7f7f8f9702
-    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallSmallY.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - RoomBorderLable
   - m_GUID: 5233f5579fd160446b57b03ede12951c
     m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallPrefab.prefab
     m_ReadOnly: 0
@@ -59,6 +39,11 @@ MonoBehaviour:
     - RoomBorderLable
   - m_GUID: 75da6b3d474d7cb4485cd58584b3d3b0
     m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/WallSmallPrefab.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - RoomBorderLable
+  - m_GUID: 7c2ff658a777fec4bbc4da22c8203ba2
+    m_Address: Assets/GameMain/AB/Prefab/Entity/RoomBorder/Ceiling.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - RoomBorderLable

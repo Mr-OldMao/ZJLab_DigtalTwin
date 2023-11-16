@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: StudyRoom_SmallWall
+  m_Name: SmallWall_2
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -38,18 +38,18 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 0.38, y: 0.334}
-        m_Offset: {x: 0, y: 0}
+        m_Scale: {x: 0.14, y: 0.24}
+        m_Offset: {x: 0.4, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 2a9ab2a44f7bd204d95f86103109e367, type: 3}
-        m_Scale: {x: 0.38, y: 0.334}
-        m_Offset: {x: 0, y: 0}
+        m_Texture: {fileID: 2800000, guid: 22a35c8e036c2ec4a83f95734ccb2ea9, type: 3}
+        m_Scale: {x: 0.14, y: 0.24}
+        m_Offset: {x: 0.4, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
-        m_Texture: {fileID: 2800000, guid: ee7c2c8a60a7ac94eba1624394cc1c83, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9631c0c4841ea7b40bb880c09326b154, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
@@ -63,11 +63,11 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _GlossMapScale: 0.58
-    - _Glossiness: 0.57
+    - _Glossiness: 0.186
     - _GlossyReflections: 1
-    - _Metallic: 0.36
+    - _Metallic: 0.25
     - _Mode: 0
-    - _OcclusionStrength: 0.144
+    - _OcclusionStrength: 0.09
     - _Parallax: 0.005
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -75,6 +75,6 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.8666667, g: 0.8666667, b: 0.8666667, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

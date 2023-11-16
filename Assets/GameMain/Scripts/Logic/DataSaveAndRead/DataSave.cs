@@ -5,6 +5,7 @@ using static GenerateRoomData;
 using MFramework;
 using System;
 using static GetEnvGraph;
+using static DataRead;
 /// <summary>
 /// 标题：存档
 /// 功能：存储当前场景中必要的数据
@@ -23,9 +24,12 @@ public class DataSave : SingletonByMono<DataSave>
     [SerializeField]
     public PostThingGraph m_PostThingGraph;
     [SerializeField]
-    private GetEnvGraph_data m_GetEnvGraphData;
-    //[SerializeField]
-    //public List<NewRoomInfo> newRoomInfos;
+    private GetEnvGraph_data m_GetEnvGraphData; 
+    [SerializeField]
+    private List<RoomMatData> m_ListRoomMatData;
+
+
+
 
     private List<DataPackageInfo> m_DpList = new List<DataPackageInfo>();
     /// <summary>
@@ -49,6 +53,8 @@ public class DataSave : SingletonByMono<DataSave>
             SerializeData("m_BorderEntityDatasJson", m_BorderEntityDatas);
             SerializeData("m_PostThingGraphJson", m_PostThingGraph);
             SerializeData("m_GetEnvGraphDataJson", m_GetEnvGraphData);
+            //SerializeData("m_ListRoomMatData", m_ListRoomMatData);
+            
 
             string targetJson = JsonUtility.ToJson(dataPackage, false);
             res = !string.IsNullOrEmpty(targetJson);
@@ -116,6 +122,14 @@ public class DataSave : SingletonByMono<DataSave>
     public void SaveGetEnvGraph_data(GetEnvGraph_data getEnvGraph_Data)
     {
         m_GetEnvGraphData = getEnvGraph_Data;
+    }
+
+    /// <summary>
+    /// 保存所有房间的地板、墙壁材质数据
+    /// </summary>
+    public void SaveGetThingGraph_data_items(List<RoomMatData> listRoomMatData)
+    {
+        m_ListRoomMatData = listRoomMatData;
     }
 }
 

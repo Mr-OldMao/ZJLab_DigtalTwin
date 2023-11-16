@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using MFramework;
 using System;
+using static DataRead;
+using static GenerateRoomBorderModel;
 
 /// <summary>
 /// 标题：房间边界模型(墙壁、门、地砖)自动生成器
@@ -127,11 +129,15 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
     public void GenerateRoomBorder()
     {
         ClearRoom();
-
+        List<RoomMatData> roomMatDatas = DataRead.GetInstance.ReadRoomMatData();
+        int matID;
+        string matKey;
+        Material mat;
         for (int i = 0; i < GenerateRoomData.GetInstance.listRoomBuilderInfo.Count; i++)
         {
             BorderEntityData borderEntityData = GenerateRoomData.GetInstance.listRoomBuilderInfo[i];
             GameObject entityModel = null;
+
             switch (borderEntityData.entityModelType)
             {
                 case EntityModelType.Null:
@@ -145,8 +151,12 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
                         entityModel.transform.GetChild(j).SetActive(isTrue);
                         if (isTrue)
                         {
-                            string reskey = borderEntityData.listRoomType[0].ToString() + "_Wall";
-                            Material mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(reskey, false);
+                            //string reskey = borderEntityData.listRoomType[0].ToString() + "_Wall";
+                            //Material mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(reskey, false);
+
+                            matID = GetRoomMatID(borderEntityData.listRoomType[0], borderEntityData.entityModelType, ref roomMatDatas);
+                            matKey = "Wall_" + matID;
+                            mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(matKey, false);
                             entityModel.transform.GetChild(j).GetComponentInChildren<MeshRenderer>().material = mat;
                         }
                     }
@@ -159,8 +169,11 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
                         entityModel.transform.GetChild(j).SetActive(isTrue);
                         if (isTrue)
                         {
-                            string reskey = borderEntityData.listRoomType[0].ToString() + "_SmallWall";
-                            Material mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(reskey, false);
+                            //string reskey = borderEntityData.listRoomType[0].ToString() + "_SmallWall";
+                            //Material mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(reskey, false);
+                            matID = GetRoomMatID(borderEntityData.listRoomType[0], borderEntityData.entityModelType, ref roomMatDatas);
+                            matKey = "SmallWall_" + matID;
+                            mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(matKey, false);
                             entityModel.transform.GetChild(j).GetComponentInChildren<MeshRenderer>().material = mat;
                         }
                     }
@@ -171,9 +184,13 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
                 case EntityModelType.Floor:
 
                     entityModel = LoadAssetsByAddressable.GetInstance.GetEntityRes("Floor");
-                    string entityResName = "Floor_" + borderEntityData.listRoomType[0].ToString();
-                    Material floorMat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(entityResName,false);
-                    entityModel.GetComponentInChildren<MeshRenderer>().material = floorMat;
+                    //string entityResName = "Floor_" + borderEntityData.listRoomType[0].ToString();
+                    //Material mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(entityResName, false);
+
+                    matID = GetRoomMatID(borderEntityData.listRoomType[0], borderEntityData.entityModelType, ref roomMatDatas);
+                    matKey = "Floor_" + matID;
+                    mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(matKey, false);
+                    entityModel.GetComponentInChildren<MeshRenderer>().material = mat;
                     break;
                 default:
                     break;
@@ -243,6 +260,75 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
 
     }
 
+    /// <summary>
+    /// 获取房间的地板、墙壁材质ID
+    /// </summary>
+    /// <param name="roomType"></param>
+    /// <param name="entityModelType"></param>
+    /// <param name="roomMatDatas"></param>
+    /// <returns></returns>
+    private int GetRoomMatID(RoomType roomType, EntityModelType entityModelType, ref List<RoomMatData> roomMatDatas)
+    {
+        //0-随机材质 1-10指定材质
+        int curRoomMatIndex = 0;
+        int maxID = 6;
+        if (roomMatDatas == null)
+        {
+            roomMatDatas = new List<RoomMatData>();
+        }
+        RoomMatData roomMatData = roomMatDatas?.Find((p) => { return p.roomType == roomType; });
+        switch (entityModelType)
+        {
+            case EntityModelType.Wall:
+            case EntityModelType.SmallWall:
+                if (roomMatData == null)
+                {
+                    Debugger.LogError("未找到该房间类型的墙壁材质 roomType:" + roomType);
+                    curRoomMatIndex = UnityEngine.Random.Range(1, maxID + 1);
+                    roomMatDatas.Add(new RoomMatData { roomType = roomType, matIDWall = curRoomMatIndex, matIDFloor = -1 });
+                }
+                else
+                {
+                    if (roomMatData?.matIDWall <= 0)
+                    {
+                        curRoomMatIndex = UnityEngine.Random.Range(1, maxID + 1);
+                        roomMatData.matIDWall = curRoomMatIndex;
+                    }
+                    else
+                    {
+                        curRoomMatIndex = roomMatData.matIDWall;
+                    }
+                }
+                break;
+            case EntityModelType.Floor:
+                if (roomMatData == null)
+                {
+                    Debugger.LogError("未找到该房间类型的地板材质 roomType:" + roomType);
+                    curRoomMatIndex = UnityEngine.Random.Range(1, maxID + 1);
+                    roomMatDatas.Add(new RoomMatData { roomType = roomType, matIDWall = -1, matIDFloor = curRoomMatIndex });
+                }
+                else
+                {
+                    if (roomMatData?.matIDFloor <= 0)
+                    {
+                        curRoomMatIndex = UnityEngine.Random.Range(1, maxID + 1);
+                        roomMatData.matIDFloor = curRoomMatIndex;
+                    }
+                    else
+                    {
+                        curRoomMatIndex = roomMatData.matIDFloor;
+                    }
+                }
+                break;
+            default:
+                Debugger.LogError("entityModelType is border , entityModelType:" + entityModelType);
+                break;
+        }
+
+
+        return curRoomMatIndex;
+
+    }
 
     private GameObject GetRoomRootNode(RoomType roomType)
     {

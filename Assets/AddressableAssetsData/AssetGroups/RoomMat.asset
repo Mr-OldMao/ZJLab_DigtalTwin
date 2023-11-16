@@ -17,93 +17,93 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: d9583b42bad815342950ee84ae7edfb4
   m_SerializeEntries:
-  - m_GUID: 304c81db729c1134e987e3799d9e3034
-    m_Address: Assets/GameMain/AB/Material/StorageRoomMat.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: 172efcdbd5a9b684cafeca3fffed2af5
-    m_Address: Assets/GameMain/AB/Material/BedRoomMat.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: a7c1649fc4936074e93a78483a10b043
-    m_Address: Assets/GameMain/AB/Material/KitchenRoomMat.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: bbc7ce67342de9f409746c53624c9bf8
-    m_Address: Assets/GameMain/AB/Material/LivingRoomMat.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: 62d7c59733a501943927569a9b98337f
-    m_Address: Assets/GameMain/AB/Material/BathRoomMat.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: 70b4cb75aa18caf469eddb12eb336890
-    m_Address: Assets/GameMain/AB/Material/StudyRoomMat.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: f34c1ed1c621b5f4e81867d8d9ef8e94
-    m_Address: Assets/GameMain/AB/Material/StudyRoom_SmallWall.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: 84bbb666f5e82764d9064f14eb444686
-    m_Address: Assets/GameMain/AB/Material/StorageRoom_SmallWall.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: 948127c5028cf0b4d8e8c32f4d252db8
-    m_Address: Assets/GameMain/AB/Material/LivingRoom_SmallWall.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: 63b21bc710a3cf049ab2c1eeec1058a7
-    m_Address: Assets/GameMain/AB/Material/KitchenRoom_SmallWall.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: 3229ded507c79aa4b8dae688cf01cc1a
-    m_Address: Assets/GameMain/AB/Material/BedRoom_SmallWall.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: b8c620ff14a4ce54ea4577d70557a448
-    m_Address: Assets/GameMain/AB/Material/BathRoom_SmallWall.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: 04f8d2e92caa2ae4eb1950707e666a67
-    m_Address: Assets/GameMain/AB/Material/Floor_KitchenRoom.mat
+  - m_GUID: 008b244219960444eb631d536d905871
+    m_Address: Assets/GameMain/AB/Material/Floor_2.mat
     m_ReadOnly: 0
     m_SerializedLabels:
     - Mat
   - m_GUID: 9173e94633dd52d4a9c895e34f3c46fd
-    m_Address: Assets/GameMain/AB/Material/Floor_StorageRoom.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: 008b244219960444eb631d536d905871
-    m_Address: Assets/GameMain/AB/Material/Floor_BedRoom.mat
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - Mat
-  - m_GUID: 80726a2d8bb07a24fb8d2ff6dff5ed4e
-    m_Address: Assets/GameMain/AB/Material/Floor_StudyRoom.mat
+    m_Address: Assets/GameMain/AB/Material/Floor_5.mat
     m_ReadOnly: 0
     m_SerializedLabels:
     - Mat
   - m_GUID: 64e80efe7105f4646a499bfe9e511a4e
-    m_Address: Assets/GameMain/AB/Material/Floor_LivingRoom.mat
+    m_Address: Assets/GameMain/AB/Material/Floor_4.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: b8c620ff14a4ce54ea4577d70557a448
+    m_Address: Assets/GameMain/AB/Material/SmallWall_1.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 3229ded507c79aa4b8dae688cf01cc1a
+    m_Address: Assets/GameMain/AB/Material/SmallWall_2.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 948127c5028cf0b4d8e8c32f4d252db8
+    m_Address: Assets/GameMain/AB/Material/SmallWall_4.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 84bbb666f5e82764d9064f14eb444686
+    m_Address: Assets/GameMain/AB/Material/SmallWall_5.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: f34c1ed1c621b5f4e81867d8d9ef8e94
+    m_Address: Assets/GameMain/AB/Material/SmallWall_6.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 70b4cb75aa18caf469eddb12eb336890
+    m_Address: Assets/GameMain/AB/Material/Wall_6.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 80726a2d8bb07a24fb8d2ff6dff5ed4e
+    m_Address: Assets/GameMain/AB/Material/Floor_6.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 62d7c59733a501943927569a9b98337f
+    m_Address: Assets/GameMain/AB/Material/Wall_1.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: bbc7ce67342de9f409746c53624c9bf8
+    m_Address: Assets/GameMain/AB/Material/Wall_4.mat
     m_ReadOnly: 0
     m_SerializedLabels:
     - Mat
   - m_GUID: 4a2f2dd70ebb2d04cb6668366e546085
-    m_Address: Assets/GameMain/AB/Material/Floor_BathRoom.mat
+    m_Address: Assets/GameMain/AB/Material/Floor_1.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 172efcdbd5a9b684cafeca3fffed2af5
+    m_Address: Assets/GameMain/AB/Material/Wall_2.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 304c81db729c1134e987e3799d9e3034
+    m_Address: Assets/GameMain/AB/Material/Wall_5.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 63b21bc710a3cf049ab2c1eeec1058a7
+    m_Address: Assets/GameMain/AB/Material/SmallWall_3.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: a7c1649fc4936074e93a78483a10b043
+    m_Address: Assets/GameMain/AB/Material/Wall_3.mat
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Mat
+  - m_GUID: 04f8d2e92caa2ae4eb1950707e666a67
+    m_Address: Assets/GameMain/AB/Material/Floor_3.mat
     m_ReadOnly: 0
     m_SerializedLabels:
     - Mat

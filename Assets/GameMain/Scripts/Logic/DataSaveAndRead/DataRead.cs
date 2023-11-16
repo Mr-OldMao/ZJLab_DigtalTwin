@@ -18,10 +18,13 @@ public class DataRead : SingletonByMono<DataRead>
 {
     private List<RoomInfo> m_RoomInfos;
     private List<RoomBaseInfo> m_RoomBaseInfos;
-
     private List<BorderEntityData> m_BorderEntityDatas;
     private PostThingGraph m_PostThingGraph;
     private GetEnvGraph_data m_GetEnvGraphData;
+    private List<RoomMatData> m_ListRoomMatData;
+
+
+
     /// <summary>
     /// 预读取所有数据 根据服务器场景ID
     /// </summary>
@@ -51,6 +54,16 @@ public class DataRead : SingletonByMono<DataRead>
                     ParseDataPackage(dataPackage);
                     Debugger.Log("解析服务器读档成功");
                     callback.Invoke(true);
+                    //if (dataPackage.dataPackageInfo.TargetToList().Count == 6)
+                    //{
+                    //    Debugger.Log("解析服务器读档成功");
+                    //    callback.Invoke(true);
+                    //}
+                    //else
+                    //{
+                    //    Debugger.LogError("服务器读档失败 数据数量有误：" + dataPackage.dataPackageInfo.TargetToList().Count);
+                    //    callback.Invoke(false);
+                    //}
                 }
                 catch (Exception e)
                 {
@@ -132,7 +145,6 @@ public class DataRead : SingletonByMono<DataRead>
                     Serialization<BorderEntityData> borderEntityData = JsonUtility.FromJson<Serialization<BorderEntityData>>(item.json);
                     m_BorderEntityDatas = borderEntityData.TargetToList();
                     break;
-
                 case "m_PostThingGraphJson":
                     Serialization<PostThingGraph> postThingGraph = JsonUtility.FromJson<Serialization<PostThingGraph>>(item.json);
                     m_PostThingGraph = postThingGraph.Target();
@@ -140,6 +152,10 @@ public class DataRead : SingletonByMono<DataRead>
                 case "m_GetEnvGraphDataJson":
                     Serialization<GetEnvGraph_data> getEnvGraph_data = JsonUtility.FromJson<Serialization<GetEnvGraph_data>>(item.json);
                     m_GetEnvGraphData = getEnvGraph_data.Target();
+                    break;
+                case "m_ListRoomMatData":
+                    Serialization<RoomMatData> listRoomMatData = JsonUtility.FromJson<Serialization<RoomMatData>>(item.json);
+                    m_ListRoomMatData = listRoomMatData.TargetToList();
                     break;
                 default:
                     Debugger.Log("key dont , key ：" + item.key);
@@ -182,5 +198,24 @@ public class DataRead : SingletonByMono<DataRead>
         return m_GetEnvGraphData;
     }
 
+    /// <summary>
+    /// 房间的地板、墙壁材质数据
+    /// </summary>
+    /// <returns></returns>
+    public List<RoomMatData> ReadRoomMatData()
+    {
+        return m_ListRoomMatData;
+    }
+
+
+    /// <summary>
+    /// 房间的地板、墙壁材质数据
+    /// </summary>
+    public class RoomMatData
+    {
+        public RoomType roomType;
+        public int matIDFloor;
+        public int matIDWall;
+    }
 
 }
