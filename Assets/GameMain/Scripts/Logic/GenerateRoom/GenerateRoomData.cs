@@ -418,6 +418,13 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         listRoomType = new List<RoomType> { roomInfo.roomType },
                         entityModelType = EntityModelType.Floor
                     });
+                    listRoomBuilderInfo.Add(new BorderEntityData
+                    {
+                        entityAxis = 0,
+                        pos = pos,
+                        listRoomType = new List<RoomType> { roomInfo.roomType },
+                        entityModelType = EntityModelType.Ceiling
+                    });
                 }
             }
         }

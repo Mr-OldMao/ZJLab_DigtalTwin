@@ -137,13 +137,11 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
         {
             BorderEntityData borderEntityData = GenerateRoomData.GetInstance.listRoomBuilderInfo[i];
             GameObject entityModel = null;
-
             switch (borderEntityData.entityModelType)
             {
                 case EntityModelType.Null:
                     break;
                 case EntityModelType.Wall:
-                    //entityModel = borderEntityData.entityAxis == 0 ? LoadAssetsByAddressable.GetInstance.GetEntityRes("WallX") : LoadAssetsByAddressable.GetInstance.GetEntityRes("WallY");
                     entityModel = LoadAssetsByAddressable.GetInstance.GetEntityRes("WallPrefab");
                     for (int j = 0; j < entityModel.transform.childCount; j++)
                     {
@@ -151,9 +149,6 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
                         entityModel.transform.GetChild(j).SetActive(isTrue);
                         if (isTrue)
                         {
-                            //string reskey = borderEntityData.listRoomType[0].ToString() + "_Wall";
-                            //Material mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(reskey, false);
-
                             matID = GetRoomMatID(borderEntityData.listRoomType[0], borderEntityData.entityModelType, ref roomMatDatas);
                             matKey = "Wall_" + matID;
                             mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(matKey, false);
@@ -169,8 +164,6 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
                         entityModel.transform.GetChild(j).SetActive(isTrue);
                         if (isTrue)
                         {
-                            //string reskey = borderEntityData.listRoomType[0].ToString() + "_SmallWall";
-                            //Material mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(reskey, false);
                             matID = GetRoomMatID(borderEntityData.listRoomType[0], borderEntityData.entityModelType, ref roomMatDatas);
                             matKey = "SmallWall_" + matID;
                             mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(matKey, false);
@@ -182,15 +175,14 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
                     entityModel = borderEntityData.entityAxis == 0 ? LoadAssetsByAddressable.GetInstance.GetEntityRes("DoorX") : LoadAssetsByAddressable.GetInstance.GetEntityRes("DoorY");
                     break;
                 case EntityModelType.Floor:
-
                     entityModel = LoadAssetsByAddressable.GetInstance.GetEntityRes("Floor");
-                    //string entityResName = "Floor_" + borderEntityData.listRoomType[0].ToString();
-                    //Material mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(entityResName, false);
-
                     matID = GetRoomMatID(borderEntityData.listRoomType[0], borderEntityData.entityModelType, ref roomMatDatas);
                     matKey = "Floor_" + matID;
                     mat = LoadAssetsByAddressable.GetInstance.GetRes<Material>(matKey, false);
                     entityModel.GetComponentInChildren<MeshRenderer>().material = mat;
+                    break;
+                case EntityModelType.Ceiling:
+                    entityModel = LoadAssetsByAddressable.GetInstance.GetEntityRes("Ceiling");
                     break;
                 default:
                     break;
@@ -413,5 +405,7 @@ public enum EntityModelType
     SmallWall,
     Door,
     //地砖
-    Floor
+    Floor,
+    //天花板
+    Ceiling
 }
