@@ -24,7 +24,10 @@ public class ReadConfigFile
         //    actionCompleteCallback?.Invoke();
         //});
 
-        string path = "file://" + Application.streamingAssetsPath + "/" + "Config.json";
+        string path =  Application.streamingAssetsPath + "/" + "Config.json";
+#if !UNITY_WEBGL
+        path = "file://" + path;
+#endif
         Debugger.Log("Try Read Config ,path: " + path, LogTag.Forever);
         UnityTool.GetInstance.DownLoadAssetsByURL<string>(path, (configJson) =>
         {
