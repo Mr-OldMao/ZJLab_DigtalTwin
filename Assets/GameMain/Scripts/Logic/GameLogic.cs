@@ -31,7 +31,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "test|0";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";
+        paramStr = "Simulator:1700126538734|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 
 #else
@@ -91,14 +91,25 @@ public class GameLogic : SingletonByMono<GameLogic>
                 else
                 {
                     Debugger.LogError("从服务器读档失败，无法进入场景，即将不读档，生成随机场景实例");
-                    //MainData.CanReadFile = false;
-                    this.EnterMainScene();
+                    MainData.CanReadFile = false;
+                    MsgEvent.SendMsg(MsgEventName.InitComplete);
+
+                    //this.EnterMainScene();
                 }
             });
         }
         else
         {
             Debugger.Log("不读档，生成随机场景实例", LogTag.Forever);
+            Debugger.Log("MainDataDisplayAA   SceneID：" + MainData.SceneID
+                          + ",UseTestData：" + MainData.UseTestData
+                          + ",SendEntityInfoHZ：" + MainData.ConfigData.CoreConfig.SendEntityInfoHZ
+                          + ",Http_IP：" + MainData.ConfigData.HttpConfig.IP
+                          + ",Http_Port：" + MainData.ConfigData.HttpConfig.Port
+                          + ",Mqtt_IP：" + MainData.ConfigData.MqttConfig.ClientIP
+                          + ",Vs_Frame：" + MainData.ConfigData.VideoStreaming.Frame
+                          + ",Vs_Quality：" + MainData.ConfigData.VideoStreaming.Quality,
+                          LogTag.Forever);
             this.EnterMainScene();
         }
     }
@@ -157,7 +168,10 @@ public class GameLogic : SingletonByMono<GameLogic>
         bool getThingGraph = false;
         bool getEnvGraph = false;
 
-        InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.SceneID, () => getThingGraph = true);
+        InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.SceneID, () => getThingGraph = true, () => {
+            MainData.CanReadFile = false;
+            MsgEvent.SendMsg(MsgEventName.InitComplete);
+        });
         InterfaceDataCenter.GetInstance.CacheGetEnvGraph(MainData.SceneID, () => getEnvGraph = true);
         UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() => { return getThingGraph && getEnvGraph; }, () => callbackSuc?.Invoke());
     }

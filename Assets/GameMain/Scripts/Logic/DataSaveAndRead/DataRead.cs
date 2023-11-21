@@ -48,6 +48,12 @@ public class DataRead : SingletonByMono<DataRead>
                     callback.Invoke(false);
                     return;
                 }
+                if (readFileData?.data.dataPackageInfo == null)
+                {
+                    Debugger.LogError("尝试服务器读档失败，readFileData.data.dataPackageInfo is null");
+                    callback.Invoke(false);
+                    return;
+                }
                 DataPackage dataPackage = readFileData?.data;
                 try
                 {
@@ -131,7 +137,10 @@ public class DataRead : SingletonByMono<DataRead>
 
     private void ParseDataPackage(DataPackage dataPackage)
     {
-        MainData.SceneID = dataPackage.sceneID;
+        if (!string.IsNullOrEmpty(dataPackage.sceneID))
+        {
+            MainData.SceneID = dataPackage.sceneID;
+        }
         foreach (var item in dataPackage.dataPackageInfo.TargetToList())
         {
             switch (item.key)

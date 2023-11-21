@@ -69,7 +69,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// 缓存场景图，物体与房间的邻接关系
     /// </summary>
     /// <param name="id">仿真引擎实例的id号码</param>
-    public void CacheGetThingGraph(string id, Action callbackSuc = null)
+    public void CacheGetThingGraph(string id, Action callbackSuc = null,Action callbakcFail = null)
     {
         if (!MainData.CanReadFile)
         {
@@ -106,6 +106,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
             else
             {
                 Debugger.LogError("读档失败 postThingGraph is null");
+                callbakcFail?.Invoke();
             }
         }
     }
@@ -134,7 +135,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// 缓存环境场景图,房间与房间的邻接关系
     /// </summary>
     /// <param name="id">仿真引擎实例的id号码</param>
-    public void CacheGetEnvGraph(string id, Action callbackSuc = null)
+    public void CacheGetEnvGraph(string id, Action callbackSuc = null,Action callbackFail = null)
     {
         string rawJsonStr = "{\"id\":\"" + id + "\"}";
         Debugger.Log("缓存环境场景图,房间与房间的邻接关系 " + rawJsonStr);
@@ -163,11 +164,19 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         {
             //读档
             GetEnvGraph_data getEnvGraph_Data = DataRead.GetInstance.ReadGetEnvGraph_data();
-            MainData.getEnvGraph = new GetEnvGraph
+            if (getEnvGraph_Data != null)
             {
-                data = getEnvGraph_Data,
-                message = "读档"
-            };
+                MainData.getEnvGraph = new GetEnvGraph
+                {
+                    data = getEnvGraph_Data,
+                    message = "读档"
+                };
+            }
+            else
+            {
+                Debugger.LogError("读档失败 GetEnvGraph_data is null");
+                callbackFail?.Invoke();
+            }
         }
     }
 
@@ -233,9 +242,18 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
             }
         }, (string jsonStr) =>
         {
-            Debugger.Log("读档接口回调 jsonStr:");
+            Debugger.Log("读档接口回调 jsonStr:" + jsonStr);
             ReadFileData readFileData = JsonUtility.FromJson<ReadFileData>(jsonStr);
-            calllbackSuc?.Invoke(readFileData);
+            if (readFileData?.data?.dataPackageInfo?.TargetToList()?.Count > 0 || 
+            (readFileData?.data?.dataPackageInfo?.Target()!= null && !string.IsNullOrEmpty(readFileData?.data?.dataPackageInfo?.Target().json)) )
+            {
+                calllbackSuc?.Invoke(readFileData);
+            }
+            else
+            {
+                Debugger.LogError("读档失败 未找到存档信息 sceneID："+ sceneID);
+                callbackFail?.Invoke();
+            }
         }, null, "", (m, n) =>
         {
             Debugger.LogError("读档失败 m:" + m + ",n:" + n);
@@ -276,7 +294,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         {
             clientIP = MainData.ConfigData?.MqttConfig.ClientIP, //"10.5.24.28",
             clientPort = NetworkMqtt.GetInstance.IsWebgl ? 8083 : 1883,
-            clientID = MainData.SceneID
+            clientID = MainData.SceneID + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss")
         });
         //监听消息回调
         NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
