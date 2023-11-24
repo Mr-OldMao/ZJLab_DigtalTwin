@@ -85,6 +85,7 @@ public class CameraFreeMove : MonoBehaviour
             if (Distance >= MouseZoomMin && Distance <= MouseZoomMax)
             {
                 Distance = Input.GetAxis("Mouse ScrollWheel") * MouseWheelSensitivity;
+                Debug.Log("Distance " + Distance);
             }
             //if (Distance < MouseZoomMin)
             //{
@@ -109,7 +110,7 @@ public class CameraFreeMove : MonoBehaviour
             cameraZ = transform.forward;
 
             initScreenPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetOnScreenPosition.z);
-            Debugger.Log("downOnce");
+            Debugger.Log("鼠标中间按下：" + initScreenPos);
 
             //targetOnScreenPosition.z为目标物体到相机xmidbuttonDownPositiony平面的法线距离
             targetOnScreenPosition = Camera.main.WorldToScreenPoint(transform.position);
@@ -119,7 +120,7 @@ public class CameraFreeMove : MonoBehaviour
         if (Input.GetMouseButton(2))
         {
             curScreenPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetOnScreenPosition.z);
-
+            Debugger.Log("鼠标中间持续按下，curScreenPos：" + curScreenPos + "，initScreenPos：" + initScreenPos);
             if (JudegTargetPos(initPosition - 0.01f * ((curScreenPos.x - initScreenPos.x) * cameraX + (curScreenPos.y - initScreenPos.y) * cameraY)))
             {
                 //0.01这个系数是控制平移的速度，要根据相机和目标物体的distance来灵活选择
@@ -141,7 +142,95 @@ public class CameraFreeMove : MonoBehaviour
             Debugger.Log("upOnce");
         }
 
+        InputKey();
     }
+
+    private int m_KeyACount = 0;
+    private int m_KeyDCount = 0;
+    /// <summary>
+    /// 键盘横向移动数据
+    /// </summary>
+    private float m_MoveSpeedInputAD = 20f;
+    /// <summary>
+    /// 键盘WASD移动相机
+    /// </summary>
+    private void InputKey()
+    {
+        if (Input.GetKey(KeyCode.W))
+        {
+            Distance = 0.5f;
+            if (JudegTargetPos(storeRotation * new Vector3(0.0F, 0.0F, Distance) + transform.position))
+            {
+                transform.position = storeRotation * new Vector3(0.0F, 0.0F, Distance) + transform.position;
+            }
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            Distance = -0.5f;
+            if (JudegTargetPos(storeRotation * new Vector3(0.0F, 0.0F, Distance) + transform.position))
+            {
+                transform.position = storeRotation * new Vector3(0.0F, 0.0F, Distance) + transform.position;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            cameraX = transform.right;
+            cameraY = transform.up;
+            cameraZ = transform.forward;
+
+            initScreenPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetOnScreenPosition.z);
+            Debugger.Log("键盘A键按下：" + initScreenPos);
+
+            //targetOnScreenPosition.z为目标物体到相机xmidbuttonDownPositiony平面的法线距离
+            targetOnScreenPosition = Camera.main.WorldToScreenPoint(transform.position);
+            initPosition = transform.position;
+
+            m_KeyACount = 0;
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            m_KeyACount++;
+            //curScreenPos = new Vector3(Input.mousePosition.x - (m_KeyACount * 10f), Input.mousePosition.y, targetOnScreenPosition.z);
+            curScreenPos = new Vector3(initScreenPos.x + (m_KeyACount * m_MoveSpeedInputAD), initScreenPos.y, initScreenPos.z);
+            Debugger.Log("键盘A键持续按下，curScreenPos：" + curScreenPos + "，initScreenPos：" + initScreenPos);
+            if (JudegTargetPos(initPosition - 0.01f * ((curScreenPos.x - initScreenPos.x) * cameraX + (curScreenPos.y - initScreenPos.y) * cameraY)))
+            {
+                //0.01这个系数是控制平移的速度，要根据相机和目标物体的distance来灵活选择
+                transform.position = initPosition - 0.01f * ((curScreenPos.x - initScreenPos.x) * cameraX + (curScreenPos.y - initScreenPos.y) * cameraY);
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            cameraX = transform.right;
+            cameraY = transform.up;
+            cameraZ = transform.forward;
+
+            initScreenPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetOnScreenPosition.z);
+            Debugger.Log("键盘A键按下：" + initScreenPos);
+
+            //targetOnScreenPosition.z为目标物体到相机xmidbuttonDownPositiony平面的法线距离
+            targetOnScreenPosition = Camera.main.WorldToScreenPoint(transform.position);
+            initPosition = transform.position;
+
+            m_KeyDCount = 0;
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            m_KeyDCount++;
+            //curScreenPos = new Vector3(Input.mousePosition.x - (m_KeyDCount * 10f), Input.mousePosition.y, targetOnScreenPosition.z);
+            curScreenPos = new Vector3(initScreenPos.x - (m_KeyDCount * m_MoveSpeedInputAD), initScreenPos.y, initScreenPos.z);
+            Debugger.Log("键盘A键持续按下，curScreenPos：" + curScreenPos + "，initScreenPos：" + initScreenPos);
+            if (JudegTargetPos(initPosition - 0.01f * ((curScreenPos.x - initScreenPos.x) * cameraX + (curScreenPos.y - initScreenPos.y) * cameraY)))
+            {
+                //0.01这个系数是控制平移的速度，要根据相机和目标物体的distance来灵活选择
+                transform.position = initPosition - 0.01f * ((curScreenPos.x - initScreenPos.x) * cameraX + (curScreenPos.y - initScreenPos.y) * cameraY);
+            }
+        }
+    }
+
+   
+
 
     //将angle限制在min~max之间
     static float ClampAngle(float angle, float min, float max)
