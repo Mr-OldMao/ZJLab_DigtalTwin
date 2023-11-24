@@ -35,6 +35,18 @@ public class UIFormMain : UIFormBase
     private Button btnSave;
     [SerializeField]
     private Toggle tgeLive;
+    [SerializeField]
+    private Toggle tgeEdit;
+    [SerializeField]
+    private ToggleGroup rectTgeEditTypeGroup;
+    [SerializeField]
+    private Toggle tgePos;
+    [SerializeField]
+    private Toggle tgeRot;
+    [SerializeField]
+    private Toggle tgeScale;
+    [SerializeField]
+    private Button btnEditReset;
 
     public Button BtnStart { get => btnStart; set => btnStart = value; }
     public Button BtnStop { get => btnStop; set => btnStop = value; }
@@ -48,8 +60,15 @@ public class UIFormMain : UIFormBase
     public Button BtnRegenerateScene { get => btnRegenerateScene; set => btnRegenerateScene = value; }
     public Button BtnSave { get => btnSave; set => btnSave = value; }
     public Toggle TgeLive { get => tgeLive; set => tgeLive = value; }
+    public Toggle TgeEdit { get => tgeEdit; set => tgeEdit = value; }
+    public ToggleGroup RectTgeEditTypeGroup { get => rectTgeEditTypeGroup; set => rectTgeEditTypeGroup = value; }
+    public Toggle TgePos { get => tgePos; set => tgePos = value; }
+    public Toggle TgeRot { get => tgeRot; set => tgeRot = value; }
+    public Toggle TgeScale { get => tgeScale; set => tgeScale = value; }
+    public Button BtnEditReset { get => btnEditReset; set => btnEditReset = value; }
 
 
+    
     protected override void Awake()
     {
         base.Awake();
@@ -75,8 +94,17 @@ public class UIFormMain : UIFormBase
         btnRegenerateScene = transform.Find<Button>("btnRegenerateScene");
         btnSave = transform.Find<Button>("btnSave");
         tgeLive = transform.Find<Toggle>("tgeLive");
+        tgeEdit = transform.Find<Toggle>("tgeEdit");
+        rectTgeEditTypeGroup = transform.Find<ToggleGroup>("rectTgeEditTypeGroup");
+        tgePos = transform.Find<Toggle>("tgePos");
+        tgeRot = transform.Find<Toggle>("tgeRot");
+        tgeScale = transform.Find<Toggle>("tgeScale");
+        btnEditReset = transform.Find<Button>("btnEditReset");
 
         tgeLive.isOn = false;
+        tgeEdit.isOn = false;
+        rectTgeEditTypeGroup.gameObject.SetActive(false);
+        tgeEdit.gameObject.SetActive(false);
     }
 
     protected override void RegisterUIEvnet()
@@ -100,6 +128,16 @@ public class UIFormMain : UIFormBase
         btnCameraFree.onClick.AddListenerCustom(() =>
         {
             CameraControl.GetInstance.ClickCameraFree();
+            bool freeCamState = CameraControl.GetInstance.GetCameraEntity(CameraControl.CameraType.Free).gameObject.activeSelf;
+            tgeEdit.gameObject.SetActive(freeCamState);
+            if (!freeCamState)
+            {
+                SelectObjByMouse.GetInstance.CanSelect = false;
+            }
+            if (freeCamState && tgeEdit.isOn)
+            {
+                SelectObjByMouse.GetInstance.CanSelect = true;
+            }
         });
         btnRobotRelocation.onClick.AddListenerCustom(() =>
         {
@@ -122,7 +160,36 @@ public class UIFormMain : UIFormBase
         {
             LiveStreaming.GetInstance.IsBeginLiveStreaming = ison;
         });
-
+        tgeEdit.onValueChanged.AddListenerCustom((ison) =>
+        {
+            rectTgeEditTypeGroup.gameObject.SetActive(ison);
+            SelectObjByMouse.GetInstance.CanSelect = tgeEdit.isOn;
+        });
+        tgePos.onValueChanged.AddListenerCustom((ison) =>
+        {
+            if (ison)
+            {
+                SelectObjByMouse.GetInstance.SetPos();
+            }
+        });
+        TgeRot.onValueChanged.AddListenerCustom((ison) =>
+        {
+            if (ison)
+            {
+                SelectObjByMouse.GetInstance.SetRot();
+            }
+        });
+        tgeScale.onValueChanged.AddListenerCustom((ison) =>
+        {
+            if (ison)
+            {
+                SelectObjByMouse.GetInstance.SetScale();
+            }
+        });
+        btnEditReset.onClick.AddListenerCustom(() =>
+        {
+            SelectObjByMouse.GetInstance.ResetPos();
+        });
     }
 
     public void OnClickStateBtn(ProgramState programState, string id = "")

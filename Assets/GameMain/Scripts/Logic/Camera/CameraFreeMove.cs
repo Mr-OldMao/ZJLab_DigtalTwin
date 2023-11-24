@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using MFramework;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -108,7 +109,7 @@ public class CameraFreeMove : MonoBehaviour
             cameraZ = transform.forward;
 
             initScreenPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetOnScreenPosition.z);
-            Debug.Log("downOnce");
+            Debugger.Log("downOnce");
 
             //targetOnScreenPosition.z为目标物体到相机xmidbuttonDownPositiony平面的法线距离
             targetOnScreenPosition = Camera.main.WorldToScreenPoint(transform.position);
@@ -137,7 +138,7 @@ public class CameraFreeMove : MonoBehaviour
         }
         if (Input.GetMouseButtonUp(2))
         {
-            Debug.Log("upOnce");
+            Debugger.Log("upOnce");
         }
 
     }

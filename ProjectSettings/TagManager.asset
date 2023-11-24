@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Wall
   - Door
+  - Drag
   layers:
   - Default
   - TransparentFX

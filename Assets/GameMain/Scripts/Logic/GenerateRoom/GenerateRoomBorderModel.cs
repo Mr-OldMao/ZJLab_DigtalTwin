@@ -359,7 +359,7 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
 
 public enum RoomType
 {
-    Null,
+    Null = 0,
     /// <summary>
     /// 客厅
     /// </summary>
@@ -372,10 +372,6 @@ public enum RoomType
     /// 主卧
     /// </summary>
     BedRoom,
-    ///// <summary>
-    ///// 侧卧
-    ///// </summary>
-    //SecondBedRoom,
     /// <summary>
     /// 厨房
     /// </summary>
@@ -384,10 +380,6 @@ public enum RoomType
     /// 书房
     /// </summary>
     StudyRoom,
-    ///// <summary>
-    ///// 阳台
-    ///// </summary>
-    //BalconyRoom,
     /// <summary>
     /// 储藏室
     /// </summary>
