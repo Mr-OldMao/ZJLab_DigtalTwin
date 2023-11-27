@@ -492,7 +492,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 }
                 else
                 {
-                    Debugger.LogError("item is null ,itemName : " + parentItemName);
+                    Debugger.LogWarning("item is null ,itemName : " + parentItemName);
                 }
             }
             else
@@ -657,7 +657,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     }
                     if (!canUse)
                     {
-                        Debugger.LogError("当前实体未找到合适位置放置，隐藏该实体，itemEntity:" + relatedThingArr[i].target.name + ",id:" + relatedThingArr[i].target.id, LogTag.Forever);
+                        Debugger.LogWarning("当前实体未找到合适位置放置，隐藏该实体，itemEntity:" + relatedThingArr[i].target.name + ",id:" + relatedThingArr[i].target.id, LogTag.Forever);
                         //Destroy(clone);
                     }
 

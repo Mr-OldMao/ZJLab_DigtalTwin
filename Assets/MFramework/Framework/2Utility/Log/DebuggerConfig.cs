@@ -13,7 +13,7 @@ namespace MFramework
     {
         private static bool m_CanPrintConsoleLog = UnityEngine.PlayerPrefs.GetInt("CanPrintConsoleLog", 1) == 1;
         private static bool m_CanPrintConsoleLogError = UnityEngine.PlayerPrefs.GetInt("CanPrintConsoleLogError", 1) == 1;
-        private static bool m_CanSaveLogDataFile = UnityEngine.PlayerPrefs.GetInt("m_CanSaveLogDataFile", 1) == 1;
+        private static bool m_CanSaveLogDataFile = UnityEngine.PlayerPrefs.GetInt("CanSaveLogDataFile", 1) == 1;
         /// <summary>
         /// 是否允许控制台打印 所有非错误日志
         /// </summary>

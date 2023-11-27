@@ -275,7 +275,7 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
             case EntityModelType.SmallWall:
                 if (roomMatData == null)
                 {
-                    Debugger.LogError("未找到该房间类型的墙壁材质 roomType:" + roomType);
+                    Debugger.LogWarning("未找到该房间类型的墙壁材质 roomType:" + roomType);
                     curRoomMatIndex = UnityEngine.Random.Range(1, maxID + 1);
                     roomMatDatas.Add(new RoomMatData { roomType = roomType, matIDWall = curRoomMatIndex, matIDFloor = -1 });
                 }
