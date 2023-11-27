@@ -384,6 +384,22 @@ public enum RoomType
     /// 储藏室
     /// </summary>
     StorageRoom,
+    /// <summary>
+    /// 办公室
+    /// </summary>
+    OfficeRoom,
+    /// <summary>
+    /// 茶水间
+    /// </summary>
+    TeaRoom,
+    /// <summary>
+    /// 大厅
+    /// </summary>
+    LobbyRoom,
+    /// <summary>
+    /// 实验室
+    /// </summary>
+    LabRoom
 }
 
 /// <summary>
