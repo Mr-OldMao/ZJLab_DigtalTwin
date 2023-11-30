@@ -16,7 +16,7 @@ public class CameraControl : SingletonByMono<CameraControl>
     private Camera m_CameraFirst;
     private Camera m_CameraThree;
     private Camera m_CameraFree;
-
+    public Camera CameraCustom;
     public CameraType CurMainCamera
     {
         get;
@@ -37,12 +37,14 @@ public class CameraControl : SingletonByMono<CameraControl>
         m_CameraFirst = GameObject.Find("CameraFirst")?.GetComponent<Camera>();
         m_CameraThree = GameObject.Find("CameraThree")?.GetComponent<Camera>();
         m_CameraFree = GameObject.Find("CameraFree")?.GetComponent<Camera>();
+        CameraCustom = GameObject.Find("CameraCustom")?.GetComponent<Camera>();
+        CameraCustom.gameObject.SetActive(false);
         m_CameraFree?.gameObject.SetActive(false);
     }
 
     private void Start()
     {
-        
+
         m_CameraFree.depth = 1;
         m_CameraTop.depth = 0;
         m_CameraFirst.depth = 2;
@@ -146,7 +148,8 @@ public class CameraControl : SingletonByMono<CameraControl>
             if (cameraRect.x == 0 && cameraRect.y == 0 && cameraRect.width == 1 && cameraRect.height == 1)
             {
                 res = 1;
-            }else if (cameraRect.x == 0.7f && cameraRect.y == 0.7f && cameraRect.width == 1 && cameraRect.height == 1)
+            }
+            else if (cameraRect.x == 0.7f && cameraRect.y == 0.7f && cameraRect.width == 1 && cameraRect.height == 1)
             {
                 res = 2;
             }
@@ -156,5 +159,20 @@ public class CameraControl : SingletonByMono<CameraControl>
             }
         }
         return res;
+    }
+
+
+    public void SetCameraCustomPos(Vector3 pos, Vector3 rot)
+    {
+        if (CameraCustom != null)
+        {
+            CameraCustom.transform.position = pos;
+            CameraCustom.transform.rotation = Quaternion.Euler(rot);
+        }
+    }
+
+    public void ShowCameraCustom(bool isShow)
+    {
+        CameraCustom?.gameObject.SetActive(isShow);
     }
 }

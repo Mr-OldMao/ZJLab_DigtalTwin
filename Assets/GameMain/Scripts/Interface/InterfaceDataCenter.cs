@@ -2,9 +2,6 @@ using MFramework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Android;
-using UnityEngine.SceneManagement;
-using UnityGameFramework.Runtime;
 using static GetEnvGraph;
 using static GetThingGraph;
 /// <summary>
@@ -46,7 +43,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     //引擎状态
     public const string TOPIC_CHANGESTATE = "simulator/changeState";
     //直播流信息
-    public const string TOPIC_LIVEDATA = "simulator/liveStreaming";
+    public static string TOPIC_LIVEDATA = "simulator/liveStreaming_" + MainData.SceneID;
     //新增房间实体模型
     public const string TOPIC_ADD_GOODS = "simulator/addGoods";
     //删除房间实体模型
@@ -59,6 +56,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 
     //web端的房间布局变更
     public const string TOPIC_WEB_CHANGEPOSITION = "simulator/changePosition";
+    //web端自定义相机坐标
+    public const string TOPIC_WEB_CHANGEVIEWPOSITON = "simulator/changeViewPositon";
     #endregion
 
     #region 数字孪生
@@ -278,12 +277,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
             switch (GameLaunch.GetInstance.scene)
             {
                 case GameLaunch.Scenes.MainScene1:
-                    NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS, TOPIC_DEL_GOODS, TOPIC_WEB_CHANGEPOSITION);
+                    NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS, TOPIC_DEL_GOODS, TOPIC_WEB_CHANGEPOSITION, TOPIC_WEB_CHANGEVIEWPOSITON);
                     //TEST
                     NetworkMqtt.GetInstance.Subscribe(
                         TOPIC_WEB_SEND, TOPIC_WEB_RECV,
                         TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA,
-
                         TOPIC_RECV, TOPIC_ROOMINFODATA);
                     break;
                 case GameLaunch.Scenes.MainScene2:
@@ -356,6 +354,17 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     if (UpdateRoomData.GetInstance.CanUpdateRoomData && jsonChangeRoomLayout.sceneID == MainData.SceneID)
                     {
                         UpdateRoomData.GetInstance.UpdateAllRoomData(jsonChangeRoomLayout);
+                    }
+                    break;
+                case TOPIC_WEB_CHANGEVIEWPOSITON:
+                    JsonChangeViewPositon jsonChangeViewPositon = JsonTool.GetInstance.JsonToObjectByLitJson<JsonChangeViewPositon>(msg);
+                    if (jsonChangeViewPositon.sceneID == MainData.SceneID)
+                    {
+                        Debugger.Log("change custom camera " + msg);
+                        Vector3 pos = new(jsonChangeViewPositon.pos[0], jsonChangeViewPositon.pos[1], jsonChangeViewPositon.pos[2]);
+                        Vector3 rot = new(jsonChangeViewPositon.rot[0], jsonChangeViewPositon.rot[1], jsonChangeViewPositon.rot[2]);
+                        CameraControl.GetInstance.SetCameraCustomPos(pos, rot);
+                        CameraControl.GetInstance.ShowCameraCustom(true);
                     }
                     break;
                 default:
