@@ -21,6 +21,9 @@ public class GameLogic : SingletonByMono<GameLogic>
     private Coroutine m_CoroutineUpadeteSceneEntityInfo = null;
     private Coroutine m_CoroutineUpadeteCameraEntityInfo = null;
     private GameObject m_Debugger;
+    public bool CanUpadeteSceneEntityInfo { get; set; } = true;
+    public float x;
+    public float y;
 
     private int m_CurAgainGenerateSceneCount = 0;
     public void Init()
@@ -32,7 +35,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "test|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "Simulator:1699425737288|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 
 #else
@@ -169,7 +172,8 @@ public class GameLogic : SingletonByMono<GameLogic>
         bool getThingGraph = false;
         bool getEnvGraph = false;
 
-        InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.SceneID, () => getThingGraph = true, () => {
+        InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.SceneID, () => getThingGraph = true, () =>
+        {
             MainData.CanReadFile = false;
             MsgEvent.SendMsg(MsgEventName.InitComplete);
         });
@@ -296,7 +300,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         }
     }
 
-    private void GenerateEntity(Action generateCompleteCallback)
+    public void GenerateEntity(Action generateCompleteCallback)
     {
         staticModelRootNode.transform.position = Vector3.zero;
         //写入各个房间之间的邻接关系
@@ -370,7 +374,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                 {
                     m_CurAgainGenerateSceneCount = 0;
                     Debugger.LogError("again generate fail!");
-                    UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams { txtHintContent = "重新生成场景失败，请重试" , colorHintContent = Color.red});
+                    UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams { txtHintContent = "重新生成场景失败，请重试", colorHintContent = Color.red });
                 }
             }
             else
@@ -427,7 +431,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     /// <summary>
     /// 初始化创建房间内实体信息对象
     /// </summary>
-    private void InitCreateCacheItemDataInfo()
+    public void InitCreateCacheItemDataInfo()
     {
         //清理实体缓存信息
         List<GetThingGraph_data_items> items = new List<GetThingGraph_data_items>();
@@ -543,12 +547,15 @@ public class GameLogic : SingletonByMono<GameLogic>
     /// 原点偏移量，老原点位置在客厅的左下角，新原点需要在全局房间的左下角位置
     /// </summary>
     /// <returns></returns>
-    public Vector2 GetOriginOffset()
+    public Vector2 GetOriginOffset(List<RoomInfo> roomInfos = null)
     {
         //找到新原点  所有房间的minX和minY作为新原点
         int offsetX = 0, offsetY = 0;
-        List<RoomInfo> roomData = GenerateRoomData.GetInstance.m_ListRoomInfo;
-        foreach (RoomInfo ri in roomData)
+        if (roomInfos == null)
+        {
+            roomInfos = GenerateRoomData.GetInstance.m_ListRoomInfo;
+        }
+        foreach (RoomInfo ri in roomInfos)
         {
             if (ri.roomPosMin.x < offsetX)
             {
@@ -592,7 +599,7 @@ public class GameLogic : SingletonByMono<GameLogic>
     /// </summary>
     IEnumerator UpadeteSceneEntityInfo()
     {
-        while (true)
+        while (CanUpadeteSceneEntityInfo)
         {
 
             UpdateEnityInfoTool.GetInstance.UpdateSceneEntityInfo();
@@ -635,13 +642,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F7))
-        {
-            RobotAnimCenter robotAnimCenter = GameObject.FindObjectOfType<RobotAnimCenter>();
-            robotAnimCenter.PlayAnimByBool("CanInteraction", true);
-            robotAnimCenter.PlayAnimByName("Robot_Pick");
-            robotAnimCenter.PlayAnimByBool("CanInteraction", false);
-        }
+
 
         if (Input.GetKey(KeyCode.F2))
         {
@@ -674,7 +675,25 @@ public class GameLogic : SingletonByMono<GameLogic>
             NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_DEL_GOODS,
         testJson);
         }
-
+        if (Input.GetKeyDown(KeyCode.F7))
+        {
+            Debugger.Log("测试发送web端的房间布局变更mqtt消息");
+            string testJson =
+                @"
+{
+    ""sceneID"": """ + MainData.SceneID + @""",
+    ""roomType"": """",
+    ""roomID"": ""sim:6"",
+    ""offsetPos"":{
+            ""x"": " + x + @",
+            ""y"": " + y + @"
+    },
+    ""ChangeTime"": ""20231123_165011""
+}
+";
+            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_WEB_CHANGEPOSITION,
+        testJson);
+        }
 
         if (Input.GetKeyDown(KeyCode.F8))
         {
@@ -698,7 +717,10 @@ public class GameLogic : SingletonByMono<GameLogic>
         }
         if (Input.GetKeyDown(KeyCode.F10))
         {
-
+            RobotAnimCenter robotAnimCenter = GameObject.FindObjectOfType<RobotAnimCenter>();
+            robotAnimCenter.PlayAnimByBool("CanInteraction", true);
+            robotAnimCenter.PlayAnimByName("Robot_Pick");
+            robotAnimCenter.PlayAnimByBool("CanInteraction", false);
         }
 
         if (Input.GetKeyDown(KeyCode.F12))

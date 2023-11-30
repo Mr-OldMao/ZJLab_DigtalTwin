@@ -62,7 +62,8 @@ namespace MFramework
             //Add<UIFormTest>(new UIEntityConfigInfo(UIFormRootDir + "/Main/UIFormTest.prefab", UILayerType.Common));
             Add<UIFormMain>(new UIEntityConfigInfo(UIFormRootDir + "/UIFormMain.prefab", UILayerType.Common));
             Add<UIFormCameraHint>(new UIEntityConfigInfo(UIFormRootDir + "/UIFormCameraHint.prefab", UILayerType.Common));
-            Add<UIFormHintNotBtn>(new UIEntityConfigInfo(UIFormHintNotBtn.AssetPathNew, UILayerType.Common));
+            Add<UIFormHintNotBtn>(new UIEntityConfigInfo(UIFormHintNotBtn.AssetPathNew, UILayerType.Top));
+            Add<UIFormHintOneBtn>(new UIEntityConfigInfo(UIFormHintOneBtn.AssetPathNew, UILayerType.Top));
 
             //根据xml配置表手动绑定UI窗体信息
             BindUIFormInfoByXml();

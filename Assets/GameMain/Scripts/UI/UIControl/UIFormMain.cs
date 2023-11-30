@@ -154,7 +154,13 @@ public class UIFormMain : UIFormBase
         });
         btnSave.onClick.AddListenerCustom(() =>
         {
-            DataSave.GetInstance.Save();
+            DataSave.GetInstance.Save(() =>
+            {
+                UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
+                {
+                    txtHintContent = "存档成功!"
+                });
+            });
         });
         tgeLive.onValueChanged.AddListenerCustom((ison) =>
         {

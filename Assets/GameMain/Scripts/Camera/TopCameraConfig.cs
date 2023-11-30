@@ -39,6 +39,7 @@ public class TopCameraConfig : MonoBehaviour
     {
         int minX = 0, minY = 0, maxX = 0, maxY = 0;
         List<RoomInfo> roomData = GenerateRoomData.GetInstance.m_ListRoomInfo;
+       
         foreach (RoomInfo ri in roomData)
         {
             if (ri.roomPosMin.x < minX)
@@ -58,7 +59,6 @@ public class TopCameraConfig : MonoBehaviour
                 maxY = (int)ri.roomPosMax.y;
             }
         }
-
         return new Vector3(maxX - minX, maxY - minY);
     }
 }

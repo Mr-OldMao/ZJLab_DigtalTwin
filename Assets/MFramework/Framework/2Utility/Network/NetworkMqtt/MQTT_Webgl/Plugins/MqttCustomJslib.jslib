@@ -21,5 +21,10 @@ mergeInto(LibraryManager.library, {
 
   Jslib_Disconnect: function() {
     mqttDisconnect();
+  },
+
+ Jslib_RefreshWebgl: function() {
+    refreshWebgl();
   }
+
 });

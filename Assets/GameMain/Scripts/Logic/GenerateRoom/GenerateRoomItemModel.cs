@@ -26,7 +26,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     /// </summary>
     private bool m_IsLimitPutPos = false;
 
-    public Transform ItemEntityGroupNode { get; private set; }
+    public Transform ItemEntityGroupNode { get;  set; }
 
     /// <summary>
     /// 坐标点的放置信息

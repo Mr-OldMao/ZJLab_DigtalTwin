@@ -131,7 +131,8 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             callback(null, null);
             return;
         }
-        CacheRoomWallInfo(m_ListRoomInfo.ToArray());
+        Dictionary<Vector2, BorderInfo> dicRoomWallInfo=  CacheRoomWallInfo(m_ListRoomInfo.ToArray());
+        m_DicRoomWallInfo = dicRoomWallInfo;
 
         RoomBaseInfo livingRoomBaseInfo = roomBaseInfosClone.Find((p) => { return p.curRoomType == RoomType.LivingRoom; });
         string firstGenerateID = livingRoomBaseInfo.curRoomID;
@@ -363,7 +364,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             int temp = i;
             BorderEntityData borderItemPosInfo = borderItemPosInfos.Find((p) => { return p.pos == roomInfo.listDoorPosInfo[temp].pos && p.entityAxis == roomInfo.listDoorPosInfo[temp].entityAxis; });
             borderItemPosInfo.entityModelType = roomInfo.listDoorPosInfo[temp].entityModelType;
-            //Debugger.Log("更正实体类型：" + borderItemPosInfo.pos + "," + borderItemPosInfo.entityModelType);
+            Debugger.Log("更正实体类型：" + borderItemPosInfo.pos + "," + borderItemPosInfo.entityModelType);
         }
 
         for (int i = 0; i < roomInfo.listEmptyPosInfo?.Count; i++)
@@ -371,7 +372,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             int temp = i;
             BorderEntityData borderItemPosInfo = borderItemPosInfos.Find((p) => { return p.pos == roomInfo.listEmptyPosInfo[temp].pos && p.entityAxis == roomInfo.listEmptyPosInfo[temp].entityAxis; });
             borderItemPosInfo.entityModelType = roomInfo.listEmptyPosInfo[temp].entityModelType;
-            //Debugger.Log("更正实体类型：" + borderItemPosInfo.pos + "," + borderItemPosInfo.entityModelType);
+            Debugger.Log("更正实体类型：" + borderItemPosInfo.pos + "," + borderItemPosInfo.entityModelType);
         }
         //add smallWall
         List<BorderEntityData> smallBorderEntityData = new List<BorderEntityData>();
@@ -416,6 +417,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         entityAxis = 0,
                         pos = pos,
                         listRoomType = new List<RoomType> { roomInfo.roomType },
+                        listRoomTypeID = new List<string> { roomInfo.roomID },
                         entityModelType = EntityModelType.Floor
                     });
                     listRoomBuilderInfo.Add(new BorderEntityData
@@ -423,6 +425,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                         entityAxis = 0,
                         pos = pos,
                         listRoomType = new List<RoomType> { roomInfo.roomType },
+                        listRoomTypeID = new List<string> { roomInfo.roomID },
                         entityModelType = EntityModelType.Ceiling
                     });
                 }
@@ -758,11 +761,17 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     /// </summary>
     /// <param name="roomBaseInfos"></param>
     /// <param name="roomInfos"></param>
-    private void GenerateDoorData(List<RoomBaseInfo> roomBaseInfos, string firstGenerateID, ref List<RoomInfo> roomInfos)
+    /// <param name="DicRoomWallInfo">房间公共墙数据</param>
+    public void GenerateDoorData(List<RoomBaseInfo> roomBaseInfos, string firstGenerateID, ref List<RoomInfo> roomInfos, Dictionary<Vector2, BorderInfo> DicRoomWallInfo = null)
     {
         //获取家庭所有房间的公共墙信息
         List<BorderEntityData> commonWallEntityData = new List<BorderEntityData>();
-        foreach (var item in m_DicRoomWallInfo.Values)
+
+        if (DicRoomWallInfo == null)
+        {
+            DicRoomWallInfo = m_DicRoomWallInfo;
+        }
+        foreach (var item in DicRoomWallInfo.Values)
         {
             if (item.borderItemPosInfoX?.listRoomType?.Count > 1)
             {
@@ -866,8 +875,9 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     /// 缓存房间实体墙的信息，根据所有房间信息
     /// </summary>
     /// <param name="roomInfoArr">所有房间信息数据</param>
-    public void CacheRoomWallInfo(params RoomInfo[] roomInfoArr)
+    public Dictionary<Vector2, BorderInfo> CacheRoomWallInfo(params RoomInfo[] roomInfoArr)
     {
+        Dictionary<Vector2, BorderInfo>  dicRoomWallInfo = new Dictionary<Vector2, BorderInfo>();
         for (int j = 0; j < roomInfoArr.Length; j++)
         {
             RoomInfo roomInfo = roomInfoArr[j];
@@ -876,9 +886,9 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             {
                 int curX = i;
                 Vector2 pos1 = new Vector2(curX, roomInfo.roomPosMin.y);
-                if (!m_DicRoomWallInfo.ContainsKey(pos1))
+                if (!dicRoomWallInfo.ContainsKey(pos1))
                 {
-                    m_DicRoomWallInfo.Add(pos1, new BorderInfo
+                    dicRoomWallInfo.Add(pos1, new BorderInfo
                     {
                         borderItemPosInfoX = new BorderEntityData
                         {
@@ -893,9 +903,9 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 }
                 else
                 {
-                    if (m_DicRoomWallInfo[pos1].borderItemPosInfoX == null)
+                    if (dicRoomWallInfo[pos1].borderItemPosInfoX == null)
                     {
-                        m_DicRoomWallInfo[pos1].borderItemPosInfoX = new BorderEntityData
+                        dicRoomWallInfo[pos1].borderItemPosInfoX = new BorderEntityData
                         {
                             entityAxis = 0,
                             borderDir = BorderDir.Down,
@@ -907,18 +917,18 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                     }
                     else
                     {
-                        if (!m_DicRoomWallInfo[pos1].borderItemPosInfoX.listRoomTypeID.Contains(roomInfo.roomID))
+                        if (!dicRoomWallInfo[pos1].borderItemPosInfoX.listRoomTypeID.Contains(roomInfo.roomID))
                         {
-                            m_DicRoomWallInfo[pos1].borderItemPosInfoX.listRoomType.Add(roomInfo.roomType);
-                            m_DicRoomWallInfo[pos1].borderItemPosInfoX.listRoomTypeID.Add(roomInfo.roomID);
+                            dicRoomWallInfo[pos1].borderItemPosInfoX.listRoomType.Add(roomInfo.roomType);
+                            dicRoomWallInfo[pos1].borderItemPosInfoX.listRoomTypeID.Add(roomInfo.roomID);
                         }
                     }
                 }
 
                 Vector2 pos2 = new Vector2(curX, roomInfo.roomPosMax.y);
-                if (!m_DicRoomWallInfo.ContainsKey(pos2))
+                if (!dicRoomWallInfo.ContainsKey(pos2))
                 {
-                    m_DicRoomWallInfo.Add(pos2, new BorderInfo
+                    dicRoomWallInfo.Add(pos2, new BorderInfo
                     {
                         borderItemPosInfoX = new BorderEntityData
                         {
@@ -933,9 +943,9 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 }
                 else
                 {
-                    if (m_DicRoomWallInfo[pos2].borderItemPosInfoX == null)
+                    if (dicRoomWallInfo[pos2].borderItemPosInfoX == null)
                     {
-                        m_DicRoomWallInfo[pos2].borderItemPosInfoX = new BorderEntityData
+                        dicRoomWallInfo[pos2].borderItemPosInfoX = new BorderEntityData
                         {
                             entityAxis = 0,
                             borderDir = BorderDir.Up,
@@ -947,10 +957,10 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                     }
                     else
                     {
-                        if (!m_DicRoomWallInfo[pos2].borderItemPosInfoX.listRoomTypeID.Contains(roomInfo.roomID))
+                        if (!dicRoomWallInfo[pos2].borderItemPosInfoX.listRoomTypeID.Contains(roomInfo.roomID))
                         {
-                            m_DicRoomWallInfo[pos2].borderItemPosInfoX.listRoomType.Add(roomInfo.roomType);
-                            m_DicRoomWallInfo[pos2].borderItemPosInfoX.listRoomTypeID.Add(roomInfo.roomID);
+                            dicRoomWallInfo[pos2].borderItemPosInfoX.listRoomType.Add(roomInfo.roomType);
+                            dicRoomWallInfo[pos2].borderItemPosInfoX.listRoomTypeID.Add(roomInfo.roomID);
                         }
                     }
                 }
@@ -960,9 +970,9 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             {
                 int curY = i;
                 Vector2 pos1 = new Vector2(roomInfo.roomPosMin.x, curY);
-                if (!m_DicRoomWallInfo.ContainsKey(pos1))
+                if (!dicRoomWallInfo.ContainsKey(pos1))
                 {
-                    m_DicRoomWallInfo.Add(pos1, new BorderInfo
+                    dicRoomWallInfo.Add(pos1, new BorderInfo
                     {
                         borderItemPosInfoY = new BorderEntityData
                         {
@@ -977,9 +987,9 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 }
                 else
                 {
-                    if (m_DicRoomWallInfo[pos1].borderItemPosInfoY == null)
+                    if (dicRoomWallInfo[pos1].borderItemPosInfoY == null)
                     {
-                        m_DicRoomWallInfo[pos1].borderItemPosInfoY = new BorderEntityData
+                        dicRoomWallInfo[pos1].borderItemPosInfoY = new BorderEntityData
                         {
                             entityAxis = 1,
                             borderDir = BorderDir.Left,
@@ -991,18 +1001,18 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                     }
                     else
                     {
-                        if (!m_DicRoomWallInfo[pos1].borderItemPosInfoY.listRoomTypeID.Contains(roomInfo.roomID))
+                        if (!dicRoomWallInfo[pos1].borderItemPosInfoY.listRoomTypeID.Contains(roomInfo.roomID))
                         {
-                            m_DicRoomWallInfo[pos1].borderItemPosInfoY.listRoomType.Add(roomInfo.roomType);
-                            m_DicRoomWallInfo[pos1].borderItemPosInfoY.listRoomTypeID.Add(roomInfo.roomID);
+                            dicRoomWallInfo[pos1].borderItemPosInfoY.listRoomType.Add(roomInfo.roomType);
+                            dicRoomWallInfo[pos1].borderItemPosInfoY.listRoomTypeID.Add(roomInfo.roomID);
                         }
                     }
                 }
 
                 Vector2 pos2 = new Vector2(roomInfo.roomPosMax.x, curY);
-                if (!m_DicRoomWallInfo.ContainsKey(pos2))
+                if (!dicRoomWallInfo.ContainsKey(pos2))
                 {
-                    m_DicRoomWallInfo.Add(pos2, new BorderInfo
+                    dicRoomWallInfo.Add(pos2, new BorderInfo
                     {
                         borderItemPosInfoY = new BorderEntityData
                         {
@@ -1017,9 +1027,9 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 }
                 else
                 {
-                    if (m_DicRoomWallInfo[pos2].borderItemPosInfoY == null)
+                    if (dicRoomWallInfo[pos2].borderItemPosInfoY == null)
                     {
-                        m_DicRoomWallInfo[pos2].borderItemPosInfoY = new BorderEntityData
+                        dicRoomWallInfo[pos2].borderItemPosInfoY = new BorderEntityData
                         {
                             entityAxis = 1,
                             borderDir = BorderDir.Right,
@@ -1031,15 +1041,16 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                     }
                     else
                     {
-                        if (!m_DicRoomWallInfo[pos2].borderItemPosInfoY.listRoomTypeID.Contains(roomInfo.roomID))
+                        if (!dicRoomWallInfo[pos2].borderItemPosInfoY.listRoomTypeID.Contains(roomInfo.roomID))
                         {
-                            m_DicRoomWallInfo[pos2].borderItemPosInfoY.listRoomType.Add(roomInfo.roomType);
-                            m_DicRoomWallInfo[pos2].borderItemPosInfoY.listRoomTypeID.Add(roomInfo.roomID);
+                            dicRoomWallInfo[pos2].borderItemPosInfoY.listRoomType.Add(roomInfo.roomType);
+                            dicRoomWallInfo[pos2].borderItemPosInfoY.listRoomTypeID.Add(roomInfo.roomID);
                         }
                     }
                 }
             }
         }
+        return dicRoomWallInfo;
     }
     #endregion
 

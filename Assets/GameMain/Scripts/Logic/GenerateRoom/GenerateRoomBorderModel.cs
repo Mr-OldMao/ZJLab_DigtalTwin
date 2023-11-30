@@ -94,12 +94,12 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
         public BorderDir borderDir;
 
         /// <summary>
-        /// 当前实体所属房间类型，一个边界实体最多可属于两个房间，listRoomType.count<=2
+        /// 当前实体所属房间类型，一个边界实体最多可属于两个房间，listRoomType.count<=2 ,目前没有一个边界实体属于两个房间说法，只属于一个房间
         /// </summary>
         public List<RoomType> listRoomType;
 
         /// <summary>
-        /// 当前实体所属房间类型ID,可代替listRoomType使用，一个边界实体最多可属于两个房间，listRoomType.count<=2
+        /// 当前实体所属房间类型ID,可代替listRoomType使用，一个边界实体最多可属于两个房间，listRoomType.count<=2,目前没有一个边界实体属于两个房间说法，只属于一个房间
         /// </summary>
         public List<string> listRoomTypeID;
     }

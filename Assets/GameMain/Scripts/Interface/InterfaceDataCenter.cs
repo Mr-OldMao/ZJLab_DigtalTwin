@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Android;
+using UnityEngine.SceneManagement;
 using UnityGameFramework.Runtime;
 using static GetEnvGraph;
 using static GetThingGraph;
@@ -55,6 +56,9 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public const string TOPIC_WEB_SEND = "simulator/web/send";
     //测试 发控制结果给Web端
     public const string TOPIC_WEB_RECV = "simulator/web/recv";
+
+    //web端的房间布局变更
+    public const string TOPIC_WEB_CHANGEPOSITION = "simulator/changePosition";
     #endregion
 
     #region 数字孪生
@@ -69,7 +73,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// 缓存场景图，物体与房间的邻接关系
     /// </summary>
     /// <param name="id">仿真引擎实例的id号码</param>
-    public void CacheGetThingGraph(string id, Action callbackSuc = null,Action callbakcFail = null)
+    public void CacheGetThingGraph(string id, Action callbackSuc = null, Action callbakcFail = null)
     {
         if (!MainData.CanReadFile)
         {
@@ -135,7 +139,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// 缓存环境场景图,房间与房间的邻接关系
     /// </summary>
     /// <param name="id">仿真引擎实例的id号码</param>
-    public void CacheGetEnvGraph(string id, Action callbackSuc = null,Action callbackFail = null)
+    public void CacheGetEnvGraph(string id, Action callbackSuc = null, Action callbackFail = null)
     {
         string rawJsonStr = "{\"id\":\"" + id + "\"}";
         Debugger.Log("缓存环境场景图,房间与房间的邻接关系 " + rawJsonStr);
@@ -244,14 +248,14 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         {
             Debugger.Log("读档接口回调 jsonStr:" + jsonStr);
             ReadFileData readFileData = JsonUtility.FromJson<ReadFileData>(jsonStr);
-            if (readFileData?.data?.dataPackageInfo?.TargetToList()?.Count > 0 || 
-            (readFileData?.data?.dataPackageInfo?.Target()!= null && !string.IsNullOrEmpty(readFileData?.data?.dataPackageInfo?.Target().json)) )
+            if (readFileData?.data?.dataPackageInfo?.TargetToList()?.Count > 0 ||
+            (readFileData?.data?.dataPackageInfo?.Target() != null && !string.IsNullOrEmpty(readFileData?.data?.dataPackageInfo?.Target().json)))
             {
                 calllbackSuc?.Invoke(readFileData);
             }
             else
             {
-                Debugger.LogError("读档失败 未找到存档信息 sceneID："+ sceneID);
+                Debugger.LogError("读档失败 未找到存档信息 sceneID：" + sceneID);
                 callbackFail?.Invoke();
             }
         }, null, "", (m, n) =>
@@ -268,17 +272,18 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public void InitMQTT()
     {
         //NetworkMqtt.GetInstance.IsWebgl = false;
-
+        Debug.Log("InitMQTT");
         NetworkMqtt.GetInstance.AddConnectedSucEvent(() =>
         {
             switch (GameLaunch.GetInstance.scene)
             {
                 case GameLaunch.Scenes.MainScene1:
-                    NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS, TOPIC_DEL_GOODS);
+                    NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS, TOPIC_DEL_GOODS, TOPIC_WEB_CHANGEPOSITION);
                     //TEST
                     NetworkMqtt.GetInstance.Subscribe(
                         TOPIC_WEB_SEND, TOPIC_WEB_RECV,
                         TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA,
+
                         TOPIC_RECV, TOPIC_ROOMINFODATA);
                     break;
                 case GameLaunch.Scenes.MainScene2:
@@ -310,7 +315,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// <param name="msg"></param>
     private void ParseMQTTMsg(string topic, string msg)
     {
-        Debugger.Log($"recv mqtt callback. topic：{topic}， msg：{msg}");
+        Debugger.Log($"recv mqtt callback. topic：{topic},{System.DateTime.Now.ToString("yyyyMMdd_HHmmss")}");
         //Debugger.Log($"recv mqtt callback. topic：{topic}");
 
         //在非Unity主线程中调用UnityEngineApi
@@ -344,6 +349,14 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                 case TOPIC_PEOPLE_PERCEPTION:
                     Feature_People_Perception feature_People_Perception = JsonTool.GetInstance.JsonToObjectByLitJson<Feature_People_Perception>(msg);
                     MainData.feature_People_Perceptions.Enqueue(feature_People_Perception);
+                    break;
+                case TOPIC_WEB_CHANGEPOSITION:
+                    Debugger.Log("检测到房间布局变更mqtt消息 " + msg);
+                    JsonChangeRoomLayout jsonChangeRoomLayout = JsonTool.GetInstance.JsonToObjectByLitJson<JsonChangeRoomLayout>(msg);
+                    if (UpdateRoomData.GetInstance.CanUpdateRoomData && jsonChangeRoomLayout.sceneID == MainData.SceneID)
+                    {
+                        UpdateRoomData.GetInstance.UpdateAllRoomData(jsonChangeRoomLayout);
+                    }
                     break;
                 default:
                     //Debugger.Log($"Other Topoc :{topic}");

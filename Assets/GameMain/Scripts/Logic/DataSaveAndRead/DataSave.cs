@@ -36,7 +36,7 @@ public class DataSave : SingletonByMono<DataSave>
     /// 存档场景，序列化为json到服务器
     /// </summary>
     /// <returns></returns>
-    public bool Save()
+    public bool Save(Action callbackSuc = null)
     {
         bool res = false;
         try
@@ -62,11 +62,12 @@ public class DataSave : SingletonByMono<DataSave>
 
             //json文件存本地一份
             string fileName = "SaveScene_" + dataPackage.sceneID + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".json";
+            fileName= fileName.Replace(":", "");
             Debugger.Log("尝试本地存档 path：" + Application.streamingAssetsPath + "/" + fileName, LogTag.Forever);
             new FileIOTxt(Application.streamingAssetsPath, fileName).Write(targetJson);
             Debugger.Log("本地存档完毕 path：" + Application.streamingAssetsPath + "/" + fileName, LogTag.Forever);
 
-            InterfaceDataCenter.GetInstance.SaveFileData(targetJson);
+            InterfaceDataCenter.GetInstance.SaveFileData(targetJson, callbackSuc);
         }
         catch (System.Exception e)
         {

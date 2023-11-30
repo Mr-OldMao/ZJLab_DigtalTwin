@@ -21,6 +21,10 @@ public class MqttWebglCenter : SingletonByMono<MqttWebglCenter>
     [DllImport("__Internal")]
     private static extern void Jslib_Disconnect();
 
+    [DllImport("__Internal")]
+    private static extern void Jslib_RefreshWebgl();
+
+
     private MqttRecvMsgCallback m_RecvMsgCallback;
 
     public void Connect(string clientIP, int clientPort, string clientId, string username, string password, string destination = "Unity_Test_Destination")
@@ -69,6 +73,15 @@ public class MqttWebglCenter : SingletonByMono<MqttWebglCenter>
     public void RemoveListenerSubscribe(MqttRecvMsgCallback mqttRecvMsgCallback)
     {
         m_RecvMsgCallback -= mqttRecvMsgCallback;
+    }
+
+    /// <summary>
+    /// 刷新Webgl html页面，为Unity提供
+    /// </summary>
+    public void RefreshWeb()
+    {
+        Debugger.Log("刷新Webgl html页面，为Unity提供");
+        Jslib_RefreshWebgl();
     }
 
     /// <summary>
