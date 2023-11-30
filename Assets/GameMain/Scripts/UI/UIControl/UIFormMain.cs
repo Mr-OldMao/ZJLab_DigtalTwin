@@ -156,10 +156,22 @@ public class UIFormMain : UIFormBase
         {
             DataSave.GetInstance.Save(() =>
             {
-                UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
+                //UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
+                //{
+                //    txtHintContent = "存档成功!"
+                //});
+                UIManager.GetInstance.GetUIFormLogicScript<UIFormHintOneBtn>().Show(new UIFormHintOneBtn.ShowParams
                 {
-                    txtHintContent = "存档成功!"
-                });
+                    txtHintContent = "存档成功！即将刷新页面",
+                    btnConfirmContent = "确认",
+                    isFullMask = true,
+                }, () =>
+                {
+                    Debugger.Log("尝试刷新页面");
+#if UNITY_WEBGL && !UNITY_EDITOR
+                        MqttWebglCenter.GetInstance.RefreshWeb();
+#endif
+                }); 
             });
         });
         tgeLive.onValueChanged.AddListenerCustom((ison) =>
