@@ -316,8 +316,8 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
 
     public class Msg
     {
+        public string sceneID = MainData.SceneID;
         public Data[] msgData;
-
         public class Data
         {
             public string title;
