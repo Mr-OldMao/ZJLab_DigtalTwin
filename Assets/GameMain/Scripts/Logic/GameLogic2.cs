@@ -1,6 +1,7 @@
 using MFramework;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Feature_Robot_Pos;
 
@@ -55,6 +56,18 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
             Feature_People_Perception feature_People_Perception = MainData.feature_People_Perceptions.Dequeue();
             DisposePeoplePerception(feature_People_Perception);
         }
+
+        if (Input.GetKey(KeyCode.F2))
+        {
+            string testJson =
+                 "{\"test\":\"" + System.DateTime.Now.ToString("HHmmss") + "\"}";
+
+            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_ROBOT_POS,
+                testJson);
+            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_PEOPLE_PERCEPTION,
+                testJson);
+        }
+
     }
 
     /// <summary>
@@ -94,5 +107,5 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
     private void DisposePeoplePerception(Feature_People_Perception feature_People_Perception)
     {
 
-    }
+    } 
 }
