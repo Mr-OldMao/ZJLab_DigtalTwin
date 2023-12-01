@@ -217,13 +217,14 @@ public class DataRead : SingletonByMono<DataRead>
         return m_ListRoomMatData;
     }
 
-
+    [Serializable]
     /// <summary>
     /// 房间的地板、墙壁材质数据
     /// </summary>
     public class RoomMatData
     {
         public RoomType roomType;
+        public string roomID;
         public int matIDFloor;
         public int matIDWall;
     }

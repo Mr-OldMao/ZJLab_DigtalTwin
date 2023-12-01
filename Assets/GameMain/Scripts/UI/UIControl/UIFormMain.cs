@@ -160,6 +160,7 @@ public class UIFormMain : UIFormBase
                 //{
                 //    txtHintContent = "存档成功!"
                 //});
+                Time.timeScale = 0;
                 UIManager.GetInstance.GetUIFormLogicScript<UIFormHintOneBtn>().Show(new UIFormHintOneBtn.ShowParams
                 {
                     txtHintContent = "存档成功！即将刷新页面",

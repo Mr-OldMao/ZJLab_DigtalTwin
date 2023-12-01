@@ -24,7 +24,7 @@ public class DataSave : SingletonByMono<DataSave>
     [SerializeField]
     public PostThingGraph m_PostThingGraph;
     [SerializeField]
-    private GetEnvGraph_data m_GetEnvGraphData; 
+    private GetEnvGraph_data m_GetEnvGraphData;
     [SerializeField]
     private List<RoomMatData> m_ListRoomMatData;
 
@@ -53,8 +53,8 @@ public class DataSave : SingletonByMono<DataSave>
             SerializeData("m_BorderEntityDatasJson", m_BorderEntityDatas);
             SerializeData("m_PostThingGraphJson", m_PostThingGraph);
             SerializeData("m_GetEnvGraphDataJson", m_GetEnvGraphData);
-            //SerializeData("m_ListRoomMatData", m_ListRoomMatData);
-            
+            SerializeData("m_ListRoomMatData", m_ListRoomMatData);
+
 
             string targetJson = JsonUtility.ToJson(dataPackage, false);
             res = !string.IsNullOrEmpty(targetJson);
@@ -62,10 +62,10 @@ public class DataSave : SingletonByMono<DataSave>
 
             //json文件存本地一份
             string fileName = "SaveScene_" + dataPackage.sceneID + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".json";
-            fileName= fileName.Replace(":", "");
+            fileName = fileName.Replace(":", "");
             Debugger.Log("尝试本地存档 path：" + Application.streamingAssetsPath + "/" + fileName, LogTag.Forever);
             new FileIOTxt(Application.streamingAssetsPath, fileName).Write(targetJson);
-            Debugger.Log("本地存档完毕 path：" + Application.streamingAssetsPath + "/" + fileName, LogTag.Forever);
+            Debugger.Log("本地存档成功 path：" + Application.streamingAssetsPath + "/" + fileName, LogTag.Forever);
 
             InterfaceDataCenter.GetInstance.SaveFileData(targetJson, callbackSuc);
         }
@@ -128,7 +128,7 @@ public class DataSave : SingletonByMono<DataSave>
     /// <summary>
     /// 保存所有房间的地板、墙壁材质数据
     /// </summary>
-    public void SaveGetThingGraph_data_items(List<RoomMatData> listRoomMatData)
+    public void SaveRoomMatData(List<RoomMatData> listRoomMatData)
     {
         m_ListRoomMatData = listRoomMatData;
     }
