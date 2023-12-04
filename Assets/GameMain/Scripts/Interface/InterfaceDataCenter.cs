@@ -1,7 +1,10 @@
 using MFramework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using static DataRead;
+using static GenerateRoomData;
 using static GetEnvGraph;
 using static GetThingGraph;
 /// <summary>
@@ -82,13 +85,32 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
             {
                 MainData.getThingGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetThingGraph>(jsonStr);
                 Debugger.Log("已获取场景图，缓存物体与房间的邻接关系 jsonStr:" + jsonStr);
-                ////存档
+                //存档
                 //DataSave.GetInstance.SaveGetThingGraph_data_items(new PostThingGraph
                 //{
                 //    id = MainData.SceneID,
                 //    idScene = MainData.SceneID,
                 //    items = MainData.getThingGraph.data.items
                 //});
+
+                List<RoomMatData> listRoomMatData = new List<RoomMatData>();
+                foreach (var item in MainData.getThingGraph.data.items)
+                {
+                    RoomMatData roomMatData = listRoomMatData.Find((p) => { return p.roomID == item.id; });
+                    if (roomMatData == null)
+                    {
+                        roomMatData = new RoomMatData
+                        {
+                            roomID = item.id,
+                            roomType = (RoomType)Enum.Parse(typeof(RoomType), item.name),
+                            matIDFloor = item.floorMaterial,
+                            matIDWall = item.wallMaterial
+                        };
+                        listRoomMatData.Add(roomMatData);
+                    }
+                }
+                GenerateRoomData.GetInstance.roomMatDatas = listRoomMatData;
+
                 callbackSuc?.Invoke();
             }, null, rawJsonStr);
         }

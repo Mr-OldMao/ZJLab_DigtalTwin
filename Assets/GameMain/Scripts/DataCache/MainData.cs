@@ -15,7 +15,7 @@ public class MainData
     /// <summary>
     /// 当前是否使用测试数据
     /// </summary>
-    public static bool UseTestData { get; set; } = true;
+    public static bool UseTestData { get; set; } = false;
 
     /// <summary>
     /// 是否为首次启动程序创建场景

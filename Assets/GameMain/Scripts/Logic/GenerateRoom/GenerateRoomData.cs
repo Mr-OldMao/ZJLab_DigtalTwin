@@ -82,6 +82,23 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     }
 
     /// <summary>
+    /// 所有房间的地面材质、墙壁材质数据
+    /// </summary>
+    public List<RoomMatData> roomMatDatas;
+
+    [Serializable]
+    /// <summary>
+    /// 房间的地板、墙壁材质数据
+    /// </summary>
+    public class RoomMatData
+    {
+        public RoomType roomType;
+        public string roomID;
+        public int matIDFloor;
+        public int matIDWall;
+    }
+
+    /// <summary>
     /// 方位标识
     /// </summary>
     public enum DirEnum

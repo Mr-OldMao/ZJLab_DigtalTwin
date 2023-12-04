@@ -27,7 +27,7 @@ public class GetThingGraph
 	public class GetThingGraph_data
 	{
 		/// <summary>
-		/// 
+		/// 所有房间的数据信息
 		/// </summary>
 		public List<GetThingGraph_data_items> items;
 	}
@@ -51,14 +51,22 @@ public class GetThingGraph
 		/// </summary>
 		public string name;
         /// <summary>
-        /// 当前房间所有邻接关系
+        /// 物体与当前房间所有邻接关系
         /// </summary>
         public List<GetThingGraph_data_items_relatedThing> relatedThing;
         /// <summary>
         /// 当前物体是否是动态的
         /// </summary>
         public bool dynamic;
-	}
+		/// <summary>
+		/// 墙壁材质id
+		/// </summary>
+		public int wallMaterial;
+        /// <summary>
+        /// 地面材质id
+        /// </summary>
+        public int floorMaterial;
+    }
 	[Serializable]
 	public class GetThingGraph_data_items_relatedThing
 	{

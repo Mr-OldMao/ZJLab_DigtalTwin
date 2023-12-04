@@ -4,6 +4,7 @@ using MFramework;
 using System;
 using static DataRead;
 using static GenerateRoomBorderModel;
+using static GenerateRoomData;
 
 /// <summary>
 /// 标题：房间边界模型(墙壁、门、地砖)自动生成器
@@ -129,7 +130,16 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
     public void GenerateRoomBorder()
     {
         ClearRoom();
-        List<RoomMatData> roomMatDatas = DataRead.GetInstance.ReadRoomMatData();
+        //获取材质信息
+        List<RoomMatData> roomMatDatas = null;
+        if (MainData.CanReadFile)
+        {
+            roomMatDatas = DataRead.GetInstance.ReadRoomMatData();
+        }
+        else
+        {
+            roomMatDatas = GenerateRoomData.GetInstance.roomMatDatas;
+        }
         if (roomMatDatas == null)
         {
             roomMatDatas = new List<RoomMatData>();
