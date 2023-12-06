@@ -35,7 +35,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "Simulator:1699425737288|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "test|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 
 #else
@@ -642,8 +642,6 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     public void Update()
     {
-
-
         if (Input.GetKey(KeyCode.F2))
         {
             string testJson =
@@ -712,8 +710,17 @@ public class GameLogic : SingletonByMono<GameLogic>
             //TaskCenter.GetInstance.TestSendOrder(Order.Grab_item_pull, "Book", "sim:1027");
             //TaskCenter.GetInstance.TestSendOrder(Order.Close_Door_Inside, "DoorX", testDoorID);
             //TaskCenter.GetInstance.TestSendOrder(Order.Robot_CleanTable, "Desk", "sim:1025");
-            TaskCenter.GetInstance.TestSendOrder(Order.Press_Button, "TV", "sim:1016");
+            //TaskCenter.GetInstance.TestSendOrder(Order.Press_Button, "TV", "sim:1016");
             //TaskCenter.GetInstance.TestSendOrder(Order.Knock_on_door, "DoorX", testDoorID);
+
+            //TaskCenter.GetInstance.TestSendOrder(Order.Pull_Start, "BoxPull", "sim:1032");
+            //TaskCenter.GetInstance.TestSendOrder(Order.Push_Enter, "BoxPash", "sim:1031");
+            //TaskCenter.GetInstance.TestSendOrder(Order.Wheel, "Wheel", "sim:1033");
+            //TaskCenter.GetInstance.TestSendOrder(Order.Pile, "Pile", "sim:1034");
+            //TaskCenter.GetInstance.TestSendOrder(Order.Turn_Door, "DoorX", "3_7");
+
+            TaskCenter.GetInstance.TestSendOrder(Order.Press_Button, "Sofa", "sim:1015");
+
         }
         if (Input.GetKeyDown(KeyCode.F10))
         {

@@ -4,12 +4,8 @@ using static GenerateRoomBorderModel;
 using MFramework;
 using static GenerateRoomData;
 using System;
-using System.Linq;
 using static GetThingGraph;
-using static JsonAddEntity;
-using Unity.VisualScripting;
 using static GetEnvGraph;
-using static GenerateRoomItemModel;
 /// <summary>
 /// 标题：生成各个房间内所有道具(床桌椅板凳等)
 /// 功能：针对每个房间生成合理的道具，摆放位置随机且合理(1.各个房间内部物品都朝向当前房间的中心点)
@@ -390,6 +386,12 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
 
         //储藏室
         PutCustomItem(RoomType.StorageRoom, "Plant", GetDefaultItemID);
+
+
+        PutCustomItem(RoomType.StorageRoom, "BoxPash", GetDefaultItemID);
+        PutCustomItem(RoomType.StorageRoom, "BoxPull", GetDefaultItemID);
+        PutCustomItem(RoomType.StorageRoom, "Wheel", GetDefaultItemID);
+        PutCustomItem(RoomType.LivingRoom, "Pile", GetDefaultItemID);
 
     }
 

@@ -172,8 +172,93 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                 if (MainData.UseTestData)
                 {
                     //Test测试数据
-                    jsonStr = "{\r\n    \"code\": 200,\r\n    \"message\": \"good\",\r\n    \"success\": true,\r\n    \"data\": {\r\n        \"items\": [\r\n            {\r\n                \"id\": \"sim:1\",\r\n                \"name\": \"LivingRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:2\",\r\n                            \"name\": \"BathRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Left\"\r\n                    },\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Right\"\r\n                    },\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:4\",\r\n                            \"name\": \"KitchenRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:5\",\r\n                \"name\": \"BedRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:1\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:6\",\r\n                \"name\": \"StorageRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Top\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"id\": \"sim:7\",\r\n                \"name\": \"StudyRoom\",\r\n                \"relatedThing\": [\r\n                    {\r\n                        \"target\": {\r\n                            \"id\": \"sim:3\",\r\n                            \"name\": \"LivingRoom\",\r\n                            \"relatedThing\": []\r\n                        },\r\n                        \"relationship\": \"Left\"\r\n                    }\r\n                ]\r\n            }\r\n        ]\r\n    }\r\n}";
+                    jsonStr =
+                                  @"
+{
+    ""code"": 200,
+    ""message"": ""good"",
+    ""success"": true,
+    ""data"": {
+        ""items"": [
+            {
+                ""id"": ""sim:1"",
+                ""name"": ""LivingRoom"",
+                ""relatedThing"": [
+                    {
+                        ""target"": {
+                            ""id"": ""sim:2"",
+                            ""name"": ""BathRoom"",
+                            ""relatedThing"": []
+                        },
+                        ""relationship"": ""Left""
+                    },
+                    {
+                        ""target"": {
+                            ""id"": ""sim:3"",
+                            ""name"": ""LivingRoom"",
+                            ""relatedThing"": []
+                        },
+                        ""relationship"": ""Right""
+                    },
+                    {
+                        ""target"": {
+                            ""id"": ""sim:4"",
+                            ""name"": ""KitchenRoom"",
+                            ""relatedThing"": []
+                        },
+                        ""relationship"": ""Top""
+                    }
+                ]
+            },
+            {
+                ""id"": ""sim:5"",
+                ""name"": ""BedRoom"",
+                ""relatedThing"": [
+                    {
+                        ""target"": {
+                            ""id"": ""sim:1"",
+                            ""name"": ""LivingRoom"",
+                            ""relatedThing"": []
+                        },
+                        ""relationship"": ""Top""
+                    }
+                ]
+            },
+            {
+                ""id"": ""sim:6"",
+                ""name"": ""StorageRoom"",
+                ""relatedThing"": [
+                    {
+                        ""target"": {
+                            ""id"": ""sim:3"",
+                            ""name"": ""LivingRoom"",
+                            ""relatedThing"": []
+                        },
+                        ""relationship"": ""Top""
+                    }
+                ]
+            },
+            {
+                ""id"": ""sim:7"",
+                ""name"": ""StudyRoom"",
+                ""relatedThing"": [
+                    {
+                        ""target"": {
+                            ""id"": ""sim:3"",
+                            ""name"": ""LivingRoom"",
+                            ""relatedThing"": []
+                        },
+                        ""relationship"": ""Left""
+                    }
+                ]
+            }
+        ]
+    }
+}
+                ";
                 }
+
+              
                 MainData.getEnvGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetEnvGraph>(jsonStr);
                 Debugger.Log("缓存环境场景图,房间与房间的邻接关系 jsonStr:" + jsonStr);
                 //存档
@@ -319,7 +404,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         {
             clientIP = MainData.ConfigData?.MqttConfig.ClientIP, //"10.5.24.28",
             clientPort = NetworkMqtt.GetInstance.IsWebgl ? 8083 : 1883,
-            clientID = MainData.SceneID + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss")
+            clientID = MainData.SceneID + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss"),
+            userName = "UserName_"+ MainData.SceneID + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss")
         });
         //监听消息回调
         NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
@@ -499,6 +585,7 @@ public class ControlResult
 /// </summary>
 public class ControlCommit
 {
+    public string sceneID;
     /// <summary>
     /// 动作或者控制id
     /// </summary>
@@ -538,5 +625,5 @@ public class ControlCommit
     /// <summary>
     /// 任务id，具有唯⼀性
     /// </summary>
-    public string task_id;
+    public string taskId;
 }

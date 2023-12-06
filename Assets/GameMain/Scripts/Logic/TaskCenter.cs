@@ -96,12 +96,51 @@ public class TaskCenter : SingletonByMono<TaskCenter>
 
         IsExecuteTask = true;
         GetCurExecuteTask = controlCommit;
-        Vector3 targetPos = new Vector3(controlCommit.position[0], controlCommit.position[1], controlCommit.position[2]);
+        Vector3 targetPos = Vector3.zero;
+        Vector3 targetRot = Vector3.zero;
+
+        //通过id查要走到的位置
+        GameObject objModel = null;
+
+
+        List<Transform> navNodes = GameObject.Find(controlCommit.objectName + "_" + controlCommit.objectId)?.transform.Finds<Transform>("NavNode");
+        if (navNodes?.Count == 1)
+        {
+            objModel = navNodes[0].gameObject;
+        }
+        else if (navNodes?.Count > 1)//寻找最合适的NavaNode
+        {
+            Transform curNav = navNodes[0];
+            float minDis = Vector3.Distance(m_AIRobotMove.transform.position, curNav.position);
+            for (int i = 1; i < navNodes.Count; i++)
+            {
+                float curDic = Vector3.Distance(m_AIRobotMove.transform.position, navNodes[i].position);
+                if (curDic < minDis)
+                {
+                    minDis = curDic;
+                    curNav = navNodes[i];
+                }
+            }
+            objModel = curNav.gameObject;
+        }
+
+        if (objModel == null)
+        {
+            Debugger.LogError("not find item , item :" + controlCommit.objectName + "_" + controlCommit.objectId);
+            targetPos = new Vector3(controlCommit.position[0], controlCommit.position[1], controlCommit.position[2]);
+        }
+        else
+        {
+            targetPos = objModel.transform.position;
+            targetRot = objModel.transform.rotation.eulerAngles;
+        }
+
         //判定是否能到达目标位置
         bool canArrive = m_AIRobotMove.JudgeCanArrivePos(targetPos);
+
         if (canArrive)
         {
-            m_AIRobotMove.SetTargetPointObj(targetPos);
+            m_AIRobotMove.SetTargetPointObj(targetPos, targetRot);
             //导航到目标位置
             m_AIRobotMove.Move(targetPos);
 
@@ -131,7 +170,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             {
                 motionId = GetCurExecuteTask.motionId,
                 name = GetCurExecuteTask.name,
-                task_id = GetCurExecuteTask.task_id,
+                task_id = GetCurExecuteTask.taskId,
                 simulatorId = GetCurExecuteTask.simulatorId,
                 stateCode = 0,
                 stateMsg = "suc",
@@ -212,6 +251,10 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     grabObj = MainData.CacheItemsEntity[objName2];
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PutDown");
                     break;
+                ////转动门把手
+                //case Order.Turn_Door:
+                //    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Turn_Door");
+                //    break;
                 //打开门
                 case Order.Open_Door_Inside:
                 case Order.Open_Door_Outside:
@@ -233,20 +276,39 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     //    m_RobotAnimCenter.PlayAnimByBool("CanInteraction", false);
                     //}
                     //);
-
-
                     break;
                 //擦桌子
                 case Order.Robot_CleanTable:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_CleanTable");
                     break;
-                ////倒水
+                //倒水todo
                 //case Order.:
                 //    animSecond = robotAnimCenter.PlayAnimByName("");
                 //    break;
                 //操作阀门
-                case "todo3":
-                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PressBtn");
+                case Order.Wheel:
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Wheel");
+                    string key = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
+                    if (MainData.CacheItemsEntity.ContainsKey(key))
+                    {
+                        Animator wheelAnim = MainData.CacheItemsEntity[key].GetComponentInChildren<Animator>();
+                        if (wheelAnim != null)
+                        {
+                            wheelAnim.Play("Wheel");
+                        }
+                        else
+                        {
+                            Debugger.LogError("wheelAnim is null");
+                        }
+                    }
+                    else
+                    {
+                        Debugger.LogError("Wheel is null");
+                    }
+                    break;
+                //充电
+                case Order.Pile:
+                    animSecond = 0.1f;
                     break;
                 //蹲下拾取
                 case Order.Pick_Fwd:
@@ -262,12 +324,16 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case Order.Push_Loop:
                 case Order.Push_Idle_inPlace:
                 case Order.Push_Start:
-                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Push_Idle");
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Box_Push");
+                    //箱子动画 todo
+
                     break;
-                ////拉
-                //case Order.:
-                //    animSecond = robotAnimCenter.PlayAnimByName("");
-                //    break;
+                //拉
+                case Order.Pull_Start:
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Box_Pull");
+                    //箱子动画 todo
+
+                    break;
                 //按下按钮
                 case Order.Press_Button:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PressBtn");
@@ -279,6 +345,18 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 //敲门
                 case Order.Knock_on_door:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Knock_on_door");
+                    break;
+                //跳跃
+                case Order.Jump:
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Jump_in_Place");
+                    break;
+                //射箭
+                case Order.CDA_Release:
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_CDA_Release");
+                    break;
+                //回旋踢
+                case Order.Combat_Spinning_Kick:
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Combat_Spinning_Kick");
                     break;
                 default:
                     Debug.LogError("当前指令动画未配置 orderAnim: " + orderStr + "，motionId:" + GetCurExecuteTask.motionId);
@@ -327,23 +405,27 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// 任务执行失败回调
     /// </summary>
     /// <param name="stateCode"></param>
-    private void TaskExecuteFail(Vector3 targetPos, int stateCode = 2)
+    private void TaskExecuteFail(Vector3 targetPos, int stateCode = 2,string stateMsg ="")
     {
-        Debug.LogError("无法导航到目标位置 targetPos:" + targetPos);
+        Debug.LogError("任务执行失败回调 targetPos:" + targetPos);
 
         //改变机器人状态
         m_RobotAnimCenter.PlayAnimByBool("IsMoving", false);
         m_AIRobotMove.curRobotState = AIRobotMove.RobotBaseState.Idel;
 
+        if (string.IsNullOrEmpty(stateMsg))
+        {
+            stateMsg = "dont arrive target pos , targetPos:" + targetPos;
+        }
         //返回指令执行结果
         ControlResult controlResult = new ControlResult
         {
             motionId = GetCurExecuteTask.motionId,
             name = GetCurExecuteTask.name,
-            task_id = GetCurExecuteTask.task_id,
+            task_id = GetCurExecuteTask.taskId,
             simulatorId = GetCurExecuteTask.simulatorId,
             stateCode = stateCode,
-            stateMsg = "dont arrive target pos , targetPos:" + targetPos,
+            stateMsg = stateMsg,
             targetRommType = GetTargetRoomType().ToString()
         };
         InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
@@ -373,28 +455,47 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     {
         ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(controlCommitJsonStr);
         bool isRight = true;
+        string taskFailDes = "";
         //判断当前指令是否合法
-        if (controlCommit != null && !string.IsNullOrEmpty(controlCommit.task_id))
+        if (controlCommit != null)
         {
-            if (controlCommit.simulatorId == MainData.SceneID)
+            if (!string.IsNullOrEmpty(controlCommit.taskId))
             {
-                isRight = false;
-                Debugger.LogError("新增决策指令失败,仿真实例id，curSceneID：" + MainData.SceneID + ",OrderIDL" + controlCommit.simulatorId + ",json：" + controlCommitJsonStr);
+                if (controlCommit.sceneID == MainData.SceneID || controlCommit.simulatorId == MainData.SceneID)
+                {
+                    isRight = true;
+                }
+                else
+                {
+                    isRight = false;
+                    taskFailDes = "新增决策指令失败,仿真实例，id，curSceneID：" + MainData.SceneID + "，simulatorId：" + controlCommit.simulatorId+"，sceneID："+ controlCommit.sceneID + ",json：" + controlCommitJsonStr;
+                }
+                if (MainData.ControlCommitCompletedList.Find((p) => { return p.task_id == controlCommit.taskId; }) != null)
+                {
+                    isRight = false;
+                    taskFailDes = "新增决策指令失败,已完成过当前决策指令，id，task_id：" + controlCommit.taskId + ",json：" + controlCommitJsonStr;
+                }
             }
-            else if (MainData.ControlCommitCompletedList.Find((p) => { return p.task_id == controlCommit.task_id; }) != null)
+            else
             {
+                taskFailDes = "新增决策指令失败,task_id is null , json：" + controlCommitJsonStr;
                 isRight = false;
-                Debugger.LogError("新增决策指令失败,已完成过当前决策指令，task_id：" + controlCommit.task_id + ",json：" + controlCommitJsonStr);
             }
         }
         else
         {
-            Debugger.LogError("新增决策指令失败,controlCommit is nill");
+            taskFailDes = "新增决策指令失败,controlCommit is null , json：" + controlCommitJsonStr;
+            isRight = false;
         }
         if (isRight)
         {
             MainData.ControlCommit.Enqueue(controlCommit);
             Debugger.Log("新增决策指令成功 , json：" + controlCommitJsonStr, LogTag.Forever);
+        }
+        else
+        {
+            Debugger.LogError(taskFailDes, LogTag.Forever);
+            TaskExecuteFail(Vector3.zero, 1, taskFailDes);
         }
     }
 
@@ -495,8 +596,17 @@ class Order
     public const string Push_Idle_inPlace = "Push_Idle_inPlace";
     public const string Push_Loop = "Push_Loop";
     public const string Push_Start = "Push_Start";
+
+    public const string Pull_Start = "Pull_Start";
     public const string IDLE = "IDLE";
     public const string MOVE = "MOVE";
 
+    public const string Wheel = "Wheel";
     public const string Robot_CleanTable = "Robot_CleanTable";
+    public const string Pile = "Pile";
+    //public const string Turn_Door = "Turn_Door";
+
+    public const string Jump = "Jump";
+    public const string CDA_Release = "CDA_Release";
+    public const string Combat_Spinning_Kick = "Combat_Spinning_Kick";
 }

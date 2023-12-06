@@ -69,10 +69,11 @@ public class AIRobotMove : MonoBehaviour
         curRobotState = RobotBaseState.Idel;
     }
 
-    public void SetTargetPointObj(Vector3 pos)
+    public void SetTargetPointObj(Vector3 pos,Vector3 rot)
     {
         targetPoint.gameObject.SetActive(false);
         targetPoint.position = pos;
+        targetPoint.rotation = Quaternion.Euler(rot);
         targetPoint.gameObject.SetActive(true);
     }
 
@@ -278,7 +279,10 @@ public class AIRobotMove : MonoBehaviour
         //Debug.Log("coll " + collision.collider.name);
         if (collision.collider.gameObject.name == "TargetPoint")
         {
-            transform.LookAt(targetPoint);
+            transform.position = targetPoint.position;
+            transform.rotation = Quaternion.Euler(targetPoint.transform.eulerAngles);
+            //transform.LookAt(targetPoint);
+
 
             MsgEvent.SendMsg(MsgEventName.RobotMoveEnd);
             MsgEvent.SendMsg(MsgEventName.RobotArriveTargetPos);
