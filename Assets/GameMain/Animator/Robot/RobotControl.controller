@@ -1312,7 +1312,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Robot_BA_Release
+  m_Name: Robot_CDA_Release
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:

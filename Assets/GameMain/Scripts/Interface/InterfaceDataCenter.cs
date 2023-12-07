@@ -257,7 +257,6 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 }
                 ";
                 }
-
               
                 MainData.getEnvGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetEnvGraph>(jsonStr);
                 Debugger.Log("缓存环境场景图,房间与房间的邻接关系 jsonStr:" + jsonStr);
@@ -421,7 +420,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// <param name="msg"></param>
     private void ParseMQTTMsg(string topic, string msg)
     {
-        Debugger.Log($"recv mqtt callback. topic：{topic},{System.DateTime.Now.ToString("yyyyMMdd_HHmmss")}");
+        Debugger.Log($"recv mqtt callback. topic：{topic}，curTime：{System.DateTime.Now.ToString("yyyyMMdd_HHmmss")}");
         //Debugger.Log($"recv mqtt callback. topic：{topic}");
 
         //在非Unity主线程中调用UnityEngineApi
@@ -449,10 +448,12 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     MainDataTool.GetInstance.DelEntityToTargetPlace(jsonDelEntity);
                     break;
                 case TOPIC_ROBOT_POS:
+                    Debugger.Log("TOPIC_ROBOT_POS,json: " + msg);
                     Feature_Robot_Pos feature_Robot_Pos = JsonTool.GetInstance.JsonToObjectByLitJson<Feature_Robot_Pos>(msg);
                     MainData.feature_robot_pos.Enqueue(feature_Robot_Pos);
                     break;
                 case TOPIC_PEOPLE_PERCEPTION:
+                    Debugger.Log("TOPIC_PEOPLE_PERCEPTION,json: " + msg);
                     Feature_People_Perception feature_People_Perception = JsonTool.GetInstance.JsonToObjectByLitJson<Feature_People_Perception>(msg);
                     MainData.feature_People_Perceptions.Enqueue(feature_People_Perception);
                     break;

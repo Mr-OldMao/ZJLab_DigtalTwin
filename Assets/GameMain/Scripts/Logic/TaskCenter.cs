@@ -207,7 +207,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             GameObject grabObj = null;
             switch (orderStr)
             {
-                case Order.MOVE:
+                //行走
+                case Order.WALK:
                     break;
                 //拿取
                 case Order.Grab_item:
@@ -251,10 +252,6 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     grabObj = MainData.CacheItemsEntity[objName2];
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PutDown");
                     break;
-                ////转动门把手
-                //case Order.Turn_Door:
-                //    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Turn_Door");
-                //    break;
                 //打开门
                 case Order.Open_Door_Inside:
                 case Order.Open_Door_Outside:
@@ -281,10 +278,6 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case Order.Robot_CleanTable:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_CleanTable");
                     break;
-                //倒水todo
-                //case Order.:
-                //    animSecond = robotAnimCenter.PlayAnimByName("");
-                //    break;
                 //操作阀门
                 case Order.Wheel:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Wheel");
@@ -358,6 +351,15 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case Order.Combat_Spinning_Kick:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Combat_Spinning_Kick");
                     break;
+
+                ////转动门把手
+                //case Order.Turn_Door:
+                //    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Turn_Door");
+                //    break;
+                //倒水todo
+                //case Order.:
+                //    animSecond = robotAnimCenter.PlayAnimByName("");
+                //    break;
                 default:
                     Debug.LogError("当前指令动画未配置 orderAnim: " + orderStr + "，motionId:" + GetCurExecuteTask.motionId);
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Other");
@@ -599,7 +601,7 @@ class Order
 
     public const string Pull_Start = "Pull_Start";
     public const string IDLE = "IDLE";
-    public const string MOVE = "MOVE";
+    public const string WALK = "WALK";
 
     public const string Wheel = "Wheel";
     public const string Robot_CleanTable = "Robot_CleanTable";

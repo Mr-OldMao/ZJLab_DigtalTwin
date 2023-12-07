@@ -8,8 +8,8 @@ using UnityEngine;
 /// </summary>
 public class CameraFreeMove : MonoBehaviour
 {
-    private Vector3 movePosMin = new Vector3(0, 0f, 0f);
-    private Vector3 movePosMax = new Vector3(50f, 30f, 50f);
+    public Vector3 movePosMin = new Vector3(0, 0f, 0f);
+    public Vector3 movePosMax = new Vector3(50f, 30f, 50f);
 
 
 
@@ -85,7 +85,7 @@ public class CameraFreeMove : MonoBehaviour
             if (Distance >= MouseZoomMin && Distance <= MouseZoomMax)
             {
                 Distance = Input.GetAxis("Mouse ScrollWheel") * MouseWheelSensitivity;
-                Debug.Log("Distance " + Distance);
+                //Debug.Log("Distance " + Distance);
             }
             //if (Distance < MouseZoomMin)
             //{
@@ -110,7 +110,7 @@ public class CameraFreeMove : MonoBehaviour
             cameraZ = transform.forward;
 
             initScreenPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetOnScreenPosition.z);
-            Debugger.Log("鼠标中间按下：" + initScreenPos);
+            //Debugger.Log("鼠标中间按下：" + initScreenPos);
 
             //targetOnScreenPosition.z为目标物体到相机xmidbuttonDownPositiony平面的法线距离
             targetOnScreenPosition = Camera.main.WorldToScreenPoint(transform.position);
@@ -120,7 +120,7 @@ public class CameraFreeMove : MonoBehaviour
         if (Input.GetMouseButton(2))
         {
             curScreenPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetOnScreenPosition.z);
-            Debugger.Log("鼠标中间持续按下，curScreenPos：" + curScreenPos + "，initScreenPos：" + initScreenPos);
+            //Debugger.Log("鼠标中间持续按下，curScreenPos：" + curScreenPos + "，initScreenPos：" + initScreenPos);
             if (JudegTargetPos(initPosition - 0.01f * ((curScreenPos.x - initScreenPos.x) * cameraX + (curScreenPos.y - initScreenPos.y) * cameraY)))
             {
                 //0.01这个系数是控制平移的速度，要根据相机和目标物体的distance来灵活选择

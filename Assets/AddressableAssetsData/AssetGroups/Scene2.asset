@@ -17,13 +17,13 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 428904d5c3b4e27419d078c762d58579
   m_SerializeEntries:
-  - m_GUID: e465592005de72545af61b5328e5aa4b
-    m_Address: Assets/GameMain/AB/Prefab/Entity/Robot/RobotPrefab.prefab
+  - m_GUID: f8c722a0674b60f44840b06cfd7cefdb
+    m_Address: Assets/GameMain/AB/Prefab/Entity/Robot/PeoplePrefab.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - Scene2
-  - m_GUID: f8c722a0674b60f44840b06cfd7cefdb
-    m_Address: Assets/GameMain/AB/Prefab/Entity/Robot/PeoplePrefab.prefab
+  - m_GUID: e465592005de72545af61b5328e5aa4b
+    m_Address: Assets/GameMain/AB/Prefab/Entity/Robot/RobotPrefab.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - Scene2
