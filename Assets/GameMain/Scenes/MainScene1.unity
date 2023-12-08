@@ -487,6 +487,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 890353a6f4051354680d3335f10e7220, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movePosMin: {x: 0, y: 0, z: 0}
+  movePosMax: {x: 50, y: 30, z: 50}
 --- !u!20 &739553035
 Camera:
   m_ObjectHideFlags: 0

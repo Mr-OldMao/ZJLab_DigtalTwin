@@ -148,10 +148,14 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             callback(null, null);
             return;
         }
-        Dictionary<Vector2, BorderInfo> dicRoomWallInfo=  CacheRoomWallInfo(m_ListRoomInfo.ToArray());
+        Dictionary<Vector2, BorderInfo> dicRoomWallInfo = CacheRoomWallInfo(m_ListRoomInfo.ToArray());
         m_DicRoomWallInfo = dicRoomWallInfo;
 
         RoomBaseInfo livingRoomBaseInfo = roomBaseInfosClone.Find((p) => { return p.curRoomType == RoomType.LivingRoom; });
+        if (livingRoomBaseInfo == null)
+        {
+            livingRoomBaseInfo = roomBaseInfosClone[0];
+        }
         string firstGenerateID = livingRoomBaseInfo.curRoomID;
 
         if (!MainData.CanReadFile)
@@ -170,9 +174,29 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
         m_ListRoomInfo = new List<RoomInfo>();
         if (!MainData.CanReadFile)
         {
+            ////随机生成所有房间顺序：首先生成客厅房间，其次是邻接关系最多的房间，到最好邻接关系最少的房间
+            ////找到客厅房间放置在坐标系，房间左下角在原点，向第一象限延申
+            //RoomBaseInfo livingRoomBaseInfo = roomBaseInfos.Find((p) => { return p.curRoomType == RoomType.LivingRoom; });
+            //string firstGenerateID = livingRoomBaseInfo.curRoomID;
+            //RoomInfo livingRoomInfo = new RoomInfo
+            //{
+            //    roomType = livingRoomBaseInfo.curRoomType,
+            //    roomSize = livingRoomBaseInfo.roomSize,
+            //    roomPosMin = new Vector2(0, 0),
+            //    roomPosMax = new Vector2(livingRoomBaseInfo.roomSize[0], livingRoomBaseInfo.roomSize[1]),
+            //    listDoorPosInfo = null, //TODO
+            //    listEmptyPosInfo = null, //TODO
+            //    roomID = firstGenerateID,
+            //};
+            //m_ListRoomInfo.Add(livingRoomInfo);
+
             //随机生成所有房间顺序：首先生成客厅房间，其次是邻接关系最多的房间，到最好邻接关系最少的房间
             //找到客厅房间放置在坐标系，房间左下角在原点，向第一象限延申
             RoomBaseInfo livingRoomBaseInfo = roomBaseInfos.Find((p) => { return p.curRoomType == RoomType.LivingRoom; });
+            if (livingRoomBaseInfo == null)
+            {
+                livingRoomBaseInfo = roomBaseInfos[0];
+            }
             string firstGenerateID = livingRoomBaseInfo.curRoomID;
             RoomInfo livingRoomInfo = new RoomInfo
             {
@@ -185,6 +209,8 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
                 roomID = firstGenerateID,
             };
             m_ListRoomInfo.Add(livingRoomInfo);
+
+
             UpdateRoomBuilderInfo(livingRoomInfo);
             roomBaseInfos.Remove(livingRoomBaseInfo);
 
@@ -894,7 +920,7 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
     /// <param name="roomInfoArr">所有房间信息数据</param>
     public Dictionary<Vector2, BorderInfo> CacheRoomWallInfo(params RoomInfo[] roomInfoArr)
     {
-        Dictionary<Vector2, BorderInfo>  dicRoomWallInfo = new Dictionary<Vector2, BorderInfo>();
+        Dictionary<Vector2, BorderInfo> dicRoomWallInfo = new Dictionary<Vector2, BorderInfo>();
         for (int j = 0; j < roomInfoArr.Length; j++)
         {
             RoomInfo roomInfo = roomInfoArr[j];

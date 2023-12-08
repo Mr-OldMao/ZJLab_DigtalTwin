@@ -1,12 +1,9 @@
 using MFramework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static Feature_Robot_Pos;
-using static UnityEditor.FilePathAttribute;
 
 /// <summary>
 /// 标题：数字孪生程序主逻辑
@@ -48,6 +45,10 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
             {
                 //接入网络通信 
                 NetworkMQTT();
+
+                
+                UIManager.GetInstance.Show<UIFormScene2>().Init();
+
             });
         });
 

@@ -144,6 +144,7 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
         {
             roomMatDatas = new List<RoomMatData>();
         }
+
         int matID;
         string matKey;
         Material mat;
@@ -385,7 +386,7 @@ public enum RoomType
     /// </summary>
     BathRoom,
     /// <summary>
-    /// 主卧
+    /// 卧室
     /// </summary>
     BedRoom,
     /// <summary>

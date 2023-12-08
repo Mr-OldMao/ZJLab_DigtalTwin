@@ -180,7 +180,7 @@ public class CameraFreeMove : MonoBehaviour
             cameraZ = transform.forward;
 
             initScreenPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetOnScreenPosition.z);
-            Debugger.Log("键盘A键按下：" + initScreenPos);
+            //Debugger.Log("键盘A键按下：" + initScreenPos);
 
             //targetOnScreenPosition.z为目标物体到相机xmidbuttonDownPositiony平面的法线距离
             targetOnScreenPosition = Camera.main.WorldToScreenPoint(transform.position);
@@ -193,7 +193,7 @@ public class CameraFreeMove : MonoBehaviour
             m_KeyACount++;
             //curScreenPos = new Vector3(Input.mousePosition.x - (m_KeyACount * 10f), Input.mousePosition.y, targetOnScreenPosition.z);
             curScreenPos = new Vector3(initScreenPos.x + (m_KeyACount * m_MoveSpeedInputAD), initScreenPos.y, initScreenPos.z);
-            Debugger.Log("键盘A键持续按下，curScreenPos：" + curScreenPos + "，initScreenPos：" + initScreenPos);
+            //Debugger.Log("键盘A键持续按下，curScreenPos：" + curScreenPos + "，initScreenPos：" + initScreenPos);
             if (JudegTargetPos(initPosition - 0.01f * ((curScreenPos.x - initScreenPos.x) * cameraX + (curScreenPos.y - initScreenPos.y) * cameraY)))
             {
                 //0.01这个系数是控制平移的速度，要根据相机和目标物体的distance来灵活选择
@@ -207,7 +207,7 @@ public class CameraFreeMove : MonoBehaviour
             cameraZ = transform.forward;
 
             initScreenPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetOnScreenPosition.z);
-            Debugger.Log("键盘A键按下：" + initScreenPos);
+            //Debugger.Log("键盘A键按下：" + initScreenPos);
 
             //targetOnScreenPosition.z为目标物体到相机xmidbuttonDownPositiony平面的法线距离
             targetOnScreenPosition = Camera.main.WorldToScreenPoint(transform.position);
@@ -220,7 +220,7 @@ public class CameraFreeMove : MonoBehaviour
             m_KeyDCount++;
             //curScreenPos = new Vector3(Input.mousePosition.x - (m_KeyDCount * 10f), Input.mousePosition.y, targetOnScreenPosition.z);
             curScreenPos = new Vector3(initScreenPos.x - (m_KeyDCount * m_MoveSpeedInputAD), initScreenPos.y, initScreenPos.z);
-            Debugger.Log("键盘A键持续按下，curScreenPos：" + curScreenPos + "，initScreenPos：" + initScreenPos);
+            //Debugger.Log("键盘A键持续按下，curScreenPos：" + curScreenPos + "，initScreenPos：" + initScreenPos);
             if (JudegTargetPos(initPosition - 0.01f * ((curScreenPos.x - initScreenPos.x) * cameraX + (curScreenPos.y - initScreenPos.y) * cameraY)))
             {
                 //0.01这个系数是控制平移的速度，要根据相机和目标物体的distance来灵活选择

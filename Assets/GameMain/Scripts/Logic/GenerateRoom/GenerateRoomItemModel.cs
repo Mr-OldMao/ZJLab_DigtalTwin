@@ -22,7 +22,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     /// </summary>
     private bool m_IsLimitPutPos = false;
 
-    public Transform ItemEntityGroupNode { get;  set; }
+    public Transform ItemEntityGroupNode { get; set; }
 
     /// <summary>
     /// 坐标点的放置信息
@@ -127,6 +127,16 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         }
 
         if (!MainData.CanReadFile)
+        {
+            //在每个房间天花板中心放置灯
+            SetToplampInsideItemEnity();
+        }
+
+        ////在每个房间天花板中心放置灯
+        //SetToplampInsideItemEnity();
+
+
+        if (MainData.UseTestData)
         {
             //设置各个房间默认的实体物品，位置随机
             SetDefaultRoomInsideItemEntity();
@@ -298,14 +308,11 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         }
     }
 
-
-
     /// <summary>
-    /// 设置各个房间默认的实体物品，位置随机
+    /// 在每个房间天花板中心放置灯
     /// </summary>
-    private void SetDefaultRoomInsideItemEntity()
+    private void SetToplampInsideItemEnity()
     {
-        //return;
 
         for (int i = 0; i < GenerateRoomData.GetInstance.m_ListRoomInfo.Count; i++)
         {
@@ -329,8 +336,13 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             //在每个房间放置垃圾桶
             PutCustomItem(roomTypeStr, "Bin", GetDefaultItemID);
         }
+    }
 
-
+    /// <summary>
+    /// 设置各个房间默认的实体物品，位置随机
+    /// </summary>
+    private void SetDefaultRoomInsideItemEntity()
+    {
         //客厅
         PutCustomItem(RoomType.LivingRoom, "Sofa", GetDefaultItemID);
         PutCustomItem(RoomType.LivingRoom, "TV", GetDefaultItemID);
@@ -455,11 +467,16 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
             }
             //当前实体信息
             string entityName = relatedThingArr[i].target.name;
-            //剔除Door信息
+            //剔除Door信息和
             if (entityName.EndsWith("Door"))
             {
                 continue;
             }
+            ////重新生成场景后屏蔽顶灯Toplamp信息
+            //if (relatedThingArr[i].target.name == "Toplamp" && !MainData.IsFirstGenerate)
+            //{
+            //    continue;
+            //}
             //实例化实体
             GameObject clone = GetItemEntity(entityName);
             Transform parentTrans = ItemEntityGroupNode.transform.Find(roomType.ToString() + "_" + roomID);

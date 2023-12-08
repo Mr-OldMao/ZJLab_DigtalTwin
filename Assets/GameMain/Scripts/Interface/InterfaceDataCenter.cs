@@ -257,7 +257,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 }
                 ";
                 }
-              
+
                 MainData.getEnvGraph = JsonTool.GetInstance.JsonToObjectByLitJson<GetEnvGraph>(jsonStr);
                 Debugger.Log("缓存环境场景图,房间与房间的邻接关系 jsonStr:" + jsonStr);
                 //存档
@@ -387,7 +387,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     //TEST
                     NetworkMqtt.GetInstance.Subscribe(
                         TOPIC_WEB_SEND, TOPIC_WEB_RECV,
-                        TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA,
+                        //TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA,
                         TOPIC_RECV, TOPIC_ROOMINFODATA);
                     break;
                 case GameLaunch.Scenes.MainScene2:
@@ -404,7 +404,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
             clientIP = MainData.ConfigData?.MqttConfig.ClientIP, //"10.5.24.28",
             clientPort = NetworkMqtt.GetInstance.IsWebgl ? 8083 : 1883,
             clientID = MainData.SceneID + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss"),
-            userName = "UserName_"+ MainData.SceneID + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss")
+            userName = "UserName_" + MainData.SceneID + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss")
         });
         //监听消息回调
         NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
@@ -420,7 +420,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// <param name="msg"></param>
     private void ParseMQTTMsg(string topic, string msg)
     {
-        Debugger.Log($"recv mqtt callback. topic：{topic}，curTime：{System.DateTime.Now.ToString("yyyyMMdd_HHmmss")}");
+        Debugger.Log($"recv mqtt callback. topic：{topic}，curTime：{System.DateTime.Now.ToString("yyyyMMdd_HHmmss")} ,msg：{msg}" );
         //Debugger.Log($"recv mqtt callback. topic：{topic}");
 
         //在非Unity主线程中调用UnityEngineApi
@@ -475,6 +475,9 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                         CameraControl.GetInstance.SetCameraCustomPos(pos, rot);
                         CameraControl.GetInstance.ShowCameraCustom(true);
                     }
+                    break;
+                case TOPIC_GLOBAL:
+                    Debugger.Log("TOPIC_GLOBAL,json：" + msg);
                     break;
                 default:
                     //Debugger.Log($"Other Topoc :{topic}");

@@ -64,6 +64,7 @@ namespace MFramework
             Add<UIFormCameraHint>(new UIEntityConfigInfo(UIFormRootDir + "/UIFormCameraHint.prefab", UILayerType.Common));
             Add<UIFormHintNotBtn>(new UIEntityConfigInfo(UIFormHintNotBtn.AssetPathNew, UILayerType.Top));
             Add<UIFormHintOneBtn>(new UIEntityConfigInfo(UIFormHintOneBtn.AssetPathNew, UILayerType.Top));
+            Add<UIFormScene2>(new UIEntityConfigInfo(UIFormScene2.AssetPathNew, UILayerType.Common));
 
             //根据xml配置表手动绑定UI窗体信息
             BindUIFormInfoByXml();
