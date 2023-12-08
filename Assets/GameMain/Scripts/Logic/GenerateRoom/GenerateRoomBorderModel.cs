@@ -205,64 +205,10 @@ public class GenerateRoomBorderModel : SingletonByMono<GenerateRoomBorderModel>
             if (entityModel != null)
             {
                 GameObject clone = Instantiate(entityModel, new Vector3(borderEntityData.pos.x, 0, borderEntityData.pos.y), Quaternion.identity);
-                //string temp = "_";
-                //foreach (var item in borderEntityData.listRoomType)
-                //{
-                //    temp += item.ToString() + "_";
-                //}
-                //if (borderEntityData?.listRoomTypeID?.Count>0)
-                //{
-                //    foreach (var item in borderEntityData?.listRoomTypeID)
-                //    {
-                //        temp += item.ToString() + "_";
-                //    }
-                //}
-                //clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y + temp;
                 clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
                 clone.transform.parent = GetRoomRootNode(borderEntityData.listRoomType[0]).transform; //TODO listRoomType[0]
                 borderEntityData.entity = clone;
             }
-
-            //if (borderEntityData.entityModelType == EntityModelType.Wall )
-            //{
-            //    GameObject modelWallSmall = LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallPrefab");
-            //    //GameObject modelWallSmall = borderEntityData.entityAxis == 0 ? LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallX") : LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallY");
-            //    for (int j = 0; j < modelWallSmall.transform.childCount; j++)
-            //    {
-            //        modelWallSmall.transform.GetChild(j).SetActive(modelWallSmall.transform.GetChild(j).name == borderEntityData.borderDir.ToString());
-            //    }
-            //    GameObject clone = Instantiate(modelWallSmall, new Vector3(borderEntityData.pos.x, 0, borderEntityData.pos.y), Quaternion.identity);
-            //    //clone.name = entityModel?.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y;
-
-            //    string temp = "_";
-            //    foreach (var item in borderEntityData.listRoomType)
-            //    {
-            //        temp += item.ToString() + "_";
-            //    }
-            //    if (borderEntityData?.listRoomTypeID?.Count > 0)
-            //    {
-            //        foreach (var item in borderEntityData?.listRoomTypeID)
-            //        {
-            //            temp += item.ToString() + "_";
-            //        }
-            //    }
-
-            //    clone.name = modelWallSmall.name + "_" + borderEntityData.pos.x + "_" + borderEntityData.pos.y + temp;
-            //    clone.transform.parent = GetRoomRootNode(borderEntityData.listRoomType[0]).transform; //TODO listRoomType[0]
-            //}
-            //else if (borderEntityData.entityModelType == EntityModelType.Door)
-            //{
-            //    GameObject modelWallSmall1 = LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallPrefab");
-            //    GameObject modelWallSmall2 = LoadAssetsByAddressable.GetInstance.GetEntityRes("WallSmallPrefab");
-            //    //获取“门”归属与哪两个房间
-            //    if (borderEntityData?.listRoomTypeID?.Count > 0)
-            //    {
-            //        foreach (var item in borderEntityData?.listRoomTypeID)
-            //        {
-            //        }
-            //    }
-            //    //获取两个房间的位置关系
-            //}
         }
 
         //缓存地板、墙壁材质

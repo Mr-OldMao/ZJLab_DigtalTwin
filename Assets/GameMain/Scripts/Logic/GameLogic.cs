@@ -26,6 +26,16 @@ public class GameLogic : SingletonByMono<GameLogic>
     public float y;
 
     private int m_CurAgainGenerateSceneCount = 0;
+
+    /// <summary>
+    /// 房间尺寸随机数 长min，max
+    /// </summary>
+    private int[] m_RoomSizeRandomLength = new int[2] { 4, 8 };
+    /// <summary>
+    /// 房间尺寸随机数 长min，max
+    /// </summary>
+    private int[] m_RoomSizeRandomWidth = new int[2] { 4, 8 };
+
     public void Init()
     {
         Debugger.Log("Init GameLogic");
@@ -35,7 +45,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "test|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "Simulator:1702015456841|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 
 #else
@@ -192,7 +202,30 @@ public class GameLogic : SingletonByMono<GameLogic>
         MsgEvent.RegisterMsgEvent(MsgEventName.GenerateSceneComplete, () =>
         {
             UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show("场景生成完毕！");
-
+            //当前场景未存档过，则自动存档一次
+            DataRead.GetInstance.ReadAllDataByServerSceneID((isSuc) =>
+            {
+                if (!isSuc)
+                {
+                    Debugger.Log("当前场景未存档过，自动存档一次", LogTag.Forever);
+                    UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
+                    {
+                        txtHintContent = "当前场景未存档过，\n即将自动存档!",
+                        delayCloseUIFormTime = 2
+                    });
+                    UnityTool.GetInstance.DelayCoroutine(2f, () =>
+                    {
+                        DataSave.GetInstance.Save(() =>
+                        {
+                            UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
+                            {
+                                txtHintContent = "自动存档成功!",
+                                delayCloseUIFormTime = 2
+                            });
+                        });
+                    });
+                }
+            });
 
             MainData.IsFirstGenerate = false;
             //原点偏移至场景左下角
@@ -314,7 +347,10 @@ public class GameLogic : SingletonByMono<GameLogic>
                 roomBaseInfos.Add(roomBaseInfo);
 
                 roomBaseInfo.curRoomType = (RoomType)Enum.Parse(typeof(RoomType), roomRelation.name);
-                roomBaseInfo.roomSize = new uint[] { (uint)UnityEngine.Random.Range(4, 8), (uint)UnityEngine.Random.Range(4, 8) };
+                uint length = (uint)UnityEngine.Random.Range(m_RoomSizeRandomLength[0], m_RoomSizeRandomLength[1]);
+                uint width = (uint)UnityEngine.Random.Range(m_RoomSizeRandomWidth[0], m_RoomSizeRandomWidth[1]);
+
+                roomBaseInfo.roomSize = new uint[] { length, width };
                 roomBaseInfo.targetRoomsDirRelation = new List<RoomsDirRelation>();
                 roomBaseInfo.curRoomID = roomRelation.id;
                 //当前房间与其他房间邻接关系
@@ -343,12 +379,17 @@ public class GameLogic : SingletonByMono<GameLogic>
                     string curRoomID = roomRelation.relatedThing[j].target.id;
                     if (roomBaseInfos.Find((p) => { return p.curRoomType == targetRoomType && p.curRoomID == curRoomID; }) == null)
                     {
-                        roomBaseInfos.Add(new RoomBaseInfo
+                        RoomBaseInfo roomBaseInfo = new RoomBaseInfo
                         {
                             curRoomType = targetRoomType,
                             curRoomID = curRoomID,
-                            roomSize = new uint[] { (uint)UnityEngine.Random.Range(6, 8), (uint)UnityEngine.Random.Range(4, 8) }
-                        });
+                        };
+                        uint length = (uint)UnityEngine.Random.Range(m_RoomSizeRandomLength[0], m_RoomSizeRandomLength[1]);
+                        uint width = (uint)UnityEngine.Random.Range(m_RoomSizeRandomWidth[0], m_RoomSizeRandomWidth[1]);
+                        roomBaseInfo.roomSize = new uint[] { length, width };
+                        roomBaseInfos.Add(roomBaseInfo);
+
+
                     }
                 }
             }

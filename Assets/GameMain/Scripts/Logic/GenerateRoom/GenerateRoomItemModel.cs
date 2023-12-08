@@ -706,17 +706,22 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
     /// <param name="isCachePutPos">是否缓存实体所放置的位置</param>
     private void PutItem(RoomType roomType, string roomID, string entityName, string entityID, Vector3 pos, bool isCachePutPos)
     {
-        GameObject entityPrefab = LoadAssetsByAddressable.GetInstance.GetEntityRes(entityName);
-        GameObject clone = Instantiate(entityPrefab);
         Transform parentTrans = ItemEntityGroupNode.transform.Find(roomType.ToString() + "_" + roomID);
         if (parentTrans == null)
         {
             parentTrans = new GameObject(roomType.ToString() + "_" + roomID).transform;
             parentTrans.SetParent(ItemEntityGroupNode.transform);
         }
-        clone.transform.SetParent(parentTrans, false);
-        clone.name = entityName + "_" + entityID;
-        clone.transform.position = pos;
+        string targetItemName = entityName + "_" + entityID;
+        GameObject targetItem = parentTrans.Find<Transform>(targetItemName)?.gameObject;
+        if (targetItem == null)
+        {
+            GameObject entityPrefab = LoadAssetsByAddressable.GetInstance.GetEntityRes(entityName);
+            targetItem = Instantiate(entityPrefab);
+            targetItem.transform.SetParent(parentTrans, false);
+            targetItem.name = targetItemName;
+        }
+        targetItem.transform.position = pos;
     }
 
     /// <summary>

@@ -351,19 +351,28 @@ public class UpdateRoomData : SingletonByMono<UpdateRoomData>
 
         //更新所有房间公共墙壁数据
         Dictionary<Vector2, BorderInfo> dicBorDerInfo = GenerateRoomData.GetInstance.CacheRoomWallInfo(m_RoomInfos.ToArray());
+
         //重新生成门位置信息
         GenerateRoomData.GetInstance.GenerateDoorData(m_RoomBaseInfos, "", ref m_RoomInfos, dicBorDerInfo);
-
+        //更新实体数据
         foreach (var item in m_RoomInfos)
         {
             if (item?.listDoorPosInfo != null)
             {
                 foreach (var doors in item?.listDoorPosInfo)
                 {
-                    Debugger.Log("newDoorPos:" + doors?.pos + " ,entityAxis: " + doors?.entityAxis + ",roomType: " + doors?.listRoomType[0] + "," + doors?.listRoomType[1]);
+                    Vector2 newDoorPos = doors.pos;
+                    Debugger.Log("newDoorPos:" + newDoorPos + " ,entityAxis: " + doors?.entityAxis + ",roomType: " + doors?.listRoomType[0] + "," + doors?.listRoomType[1]);
+
+                    //删除当前新“门”坐标位置原有的“墙体”，在当前坐标位置新增：“门”实体
+                    List<BorderEntityData> borderEntityDataWall = m_BorderEntityDatas.FindAll((p) => { return p.pos == newDoorPos && p.entityModelType == EntityModelType.Wall; });
+                    for (int i = 0; i < borderEntityDataWall?.Count; i++)
+                    {
+                        m_BorderEntityDatas.Remove(borderEntityDataWall[i]);
+                    }
+                    m_BorderEntityDatas.Add(doors);
                 }
             }
-           
         }
     }
 

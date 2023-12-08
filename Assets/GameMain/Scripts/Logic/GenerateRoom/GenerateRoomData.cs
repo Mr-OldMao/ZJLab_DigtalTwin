@@ -293,6 +293,13 @@ public class GenerateRoomData : SingletonByMono<GenerateRoomData>
             //读档
             m_ListRoomInfo = DataRead.GetInstance.ReadRoomInfos();
             listRoomBuilderInfo = DataRead.GetInstance.ReadListRoomBuilderInfo();
+            foreach (var item in listRoomBuilderInfo)
+            {
+                if (item.entityModelType == EntityModelType.Door)
+                {
+                    Debugger.Log("door:" + item.pos);
+                }
+            }
             getSuc = m_ListRoomInfo != null && listRoomBuilderInfo != null;
         }
         return getSuc;
