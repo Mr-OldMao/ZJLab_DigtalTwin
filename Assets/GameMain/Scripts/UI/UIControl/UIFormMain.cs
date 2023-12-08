@@ -68,7 +68,7 @@ public class UIFormMain : UIFormBase
     public Button BtnEditReset { get => btnEditReset; set => btnEditReset = value; }
 
 
-    
+
     protected override void Awake()
     {
         base.Awake();
@@ -172,7 +172,7 @@ public class UIFormMain : UIFormBase
 #if UNITY_WEBGL && !UNITY_EDITOR
                         MqttWebglCenter.GetInstance.RefreshWeb();
 #endif
-                }); 
+                });
             });
         });
         tgeLive.onValueChanged.AddListenerCustom((ison) =>
@@ -232,6 +232,7 @@ public class UIFormMain : UIFormBase
             case ProgramState.stop:
                 MsgEvent.SendMsg(MsgEventName.RobotMoveEnd);
                 TaskCenter.GetInstance.CanExecuteTask = false;
+                TaskCenter.GetInstance.StopTask();
                 //FindObjectOfType<AIRobotMove>().
                 break;
         }

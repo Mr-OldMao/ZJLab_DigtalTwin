@@ -154,6 +154,14 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     }
 
     /// <summary>
+    /// 终止当前的任务
+    /// </summary>
+    public void StopTask()
+    {
+        TaskExecuteFail(Vector2.zero, 1, "当前任务被终止");
+    }
+
+    /// <summary>
     /// 机器人到达目标位置回调
     /// </summary>
     private void ArriveTargetPosCallback()
