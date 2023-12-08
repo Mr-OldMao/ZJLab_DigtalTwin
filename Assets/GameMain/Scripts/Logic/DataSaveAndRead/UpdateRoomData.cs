@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MFramework;
-using static DataRead;
 using static GenerateRoomBorderModel;
 using static GenerateRoomData;
 using static GetEnvGraph;
@@ -307,12 +305,30 @@ public class UpdateRoomData : SingletonByMono<UpdateRoomData>
         //删除原来的一扇门，变为两面墙
         for (int i = 0; i < oldDoorEntityData.Count; i++)
         {
+
+
+
             BorderEntityData targetBorderEntityData = oldDoorEntityData[i];
+
+            //判断当前“墙”相对于当前房间的位置关系
+            BorderDir borderDir1 = BorderDir.Up;
+            BorderDir borderDir2 = BorderDir.Up;
+            if (targetBorderEntityData.listRoomTypeID?.Count == 2)
+            {
+                borderDir1 = GetBorderDir(targetBorderEntityData, targetBorderEntityData.listRoomTypeID[0]);
+                borderDir2 = GetBorderDir(targetBorderEntityData, targetBorderEntityData.listRoomTypeID[1]);
+            }
+            else
+            {
+                Debugger.LogError("targetBorderEntityData.listRoomTypeID Count != 2 ,count:" + targetBorderEntityData.listRoomTypeID?.Count + "," + targetBorderEntityData.pos);
+            }
+
+
             BorderEntityData targetBorderEntityData1 = new BorderEntityData
             {
                 listRoomType = new List<RoomType> { targetBorderEntityData.listRoomType[0] },
                 listRoomTypeID = new List<string> { targetBorderEntityData.listRoomTypeID[0] },
-                //borderDir = targetBorderEntityData.borderDir,
+                borderDir = borderDir1,
                 pos = targetBorderEntityData.pos,
                 entityAxis = targetBorderEntityData.entityAxis,
                 entityModelType = EntityModelType.Wall,
@@ -323,7 +339,7 @@ public class UpdateRoomData : SingletonByMono<UpdateRoomData>
             {
                 listRoomType = new List<RoomType> { targetBorderEntityData.listRoomType[1] },
                 listRoomTypeID = new List<string> { targetBorderEntityData.listRoomTypeID[1] },
-                //borderDir = targetBorderEntityData.borderDir,
+                borderDir = borderDir2,
                 pos = targetBorderEntityData.pos,
                 entityAxis = targetBorderEntityData.entityAxis,
                 entityModelType = EntityModelType.Wall,
@@ -365,7 +381,7 @@ public class UpdateRoomData : SingletonByMono<UpdateRoomData>
                     Debugger.Log("newDoorPos:" + newDoorPos + " ,entityAxis: " + doors?.entityAxis + ",roomType: " + doors?.listRoomType[0] + "," + doors?.listRoomType[1]);
 
                     //删除当前新“门”坐标位置原有的“墙体”，在当前坐标位置新增：“门”实体
-                    List<BorderEntityData> borderEntityDataWall = m_BorderEntityDatas.FindAll((p) => { return p.pos == newDoorPos && p.entityModelType == EntityModelType.Wall; });
+                    List<BorderEntityData> borderEntityDataWall = m_BorderEntityDatas.FindAll((p) => { return p.pos == newDoorPos && p.entityModelType == EntityModelType.Wall && p.entityAxis == doors.entityAxis; });
                     for (int i = 0; i < borderEntityDataWall?.Count; i++)
                     {
                         m_BorderEntityDatas.Remove(borderEntityDataWall[i]);
@@ -407,6 +423,38 @@ public class UpdateRoomData : SingletonByMono<UpdateRoomData>
         {
             return default;
         }
+    }
+
+    //当前“墙”相对于当前房间的位置关系
+    private BorderDir GetBorderDir(BorderEntityData borderEntityData, string roomTypeID)
+    {
+        BorderDir res = BorderDir.Up;
+        Vector2 sidePos1;
+        Vector2 sidePos2;
+        if (borderEntityData.entityAxis == 0)
+        {
+            //相邻的坐标
+            sidePos1 = new Vector2(borderEntityData.pos.x + 1, borderEntityData.pos.y);
+            sidePos2 = new Vector2(borderEntityData.pos.x - 1, borderEntityData.pos.y);
+        }
+        else
+        {
+            sidePos1 = new Vector2(borderEntityData.pos.x, borderEntityData.pos.y + 1);
+            sidePos2 = new Vector2(borderEntityData.pos.x, borderEntityData.pos.y - 1);
+        }
+        BorderEntityData borderEntityData1 = m_BorderEntityDatas.Find(p => p.listRoomTypeID.Contains(roomTypeID) && p.entityAxis == borderEntityData.entityAxis && p.pos == sidePos1);
+        BorderEntityData borderEntityData2 = m_BorderEntityDatas.Find(p => p.listRoomTypeID.Contains(roomTypeID) && p.entityAxis == borderEntityData.entityAxis && p.pos == sidePos2);
+        if (borderEntityData1 != null)
+        {
+            res = borderEntityData1.borderDir;
+            Debugger.Log("borderEntityData1   roomTypeID:" + roomTypeID + "," + borderEntityData1.entityAxis + ",borderDir:" + res);
+        }
+        else if (borderEntityData2 != null)
+        {
+            res = borderEntityData2.borderDir;
+            Debugger.Log("borderEntityData2   roomTypeID:" + roomTypeID + "," + borderEntityData2.entityAxis + ",borderDir:" + res);
+        }
+        return res;
     }
 
     /// <summary>
