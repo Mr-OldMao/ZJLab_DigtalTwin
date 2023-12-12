@@ -80,16 +80,23 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         bool loadMatComplete = false;
         bool loadPrefabComplete = false;
 
-        Addressables.LoadAssetsAsync<Material>(lables, (p) =>
+        if (GameLaunch.GetInstance.scene ==  GameLaunch.Scenes.MainScene1)
         {
-            AddMatRes(p.name, p);
-            m_CurLoadedCount++;
-            //GetLoadProgress(AllAssetsCount);
-        }, MergeMode.Union, true).Completed += (UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle<IList<Material>> obj) =>
+            Addressables.LoadAssetsAsync<Material>(lables, (p) =>
+           {
+               AddMatRes(p.name, p);
+               m_CurLoadedCount++;
+               //GetLoadProgress(AllAssetsCount);
+           }, MergeMode.Union, true).Completed += (UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle<IList<Material>> obj) =>
+           {
+               loadMatComplete = true;
+               Debugger.Log("Loading Material Complete");
+           };
+        }
+        else
         {
             loadMatComplete = true;
-            Debugger.Log("Loading Material Complete");
-        };
+        }
 
         Addressables.LoadAssetsAsync<GameObject>(lables, (p) =>
         {

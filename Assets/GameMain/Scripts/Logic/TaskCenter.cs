@@ -158,7 +158,10 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// </summary>
     public void StopTask()
     {
-        TaskExecuteFail(Vector2.zero, 1, "当前任务被终止");
+        if (IsExecuteTask)
+        {
+            TaskExecuteFail(Vector2.zero, 1, "当前任务被终止");
+        }
     }
 
     /// <summary>
@@ -417,7 +420,13 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// <param name="stateCode"></param>
     private void TaskExecuteFail(Vector3 targetPos, int stateCode = 2,string stateMsg ="")
     {
-        Debug.LogError("任务执行失败回调 targetPos:" + targetPos);
+        Debug.Log("任务执行失败回调 targetPos:" + targetPos);
+
+        if (GetCurExecuteTask == null)
+        {
+            Debug.LogError("GetCurExecuteTask is null");
+            return;
+        }
 
         //改变机器人状态
         m_RobotAnimCenter.PlayAnimByBool("IsMoving", false);
@@ -433,7 +442,6 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             motionId = GetCurExecuteTask.motionId,
             name = GetCurExecuteTask.name,
             task_id = GetCurExecuteTask.taskId,
-            simulatorId = GetCurExecuteTask.simulatorId,
             stateCode = stateCode,
             stateMsg = stateMsg,
             targetRommType = GetTargetRoomType().ToString()
@@ -478,7 +486,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 else
                 {
                     isRight = false;
-                    taskFailDes = "忽视当前决策指令，curSceneID：" + MainData.SceneID + "，simulatorId：" + controlCommit.simulatorId+"，sceneID："+ controlCommit.sceneID + ",json：" + controlCommitJsonStr;
+                    taskFailDes = "SceneID不匹配，忽视当前决策指令，curSceneID：" + MainData.SceneID + "，simulatorId：" + controlCommit.simulatorId+"，sceneID："+ controlCommit.sceneID + ",json：" + controlCommitJsonStr;
                     Debugger.LogWarning(taskFailDes);
                     return;
                 }

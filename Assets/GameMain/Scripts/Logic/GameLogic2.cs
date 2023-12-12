@@ -37,6 +37,8 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
             m_RobotRootNode = new GameObject("RobotRootNode").transform;
         }
 
+
+
         //异步加载ab资源
         LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "Scene2" }, () =>
         {
@@ -46,7 +48,7 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
                 //接入网络通信 
                 NetworkMQTT();
 
-                
+
                 UIManager.GetInstance.Show<UIFormScene2>().Init();
 
             });
@@ -78,7 +80,8 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
         if (MainData.feature_People_Perceptions?.Count > 0)
         {
             Feature_People_Perception feature_People_Perception = MainData.feature_People_Perceptions.Dequeue();
-            DisposePeoplePerception(feature_People_Perception);
+            DisposePeoplePos(feature_People_Perception);
+            DisposePeopleUI(feature_People_Perception);
         }
 
         if (Input.GetKey(KeyCode.F6))
@@ -147,13 +150,20 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
     /// <returns></returns>
     private string TransformTime(double timestamp)
     {
-        DateTime startTime1 = TimeZoneInfo.ConvertTime(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc), TimeZoneInfo.Local);
-        DateTime dt1 = startTime1.AddMilliseconds(timestamp);//传入的时间戳
-        return dt1.ToString();
+        //DateTime startTime1 = TimeZoneInfo.ConvertTime(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc), TimeZoneInfo.Local);
+        //DateTime dt1 = startTime1.AddMilliseconds(timestamp);//传入的时间戳
+        //return dt1.ToString();
+
+        System.DateTime startTime = System.TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1));//获取时间戳
+        System.DateTime dt = startTime.AddSeconds(timestamp);
+        string t = dt.ToString("yyyy/MM/dd HH:mm:ss");//转化为日期时间
+        return t;
     }
 
     private EntityInfo GetEntityInfo(string id, bool isRobot = true)
     {
+        id = isRobot ? "R_" + id : "P_" + id;
+
         EntityInfo res = null;
         if (m_DicEntityArray.ContainsKey(id))
         {
@@ -179,9 +189,9 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
     /// <summary>
     /// 处理访客坐标信息
     /// </summary>
-    private void DisposePeoplePerception(Feature_People_Perception feature_People_Perception)
+    private void DisposePeoplePos(Feature_People_Perception feature_People_Perception)
     {
-        GameObject entity = GetEntityInfo(feature_People_Perception.robotId,false).entity;
+        GameObject entity = GetEntityInfo(feature_People_Perception.robotId, false).entity;
         if (entity != null)
         {
             float[] pos = feature_People_Perception.data.feature[0].location;
@@ -196,6 +206,20 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
                 float rotAngle = (float)feature_People_Perception.data.feature[0].angle;
                 entity.transform.rotation = Quaternion.Euler(new Vector3(0, rotAngle, 0));
             }
+        }
+    }
+
+    /// <summary>
+    /// 处理访客UI数据
+    /// </summary>
+    /// <param name="feature_Robot_Pos"></param>
+    private void DisposePeopleUI(Feature_People_Perception feature_Robot_Pos)
+    {
+        Transform cvsRobot = GetEntityInfo(feature_Robot_Pos.robotId, false).cvsRobot;
+        if (cvsRobot != null)
+        {
+            cvsRobot.Find<Text>("txtID").text = feature_Robot_Pos.robotId;
+            cvsRobot.Find<Text>("txtTime").text = TransformTime(feature_Robot_Pos.timestamp);
         }
     }
 }
