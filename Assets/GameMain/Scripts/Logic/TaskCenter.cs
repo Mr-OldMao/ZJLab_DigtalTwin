@@ -478,7 +478,9 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 else
                 {
                     isRight = false;
-                    taskFailDes = "新增决策指令失败,仿真实例，id，curSceneID：" + MainData.SceneID + "，simulatorId：" + controlCommit.simulatorId+"，sceneID："+ controlCommit.sceneID + ",json：" + controlCommitJsonStr;
+                    taskFailDes = "忽视当前决策指令，curSceneID：" + MainData.SceneID + "，simulatorId：" + controlCommit.simulatorId+"，sceneID："+ controlCommit.sceneID + ",json：" + controlCommitJsonStr;
+                    Debugger.LogWarning(taskFailDes);
+                    return;
                 }
                 if (MainData.ControlCommitCompletedList.Find((p) => { return p.task_id == controlCommit.taskId; }) != null)
                 {
@@ -497,6 +499,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             taskFailDes = "新增决策指令失败,controlCommit is null , json：" + controlCommitJsonStr;
             isRight = false;
         }
+
+
         if (isRight)
         {
             MainData.ControlCommit.Enqueue(controlCommit);
@@ -539,26 +543,26 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         }
         string msg =
             @"
-{
-    ""motionId"": ""motion://Knock_on_door"",
-    ""name"": """ + orderName + "\"," + @"
-    ""objectName"": """ + objName + "\"," + @"
+        {
+            ""motionId"": ""motion://Knock_on_door"",
+            ""name"": """ + orderName + "\"," + @"
+            ""objectName"": """ + objName + "\"," + @"
 
-    ""objectId"": "
+            ""objectId"": "
 + "\"" + objID + "\"," +
 @"""position"": ["
 
   + objModel.transform.position.x + "," + objModel.transform.position.y + "," + objModel.transform.position.z +
 
 @"],
-    ""rotation"": [
-        0.0,
-        0.0,
-        0.0
-    ],
-    ""taskId"": ""task:grab1698110424418""
-}
-                ";
+            ""rotation"": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            ""taskId"": ""task:grab1698110424418""
+        }
+                        ";
         Debugger.Log(msg);
         ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(msg);
         if (controlCommit != null)

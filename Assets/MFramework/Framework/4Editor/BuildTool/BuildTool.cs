@@ -1,11 +1,16 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using UnityEditor;
+using UnityEditor.AddressableAssets.Build;
 using UnityEditor.Build;
+using UnityEditor.Build.Content;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 标题：自动打包工具
@@ -67,8 +72,34 @@ public class BuildTool : IPreprocessBuildWithReport, IPostprocessBuildWithReport
         }
         string curTime = string.Format("{0:yyyy_MM_dd_HH_mm_ss}", DateTime.Now);
         appName = PlayerSettings.productName;
-        curBuildOutPutAllPath = outPutFolderPath + "/" + appName + "_v" + PlayerSettings.bundleVersion + "_" + curTime;
+        //test start
+        string productName = "";
+        if (GameLaunch.GetInstance.scene == GameLaunch.Scenes.MainScene1)
+        {
+            productName = "之江仿真程序_";
+        }
+        else
+        {
+            productName = "之江数字孪生程序_";
+        }
+#if UNITY_WEBGL
+        productName += "Webgl_";
+#elif UNITY_STANDALONE_LINUX
+        productName += "PCLinux_";
+#elif UNITY_STANDALONE_WIN
+        productName += "PCWin_";
+#endif
+        productName += curTime;
+        Debug.Log(GameLaunch.GetInstance.scene +","+ productName);
+        PlayerSettings.productName = productName;
+        appName = PlayerSettings.productName;
+        //test end
+         
+
+        //curBuildOutPutAllPath = outPutFolderPath + "/" + appName + "_v" + PlayerSettings.bundleVersion + "_" + curTime;
+        curBuildOutPutAllPath = outPutFolderPath + "/" + appName;
         buildEndAutoOpenFolderPath = string.Empty;
+
         if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android)
         {
             //代码配置秘钥
@@ -82,6 +113,10 @@ public class BuildTool : IPreprocessBuildWithReport, IPostprocessBuildWithReport
         else if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.iOS)
         {
 
+        }
+        else if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.WebGL)
+        {
+            buildEndAutoOpenFolderPath = curBuildOutPutAllPath;
         }
         else if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows || EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows64)
         {

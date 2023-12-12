@@ -403,10 +403,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         {
             clientIP = MainData.ConfigData?.MqttConfig.ClientIP, //"10.5.24.28",
             clientPort = NetworkMqtt.GetInstance.IsWebgl ? 8083 : 1883,
-            clientID = MainData.SceneID + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss"),
-            userName = "UserName_" + MainData.SceneID + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss")
+            clientID = MainData.SceneID ,
+            userName = "UserName_" + MainData.SceneID
         });
         //监听消息回调
+        Debugger.Log("注册监听消息回调");
         NetworkMqtt.GetInstance.AddListenerSubscribe((string topic, string msg) =>
         {
             ParseMQTTMsg(topic, msg);
