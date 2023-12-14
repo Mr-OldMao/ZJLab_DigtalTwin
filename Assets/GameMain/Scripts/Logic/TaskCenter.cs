@@ -609,7 +609,7 @@ class Order
     public const string Close_Door_Outside = "Close_Door_Outside";
     public const string Drink = "Drink";
     public const string Grab_item = "Grab_item";
-    public const string Grab_item_pull = "";
+    public const string Grab_item_pull = "Grab_item_pull";
     public const string Heal_bandages = "Heal_bandages";
     public const string Knock_on_door = "Knock_on_door";
     public const string Lever_Floor_Pull = "Lever_Floor_Pull";

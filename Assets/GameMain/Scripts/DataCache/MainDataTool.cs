@@ -4,6 +4,7 @@ using UnityEngine;
 using MFramework;
 using static GetThingGraph;
 using static JsonAddEntity;
+using static GameLogic2;
 /// <summary>
 /// 标题：更新数据缓存
 /// 功能：
@@ -73,69 +74,86 @@ public class MainDataTool : SingletonByMono<MainDataTool>
             string entityType = entityInfo.type[..1].ToUpper() + entityInfo.type[1..].ToLower();
             LoadAssetsByAddressable.GetInstance.GetEntityRes(entityType, entityInfo.modelId, (obj) =>
             {
-                GameObject clone = Instantiate(obj);
-                if (clone == null)
+                bool addResult = false;
+                if (obj != null)
                 {
-                    return;
-                }
-                /*设置根节点*/
-                string roomObjStr = entityInfo.roomInfo.roomType.ToString() + "_" + entityInfo.roomInfo.roomID;
-                GameObject roomEntity = GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.Find(roomObjStr)?.gameObject;
-                if (roomEntity == null)
-                {
-                    roomEntity = new GameObject(roomObjStr);
-                    roomEntity.transform.SetParent(GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform);
-                }
-                GameObject parentObj = null;
-                string parentID = "";
-                //当前实体有父对象则放置在父对象下，没有则放在指定房间容器内
-                if (!string.IsNullOrEmpty(parentEntityInfo?.id) && !string.IsNullOrEmpty(parentEntityInfo?.type))
-                {
-                    parentID = parentEntityInfo.id;
-                    Transform parentEntity = GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.Find<Transform>(parentEntityInfo.type + "_" + parentEntityInfo.id);
-                    Transform parentEntityPutArea = parentEntity?.Find("PutArea/" + entityInfo.putArea);
-                    if (parentEntityPutArea != null)
+                    addResult = true;
+                    GameObject clone = Instantiate(obj);
+                    /*设置根节点*/
+                    string roomObjStr = entityInfo.roomInfo.roomType.ToString() + "_" + entityInfo.roomInfo.roomID;
+                    GameObject roomEntity = GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.Find(roomObjStr)?.gameObject;
+                    if (roomEntity == null)
                     {
-                        //放置在其他物品下
-                        parentObj = parentEntityPutArea.gameObject;
+                        roomEntity = new GameObject(roomObjStr);
+                        roomEntity.transform.SetParent(GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform);
+                    }
+                    GameObject parentObj = null;
+                    string parentID = "";
+                    //当前实体有父对象则放置在父对象下，没有则放在指定房间容器内
+                    if (!string.IsNullOrEmpty(parentEntityInfo?.id) && !string.IsNullOrEmpty(parentEntityInfo?.type))
+                    {
+                        parentID = parentEntityInfo.id;
+                        Transform parentEntity = GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.Find<Transform>(parentEntityInfo.type + "_" + parentEntityInfo.id);
+                        Transform parentEntityPutArea = parentEntity?.Find("PutArea/" + entityInfo.putArea);
+                        if (parentEntityPutArea != null)
+                        {
+                            //放置在其他物品下
+                            parentObj = parentEntityPutArea.gameObject;
+                        }
+                        else
+                        {
+                            //放置在房间下
+                            parentObj = roomEntity;
+                        }
+                        Debug.Log($"add item suc, item:{clone}" +
+                            $"roomContainer:{roomEntity}," +
+                               $"parent:{parentEntityInfo.type} " + "_" +
+                               $"{parentEntityInfo.id}," +
+                               $"putArea:{entityInfo.putArea}");
+                        clone.transform.SetParent(parentObj.transform);
+                        //实体位置pos，高度y使用PutArea/xxx 节点的高度，x/y使用web前端发来的数值
+                        clone.transform.position = new Vector3(entityInfo.pos.x, parentObj.transform.position.y, entityInfo.pos.y);
+                        clone.transform.Find("Model").transform.localPosition = Vector3.zero;
                     }
                     else
                     {
-                        //放置在房间下
+                        parentID = entityInfo.roomInfo.roomID;
                         parentObj = roomEntity;
+                        clone.transform.SetParent(parentObj.transform, false);
+                        clone.transform.position = new Vector3(entityInfo.pos.x, 0, entityInfo.pos.y);
+                        clone.transform.Find("Model").transform.localPosition = Vector3.zero;
                     }
-                    Debug.Log($"add item suc, item:{clone}" +
-                        $"roomContainer:{roomEntity}," +
-                           $"parent:{parentEntityInfo.type} " + "_" +
-                           $"{parentEntityInfo.id}," +
-                           $"putArea:{entityInfo.putArea}");
-                    clone.transform.SetParent(parentObj.transform);
-                    //实体位置pos，高度y使用PutArea/xxx 节点的高度，x/y使用web前端发来的数值
-                    clone.transform.position = new Vector3(entityInfo.pos.x, parentObj.transform.position.y, entityInfo.pos.y);
-                    clone.transform.Find("Model").transform.localPosition = Vector3.zero;
+                    string key = entityInfo.type + "_" + entityInfo.id;
+                    clone.name = key;
+
+                    //缓存数据1
+                    if (!MainData.CacheItemsEntity.ContainsKey(key))
+                    {
+                        MainData.CacheItemsEntity.Add(key, clone);
+                        //更新数据2
+                        UpdateSceneItemsInfoData(parentID, entityInfo.id, entityInfo.type, clone.transform.position, clone.transform.rotation.eulerAngles, entityInfo.dynamic == 1, entityInfo.putArea);
+
+                        //更新全局实体数据
+                        UpdateEnityInfoTool.GetInstance.UpdateSceneEntityInfo();
+                        DataSave.GetInstance.SaveGetThingGraph_data_items(MainData.CacheSceneItemsInfo);
+                    }
+                    else
+                    {
+                        Debug.LogError("物品已存在，新增物品更新数据失败 ");
+                    }
                 }
-                else
+
+                //web端新增物体后回调
+                JsonWebGlobalEntityData jsonWebGlobalEntityData = new JsonWebGlobalEntityData()
                 {
-                    parentID = entityInfo.roomInfo.roomID;
-                    parentObj = roomEntity;
-                    clone.transform.SetParent(parentObj.transform, false);
-                    clone.transform.position = new Vector3(entityInfo.pos.x, 0, entityInfo.pos.y);
-                    clone.transform.Find("Model").transform.localPosition = Vector3.zero;
-                }
-                string key = entityInfo.type + "_" + entityInfo.id;
-                clone.name = key;
-                //缓存数据1
-                if (!MainData.CacheItemsEntity.ContainsKey(key))
-                {
-                    MainData.CacheItemsEntity.Add(key, clone);
-                    //更新数据2
-                    UpdateSceneItemsInfoData(parentID, entityInfo.id, entityInfo.type, clone.transform.position, clone.transform.rotation.eulerAngles, entityInfo.dynamic == 1, entityInfo.putArea);
-                }
-                else
-                {
-                    Debug.LogError("物品已存在，新增物品更新数据失败 ");
-                }
+                    result = addResult ? 1 : 0,
+                    entityType = entityInfo.type,
+                    entityID = entityInfo.id,
+                    postThingGraph = MainData.CacheSceneItemsInfo
+                };
+                InterfaceDataCenter.GetInstance.SendMQTTUpdateEntity(jsonWebGlobalEntityData);
             });
+
         }
     }
 
@@ -234,8 +252,10 @@ public class MainDataTool : SingletonByMono<MainDataTool>
     {
         for (int i = 0; i < jsonDelEntity.entityInfo?.Length; i++)
         {
+            bool result = false;
             string targetID = jsonDelEntity.entityInfo[i].id;
-            string key = jsonDelEntity.entityInfo[i].type + "_" + targetID;
+            string targetType = jsonDelEntity.entityInfo[i].type;
+            string key = targetType + "_" + targetID;
             bool delChind = jsonDelEntity.entityInfo[i].delChind == 1;
             if (MainData.CacheItemsEntity.ContainsKey(key))
             {
@@ -266,6 +286,11 @@ public class MainDataTool : SingletonByMono<MainDataTool>
                     if (entity != null)
                     {
                         Destroy(entity);
+                        result = true;
+
+                        //更新全局实体数据
+                        UpdateEnityInfoTool.GetInstance.UpdateSceneEntityInfo();
+                        DataSave.GetInstance.SaveGetThingGraph_data_items(MainData.CacheSceneItemsInfo);
                     }
                 }
                 else
@@ -277,6 +302,17 @@ public class MainDataTool : SingletonByMono<MainDataTool>
             {
                 Debug.LogError("删除指定实体失败 key：" + key);
             }
+
+            //web端删除物体后回调
+            JsonWebGlobalEntityData jsonWebGlobalEntityData = new JsonWebGlobalEntityData()
+            {
+                result = result ? 1 : 0,
+                entityType = targetType,
+                entityID = targetID,
+                postThingGraph = MainData.CacheSceneItemsInfo
+            };
+            InterfaceDataCenter.GetInstance.SendMQTTUpdateEntity(jsonWebGlobalEntityData);
+
         }
     }
 

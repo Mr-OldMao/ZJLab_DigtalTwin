@@ -56,11 +56,14 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public const string TOPIC_WEB_SEND = "simulator/web/send";
     //测试 发控制结果给Web端
     public const string TOPIC_WEB_RECV = "simulator/web/recv";
+    //给web端更新全局场景图
+    public const string TOPIC_Web_GLOBAL = "/simulator/thingGraph/web/global";
 
     //web端的房间布局变更
     public const string TOPIC_WEB_CHANGEPOSITION = "simulator/changePosition";
     //web端自定义相机坐标
     public const string TOPIC_WEB_CHANGEVIEWPOSITON = "simulator/changeViewPositon";
+
     #endregion
 
     #region 数字孪生
@@ -424,6 +427,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     //TEST
                     NetworkMqtt.GetInstance.Subscribe(
                         TOPIC_WEB_SEND, TOPIC_WEB_RECV,
+                        TOPIC_Web_GLOBAL,
                         //TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA,
                         TOPIC_RECV, TOPIC_ROOMINFODATA);
                     break;
@@ -560,6 +564,17 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     public void SendMQTTLiveData(byte[] msgBytes)
     {
         NetworkMqtt.GetInstance.Publish(TOPIC_LIVEDATA, msgBytes);
+    }
+
+
+    /// <summary>
+    /// Web端新增、删除物品回调
+    /// </summary>
+    /// <param name="items"></param>
+    public void SendMQTTUpdateEntity(JsonWebGlobalEntityData items)
+    {
+        string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
+        NetworkMqtt.GetInstance.Publish(TOPIC_Web_GLOBAL, jsonStr);
     }
     #endregion
 
