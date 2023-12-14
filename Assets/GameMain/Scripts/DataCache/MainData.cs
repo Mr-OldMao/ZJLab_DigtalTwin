@@ -28,10 +28,10 @@ public class MainData
     public static ConfigData ConfigData { get; set; }
 
     /// <summary>
-    /// 是否正在读档
+    /// 缓存配置文件，是否允许读档字段数据
     /// 是否读档生成场景实例，T-读档，获取历史场景实例数据，根据SceneID获取历史房间布局数据以及物体位置数据    F-生成随机新场景实例
     /// </summary>
-    public static bool ReadingFile { get; set; }
+    public static bool CacheData_CanReadFile { get; set; }
 
     /// <summary>
     /// 是否允许读档

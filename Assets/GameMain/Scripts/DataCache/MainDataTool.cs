@@ -26,10 +26,12 @@ public class MainDataTool : SingletonByMono<MainDataTool>
         if (paramsStr?.Length >= 1)
         {
             MainData.CanReadFile = paramsStr[1] == "1";
+            MainData.CacheData_CanReadFile = MainData.CanReadFile;
         }
         else
         {
             MainData.CanReadFile = false;
+            MainData.CacheData_CanReadFile = MainData.CanReadFile;
         }
 
         Debug.Log("[Unity] InitMainDataParam , SceneID:" + MainData.SceneID);

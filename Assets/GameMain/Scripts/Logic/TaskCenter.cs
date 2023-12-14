@@ -81,11 +81,14 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         });
     }
 
+
+
     /// <summary>
     /// 解析指令并执行任务
     /// </summary>
     public void ParseOrderExcute(ControlCommit controlCommit)
     {
+
         //强制改变机器人状态
         m_RobotAnimCenter.PlayAnimByBool("IsMoving", false);
         m_AIRobotMove.curRobotState = AIRobotMove.RobotBaseState.Idel;
@@ -151,6 +154,9 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         {
             TaskExecuteFail(targetPos);
         }
+
+        m_AIRobotMove.ShowRobotPath(true);
+
     }
 
     /// <summary>
@@ -197,6 +203,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 m_CorLimitTask = null;
             }
         });
+        m_AIRobotMove.ShowRobotPath(false);
+
     }
 
     /// <summary>
@@ -449,6 +457,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
         IsExecuteTask = false;
         GetCurExecuteTask = null;
+
+        m_AIRobotMove.ShowRobotPath(false);
     }
 
     /// <summary>

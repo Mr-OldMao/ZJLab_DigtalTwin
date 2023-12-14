@@ -64,12 +64,17 @@ public class AIRobotMove : MonoBehaviour
         InitRobotAnimParam();
     }
 
+    public void ShowRobotPath(bool isShow)
+    {
+        m_PathLineRenderer.enabled = isShow;
+    }
+
     private void InitRobotAnimParam()
     {
         curRobotState = RobotBaseState.Idel;
     }
 
-    public void SetTargetPointObj(Vector3 pos,Vector3 rot)
+    public void SetTargetPointObj(Vector3 pos, Vector3 rot)
     {
         targetPoint.gameObject.SetActive(false);
         targetPoint.position = pos;

@@ -6,6 +6,5 @@
 public class ChangeStateData
 {  
 	public string state;
-	public string id;
-    public string idScene = MainData.SceneID;
+	public string idScene;
 }

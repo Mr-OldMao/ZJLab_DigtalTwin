@@ -53,6 +53,8 @@ public class UpdateRoomData : SingletonByMono<UpdateRoomData>
         DataSave.GetInstance.Save(() =>
         {
             CanUpdateRoomData = true;
+
+#if UNITY_WEBGL
             UIManager.GetInstance.GetUIFormLogicScript<UIFormHintOneBtn>().Show(new UIFormHintOneBtn.ShowParams
             {
                 txtHintContent = "检测到房间布局发生变动，点击确认即可重新打开程序刷新场景",
@@ -62,12 +64,19 @@ public class UpdateRoomData : SingletonByMono<UpdateRoomData>
             {
                 CanRefresh = true;
                 Debugger.Log("尝试刷新页面");
-#if UNITY_WEBGL && !UNITY_EDITOR
-                        MqttWebglCenter.GetInstance.RefreshWeb();
+#if !UNITY_EDITOR
+                MqttWebglCenter.GetInstance.RefreshWeb();
 #endif
-                // MsgEvent.SendMsg(MsgEventName.InitComplete);
-                //GameLogic.GetInstance.GenerateEntity(() => MsgEvent.SendMsg(MsgEventName.GenerateSceneComplete));
-            }); ;
+            });
+
+
+#elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX
+            UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
+            {
+                txtHintContent = "检测到房间布局发生变动，请手动重新打开该程序刷新场景",
+                delayCloseUIFormTime = 0
+            });
+#endif
         });
     }
 

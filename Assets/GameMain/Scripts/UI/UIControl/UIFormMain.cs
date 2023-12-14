@@ -111,19 +111,19 @@ public class UIFormMain : UIFormBase
     {
         BtnStart.onClick.AddListenerCustom(() =>
         {
-            OnClickStateBtn(ProgramState.start);
+            OnClickStateBtn(ProgramState.start, MainData.SceneID);
         });
         btnStop.onClick.AddListenerCustom(() =>
         {
-            OnClickStateBtn(ProgramState.stop);
+            OnClickStateBtn(ProgramState.stop, MainData.SceneID);
         });
         btnPause.onClick.AddListenerCustom(() =>
         {
-            OnClickStateBtn(ProgramState.pause);
+            OnClickStateBtn(ProgramState.pause, MainData.SceneID);
         });
         btnResume.onClick.AddListenerCustom(() =>
         {
-            OnClickStateBtn(ProgramState.resume);
+            OnClickStateBtn(ProgramState.resume, MainData.SceneID);
         });
         btnCameraFree.onClick.AddListenerCustom(() =>
         {
@@ -150,6 +150,7 @@ public class UIFormMain : UIFormBase
                 txtHintContent = "正在生成场景，请稍等...",
                 delayCloseUIFormTime = -1
             });
+            //MainData.CanReadFile = MainData.CacheData_CanReadFile;
             GameLogic.GetInstance.GenerateScene();
         });
         btnSave.onClick.AddListenerCustom(() =>
@@ -211,13 +212,9 @@ public class UIFormMain : UIFormBase
         });
     }
 
-    public void OnClickStateBtn(ProgramState programState, string id = "")
+    public void OnClickStateBtn(ProgramState programState, string sceneID)
     {
-        if (string.IsNullOrEmpty(id))
-        {
-            id = MainData.SceneID;
-        }
-        InterfaceDataCenter.GetInstance.ChangeProgramState(id, programState);
+        InterfaceDataCenter.GetInstance.ChangeProgramState(sceneID, programState);
         switch (programState)
         {
             case ProgramState.start:
