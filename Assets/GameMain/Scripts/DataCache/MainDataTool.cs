@@ -152,6 +152,13 @@ public class MainDataTool : SingletonByMono<MainDataTool>
                     postThingGraph = MainData.CacheSceneItemsInfo
                 };
                 InterfaceDataCenter.GetInstance.SendMQTTUpdateEntity(jsonWebGlobalEntityData);
+
+                string resStr = addResult ? "成功" : "失败";
+                UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
+                {
+                    txtHintContent = $"新增物体{resStr},{entityInfo.type}_{entityInfo.id}",
+                    delayCloseUIFormTime = 2
+                });
             });
 
         }
@@ -313,6 +320,13 @@ public class MainDataTool : SingletonByMono<MainDataTool>
             };
             InterfaceDataCenter.GetInstance.SendMQTTUpdateEntity(jsonWebGlobalEntityData);
 
+
+            string resStr = result ? "成功" : "失败";
+            UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
+            {
+                txtHintContent = $"删除物体{resStr},{targetType}_{targetID}",
+                delayCloseUIFormTime = 2
+            });
         }
     }
 

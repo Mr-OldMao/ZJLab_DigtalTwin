@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using static GenerateRoomBorderModel;
+using static TaskCenter;
 
 /// <summary>
 /// 标题：AI
@@ -53,6 +54,10 @@ public class AIRobotMove : MonoBehaviour
     //    Idle
     //}
 
+    /// <summary>
+    /// 自动切换目标点NavNode协程
+    /// </summary>
+    private Coroutine m_AutoChangeNavNodeCorountine = null;
 
     void Start()
     {
@@ -85,14 +90,14 @@ public class AIRobotMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.Space))
-        //{
-        //    if (autoMoveTargetPoint)
-        //    {
-        //        curRobotState = RobotBaseState.Idel;
-        //        Move(targetPoint);
-        //    }
-        //}
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            //if (autoMoveTargetPoint)
+            {
+                curRobotState = RobotBaseState.Idel;
+                Move(targetPoint);
+            }
+        }
 
         if (Input.GetKeyDown(KeyCode.C))
         {
@@ -105,6 +110,13 @@ public class AIRobotMove : MonoBehaviour
             MsgEvent.SendMsg(MsgEventName.RobotMoveStay);
         }
         UpdateMoveSpeed();
+
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+
+            StartAutoChangeTargetNavNodeCor();
+        }
     }
 
     private void RegisterMsgEvent()
@@ -169,7 +181,7 @@ public class AIRobotMove : MonoBehaviour
         });
     }
 
-    public void Move(Transform targetPoint, Action callback = null)
+    public void Move(Transform targetPoint, Action callback = null, bool isForceMove = false)
     {
         Move(targetPoint.position, callback);
     }
@@ -179,13 +191,12 @@ public class AIRobotMove : MonoBehaviour
     /// </summary>
     /// <param name="targetPoint"></param>
     /// <param name="callback"></param>
-    public void Move(Vector3 targetPoint, Action callback = null)
+    public void Move(Vector3 targetPoint, Action callback = null, bool isForceMove = false)
     {
         if (canMove)
         {
-            if (curRobotState != RobotBaseState.Moving)
+            if (curRobotState != RobotBaseState.Moving || isForceMove)
             {
-                Debug.Log("movemovemovemovemove");
                 MsgEvent.SendMsg(MsgEventName.RobotMoveBegin);
                 m_NavMeshAgent.isStopped = false;
                 m_NavMeshAgent.SetDestination(targetPoint);
@@ -213,7 +224,7 @@ public class AIRobotMove : MonoBehaviour
     /// <returns></returns>
     public bool JudgeCanArrivePos(Vector3 targetPos)
     {
-        bool res1 = false, res2 = false;
+        bool res = false, res1 = false, res2 = false, res3 = false;
 
         //判定目标点是否在屋内
         Vector2 offsetValue = GameLogic.GetInstance.GetOriginOffset();
@@ -242,15 +253,24 @@ public class AIRobotMove : MonoBehaviour
             res1 = targetPos.z >= minY && targetPos.z <= maxY;
         }
 
-        //判断目标点是否有障碍物
-        res2 = true;
-        //NavMeshHit hit;
-        //if (NavMesh.SamplePosition(targetPos, out hit, 1.0f, NavMesh.AllAreas))
-        //{
-        //    res2 = true;
-        //}
+        //判断目标点及周边一定范围内是否有可到达的点位
+        res2 = false;
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(targetPos, out hit, 0.1f, NavMesh.AllAreas))
+        {
+            res2 = true;
+        }
+        m_NavMeshAgent.SetDestination(targetPos);
+        m_NavMeshAgent.isStopped = true;
+        res3 = m_NavMeshAgent.pathStatus == NavMeshPathStatus.PathComplete;
+        Debug.Log("res1 " + res1 + " res2  " + res2 + "  res3 " + res3);
 
-        return res1 && res2;
+        res = res1 && res2 && res3;
+
+        Debug.Log("res " + res);
+
+
+        return res;
     }
 
     private void UpdateMoveSpeed()
@@ -275,6 +295,52 @@ public class AIRobotMove : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 自动切换导航目标点
+    /// </summary>
+    /// <param name="delay">执行间隔</param>
+    /// <param name="listenerTime">自动监听的时间</param>
+    public void StartAutoChangeTargetNavNodeCor(float delay = 3f, float listenerTime = TaskCenter.TaskLimitTime)
+    {
+        Debugger.Log("自动切换导航目标点StartAutoChangeTargetNavNodeCor");
+        if (m_AutoChangeNavNodeCorountine != null)
+        {
+            StopCoroutine(m_AutoChangeNavNodeCorountine);
+            m_AutoChangeNavNodeCorountine = null;
+        }
+
+        //Vector3 oldPos = transform.position;
+        m_AutoChangeNavNodeCorountine = UnityTool.GetInstance.DelayCoroutineTimer((p) =>
+         {
+             //Vector3 newPos = transform.position;
+             JudgeMoveSite(delay, (b) =>
+             {
+                 Debugger.Log("判断是否在原地移动 " + b);
+                 if (b)
+                 {
+                     //在限时内，如果无法到达目标位置则自动更换目标位置
+                     NavNodeData newNavNode = TaskCenter.GetInstance.GetNewNavNode(targetPoint.position);
+                     if (newNavNode != null)
+                     {
+                         // 换其他节点移动
+                         Debugger.Log("换其他节点移动");
+                         SetTargetPointObj(newNavNode.pos, newNavNode.rot);
+                         Move(targetPoint, null, true);
+                     }
+                 }
+             });
+
+             ////在限时内，如果无法到达目标位置则自动更换目标位置
+             //Vector3 newNavNode = TaskCenter.GetInstance.GetNewNavNode(targetPoint.position);
+             //if (newNavNode != Vector3.zero)
+             //{
+             //    // 换其他节点移动
+             //    targetPoint.position = newNavNode;
+             //    Move(targetPoint, null, true);
+             //}
+             return p < listenerTime;
+         }, delay);
+    }
 
     /// <summary>
     /// 检测是否到达目的地
@@ -288,9 +354,33 @@ public class AIRobotMove : MonoBehaviour
             transform.rotation = Quaternion.Euler(targetPoint.transform.eulerAngles);
             //transform.LookAt(targetPoint);
 
+            //终止协程
+            if (m_AutoChangeNavNodeCorountine != null)
+            {
+                StopCoroutine(m_AutoChangeNavNodeCorountine);
+                m_AutoChangeNavNodeCorountine = null;
+            }
+
 
             MsgEvent.SendMsg(MsgEventName.RobotMoveEnd);
             MsgEvent.SendMsg(MsgEventName.RobotArriveTargetPos);
         }
+    }
+
+
+    /// <summary>
+    /// 判断是否在原地移动
+    /// </summary>
+    /// <param name="callback">t-原地没动</param>
+    private void JudgeMoveSite(float delay, Action<bool> callback)
+    {
+        Vector3 pos = transform.position;
+
+        UnityTool.GetInstance.DelayCoroutine(delay, () =>
+        {
+            Vector3 curPos = transform.position;
+            callback(Vector3.Distance(pos, curPos) <= 0.05);
+        });
+
     }
 }

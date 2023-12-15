@@ -3,6 +3,7 @@ using UnityEngine;
 using MFramework;
 using System;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 /// <summary>
 /// 标题：任务中心
 /// 功能：根据指令用于派发任务，处理任务
@@ -48,7 +49,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// <summary>
     /// 执行任务限制用时
     /// </summary>
-    private const float m_TaskLimitTime = 30f;
+    public const float TaskLimitTime = 30f;
     /// <summary>
     /// 执行当前任务用时
     /// </summary>
@@ -62,6 +63,19 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// 缓存“拿”某物体时，当前的父对象，便于“放”时回到之前父对象下
     /// </summary>
     private Dictionary<GameObject, Transform> m_DicCacheGrabParent = new Dictionary<GameObject, Transform>();
+
+    /// <summary>
+    /// 当前任务的目标坐标位置
+    /// </summary>
+    private List<NavNodeData> m_TargetPos = new List<NavNodeData>();
+
+
+    public class NavNodeData
+    {
+        public Vector3 pos;
+        public Vector3 rot;
+    }
+
     public void Init()
     {
         if (m_AIRobotMove == null)
@@ -103,40 +117,99 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         Vector3 targetRot = Vector3.zero;
 
         //通过id查要走到的位置
-        GameObject objModel = null;
-
+        //GameObject objModel = null;
 
         List<Transform> navNodes = GameObject.Find(controlCommit.objectName + "_" + controlCommit.objectId)?.transform.Finds<Transform>("NavNode");
-        if (navNodes?.Count == 1)
+
+        foreach (var item in navNodes)
         {
-            objModel = navNodes[0].gameObject;
+            NavNodeData navNodeData = new NavNodeData { pos = item.position, rot = item.rotation.eulerAngles };
+            m_TargetPos.Add(navNodeData);
+            Debugger.Log("add " + navNodeData.pos);
         }
-        else if (navNodes?.Count > 1)//寻找最合适的NavaNode
+
+        //GameObject rootNode = GameObject.Find(controlCommit.objectName + "_" + controlCommit.objectId);
+        //for (int i = 0; i < rootNode?.transform.childCount; i++)
+        //{
+        //    if (rootNode?.transform.GetChild(i).name == "NavNode")
+        //    {
+        //        m_TargetPos.Add(rootNode?.transform.GetChild(i).gameObject);
+        //        Debugger.Log(rootNode?.transform.GetChild(i).gameObject.transform.position);
+        //    }
+        //}
+
+        bool isFindNavNode = false;
+        if (m_TargetPos?.Count == 1)
         {
-            Transform curNav = navNodes[0];
-            float minDis = Vector3.Distance(m_AIRobotMove.transform.position, curNav.position);
-            for (int i = 1; i < navNodes.Count; i++)
+            //objModel = m_TargetPos[0].gameObject;
+            targetPos = m_TargetPos[0].pos;
+            targetRot = m_TargetPos[0].rot;
+            isFindNavNode = true;
+        }
+        else if (m_TargetPos?.Count > 1)//寻找最合适的NavaNode
+        {
+            NavNodeData curNavNodeData = m_TargetPos[0];
+            float minDis = Vector3.Distance(m_AIRobotMove.transform.position, curNavNodeData.pos);
+
+            for (int i = 1; i < m_TargetPos.Count; i++)
             {
-                float curDic = Vector3.Distance(m_AIRobotMove.transform.position, navNodes[i].position);
+                float curDic = Vector3.Distance(m_AIRobotMove.transform.position, m_TargetPos[i].pos);
                 if (curDic < minDis)
                 {
                     minDis = curDic;
-                    curNav = navNodes[i];
+                    curNavNodeData = m_TargetPos[i];
                 }
             }
-            objModel = curNav.gameObject;
+
+            if (m_AIRobotMove.JudgeCanArrivePos(curNavNodeData.pos))
+            {
+                //objModel = curNav.gameObject;
+                targetPos = curNavNodeData.pos;
+                targetRot = curNavNodeData.rot;
+                isFindNavNode = true;
+            }
+            else
+            {
+                foreach (var navNode in m_TargetPos)
+                {
+                    if (m_AIRobotMove.JudgeCanArrivePos(navNode.pos))
+                    {
+                        //objModel = navNode.gameObject;
+                        targetPos = navNode.pos;
+                        targetRot = navNode.rot;
+                        isFindNavNode = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isFindNavNode)
+            {
+                Debugger.LogError("所用NavNode均不可使用， item :" + controlCommit.objectName + "_" + controlCommit.objectId);
+            }
         }
 
-        if (objModel == null)
+
+
+        if (!isFindNavNode)
         {
-            Debugger.LogError("not find item , item :" + controlCommit.objectName + "_" + controlCommit.objectId);
+            Debugger.LogError("未找到可用的NavNode，使用pos数据 , item :" + controlCommit.objectName + "_" + controlCommit.objectId);
             targetPos = new Vector3(controlCommit.position[0], controlCommit.position[1], controlCommit.position[2]);
+            targetRot = Vector3.zero;
         }
-        else
+        //else
+        //{
+        //    targetPos = objModel.transform.position;
+        //    targetRot = objModel.transform.rotation.eulerAngles;
+        //}
+
+
+        NavNodeData navNodeData1 = new NavNodeData()
         {
-            targetPos = objModel.transform.position;
-            targetRot = objModel.transform.rotation.eulerAngles;
-        }
+            pos = new Vector3(controlCommit.position[0], controlCommit.position[1], controlCommit.position[2]),
+            rot = Vector3.zero
+        };
+        m_TargetPos.Add(navNodeData1);
 
         //判定是否能到达目标位置
         bool canArrive = m_AIRobotMove.JudgeCanArrivePos(targetPos);
@@ -147,8 +220,36 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             //导航到目标位置
             m_AIRobotMove.Move(targetPos);
 
+            ////在限时内，如果无法到达目标位置则自动更好目标位置
+            //UnityTool.GetInstance.DelayCoroutineTimer((p) => 
+            //{
+            //    bool canArrive = m_AIRobotMove.JudgeCanArrivePos(targetPos);
+            //    Debug.Log("test " + canArrive);
+            //    //删除该节点
+            //    if (!canArrive)
+            //    {
+            //        for (int i = 0; i < m_TargetPos.Count; i++)
+            //        {
+            //            if (m_TargetPos[i].position == targetPos)
+            //            {
+            //                m_TargetPos.Remove(m_TargetPos[i]);
+            //                Debugger.Log("删除该节点成功");
+            //                if (m_TargetPos.Count > 0)
+            //                {
+            //                    //换其他节点移动
+            //                    m_AIRobotMove.Move(m_TargetPos[0], null, true);
+            //                }
+            //                break;
+            //            }
+            //        }
+            //    }
+            //    return p <= 10f || canArrive; 
+            //}, 1f);
+
+            //自动切换导航目标点
+            m_AIRobotMove.StartAutoChangeTargetNavNodeCor();
             //限时，未在指定时间内到达指定位置视为无法到达
-            m_CorLimitTask = UnityTool.GetInstance.DelayCoroutine(m_TaskLimitTime, () => TaskExecuteFail(targetPos));
+            m_CorLimitTask = UnityTool.GetInstance.DelayCoroutine(TaskLimitTime, () => TaskExecuteFail(targetPos));
         }
         else
         {
@@ -156,6 +257,32 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         }
 
         m_AIRobotMove.ShowRobotPath(true);
+    }
+
+
+    /// <summary>
+    /// 获取新的目标节点
+    /// </summary>
+    public NavNodeData GetNewNavNode(Vector3 oldNavNode)
+    {
+        NavNodeData newNavNode = null;
+        //删除该节点
+        for (int i = 0; i < m_TargetPos.Count; i++)
+        {
+            if (Vector3.Distance(m_TargetPos[i].pos, oldNavNode) < 0.1f)
+            {
+                m_TargetPos.Remove(m_TargetPos[i]);
+                Debugger.Log("删除该节点成功" + ",count " + m_TargetPos.Count);
+                break;
+            }
+        }
+        if (m_TargetPos.Count > 0)
+        {
+            newNavNode = m_TargetPos[0];
+            // m_TargetPos.Remove(m_TargetPos[0]);
+            Debugger.Log("获取新的目标节点成功" + m_TargetPos[0].pos + ",count " + m_TargetPos.Count);
+        }
+        return newNavNode;
 
     }
 
@@ -196,6 +323,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
             IsExecuteTask = false;
             GetCurExecuteTask = null;
+            m_TargetPos.Clear();
             m_CurTaskExeTime = 0;
             if (m_CorLimitTask != null)
             {
@@ -204,8 +332,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             }
         });
         m_AIRobotMove.ShowRobotPath(false);
-
     }
+
 
     /// <summary>
     /// 机器人与物体交互，播放动画
@@ -232,36 +360,37 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 //拿取
                 case Order.Grab_item:
                     //物品父节点放置在机器人手中
-                    string objName1 = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
-                    grabObj = MainData.CacheItemsEntity[objName1];
-                    if (grabObj != null)
-                    {
-                        //当前物品的父对象实体
-                        Transform grabOldParentNode = grabObj.transform.parent;
-                        grabObj.transform.parent = m_RobotAnimCenter.RobotHandleNode;
-                        grabObj.transform.localPosition = Vector3.zero;
-                        grabObj.transform.localRotation = Quaternion.Euler(Vector3.zero);
-                        if (!m_DicCacheGrabParent.ContainsKey(grabObj))
-                        {
-                            m_DicCacheGrabParent.Add(grabObj, grabOldParentNode);
-                        }
-                        foreach (var item in grabObj.transform.Finds<Transform>("Model"))
-                        {
-                            item.transform.localPosition = Vector3.zero;
-                        }
-                        foreach (var item in grabObj.GetComponentsInChildren<MeshCollider>())
-                        {
-                            item.enabled = false;
-                        }
-                        foreach (var item in grabObj.GetComponentsInChildren<NavMeshObstacle>())
-                        {
-                            item.enabled = false;
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError("obj is null ,objName: " + objName1);
-                    }
+                    grabObj = GrabEntity(1f);
+                    //string objName1 = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
+                    //grabObj = MainData.CacheItemsEntity[objName1];
+                    //if (grabObj != null)
+                    //{
+                    //    //当前物品的父对象实体
+                    //    Transform grabOldParentNode = grabObj.transform.parent;
+                    //    grabObj.transform.parent = m_RobotAnimCenter.RobotHandleNode;
+                    //    grabObj.transform.localPosition = Vector3.zero;
+                    //    grabObj.transform.localRotation = Quaternion.Euler(Vector3.zero);
+                    //    if (!m_DicCacheGrabParent.ContainsKey(grabObj))
+                    //    {
+                    //        m_DicCacheGrabParent.Add(grabObj, grabOldParentNode);
+                    //    }
+                    //    foreach (var item in grabObj.transform.Finds<Transform>("Model"))
+                    //    {
+                    //        item.transform.localPosition = Vector3.zero;
+                    //    }
+                    //    foreach (var item in grabObj.GetComponentsInChildren<MeshCollider>())
+                    //    {
+                    //        item.enabled = false;
+                    //    }
+                    //    foreach (var item in grabObj.GetComponentsInChildren<NavMeshObstacle>())
+                    //    {
+                    //        item.enabled = false;
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    Debug.LogError("obj is null ,objName: " + objName1);
+                    //}
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Grab_item");
                     break;
                 //放下
@@ -323,9 +452,9 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     animSecond = 0.1f;
                     break;
                 //蹲下拾取
-                case Order.Pick_Fwd:
-                case Order.Pick_L:
-                case Order.Pick_R:
+                case Order.Pick_item:
+                    //物品父节点放置在机器人手中
+                    grabObj = GrabEntity(0.5f);
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Pick");
                     break;
                 //推
@@ -423,10 +552,54 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     }
 
     /// <summary>
+    /// 拿取实体
+    /// </summary>
+    /// <param name="delayTime">延时设置实体父对象为机器人手臂节点</param>
+    /// <returns></returns>
+    private GameObject GrabEntity(float delayTime)
+    {
+        //物品父节点放置在机器人手中
+        string objName1 = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
+        GameObject grabObj = MainData.CacheItemsEntity[objName1];
+        if (grabObj != null)
+        {
+            //当前物品的父对象实体
+            UnityTool.GetInstance.DelayCoroutine(delayTime, () =>
+            {
+                Transform grabOldParentNode = grabObj.transform.parent;
+                grabObj.transform.parent = m_RobotAnimCenter.RobotHandleNode;
+                grabObj.transform.localPosition = Vector3.zero;
+                grabObj.transform.localRotation = Quaternion.Euler(Vector3.zero);
+                if (!m_DicCacheGrabParent.ContainsKey(grabObj))
+                {
+                    m_DicCacheGrabParent.Add(grabObj, grabOldParentNode);
+                }
+                foreach (var item in grabObj.transform.Finds<Transform>("Model"))
+                {
+                    item.transform.localPosition = Vector3.zero;
+                }
+                foreach (var item in grabObj.GetComponentsInChildren<MeshCollider>())
+                {
+                    item.enabled = false;
+                }
+                foreach (var item in grabObj.GetComponentsInChildren<NavMeshObstacle>())
+                {
+                    item.enabled = false;
+                }
+            });
+        }
+        else
+        {
+            Debug.LogError("obj is null ,objName: " + objName1);
+        }
+        return grabObj;
+    }
+
+    /// <summary>
     /// 任务执行失败回调
     /// </summary>
     /// <param name="stateCode"></param>
-    private void TaskExecuteFail(Vector3 targetPos, int stateCode = 2,string stateMsg ="")
+    private void TaskExecuteFail(Vector3 targetPos, int stateCode = 2, string stateMsg = "")
     {
         Debug.Log("任务执行失败回调 targetPos:" + targetPos);
 
@@ -457,6 +630,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
         IsExecuteTask = false;
         GetCurExecuteTask = null;
+        m_TargetPos.Clear();
 
         m_AIRobotMove.ShowRobotPath(false);
     }
@@ -496,7 +670,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 else
                 {
                     isRight = false;
-                    taskFailDes = "SceneID不匹配，忽视当前决策指令，curSceneID：" + MainData.SceneID + "，simulatorId：" + controlCommit.simulatorId+"，sceneID："+ controlCommit.sceneID + ",json：" + controlCommitJsonStr;
+                    taskFailDes = "SceneID不匹配，忽视当前决策指令，curSceneID：" + MainData.SceneID + "，simulatorId：" + controlCommit.simulatorId + "，sceneID：" + controlCommit.sceneID + ",json：" + controlCommitJsonStr;
                     Debugger.LogWarning(taskFailDes);
                     return;
                 }
@@ -616,9 +790,7 @@ class Order
     public const string Lever_Floor_Push = "Lever_Floor_Push";
     public const string Lever_Wall_Pull = "Lever_Wall_Pull";
     public const string Lever_Wall_Push = "Lever_Wall_Push";
-    public const string Pick_Fwd = "Pick_Fwd";
-    public const string Pick_L = "Pick_L";
-    public const string Pick_R = "Pick_R";
+    public const string Pick_item = "Pick_item";
     public const string Press_Button = "Press_Button";
     public const string Press_Loop = "Press_Loop";
     public const string Push_End = "Push_End";

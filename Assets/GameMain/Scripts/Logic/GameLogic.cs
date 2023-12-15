@@ -45,9 +45,8 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "Simulator:1702015456841|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "Simulator:1702643793139|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
-
 #else
 #if UNITY_STANDALONE_LINUX
         paramStr = "test|1";//"LinuxPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";
@@ -64,9 +63,14 @@ public class GameLogic : SingletonByMono<GameLogic>
     /// </summary>
     private void InitCompleteEventCallback()
     {
-        //优先级 本地读档 > 服务器读档 > 不读当
+        //优先级 测试版 > 本地读档 > 服务器读档 > 不读当(随机生成)
         //根据配置文件判定是否需要读档本地文件
-        if (!string.IsNullOrEmpty(MainData.ConfigData.CoreConfig.LocalReadFileName))
+        if (MainData.UseTestData)
+        {
+            Debugger.Log("测试版运行", LogTag.Forever);
+            this.EnterMainScene();
+        }
+        else if (!string.IsNullOrEmpty(MainData.ConfigData.CoreConfig.LocalReadFileName))
         {
             MainData.CanReadFile = true;
             Debugger.Log("尝试本地读档 CoreConfig.LocalReadFileName：" + MainData.ConfigData.CoreConfig.LocalReadFileName, LogTag.Forever);
@@ -235,7 +239,6 @@ public class GameLogic : SingletonByMono<GameLogic>
             if (MainData.CanReadFile)
             {
                 GenerateRoomItemModel.GetInstance.ItemEntityGroupNode.transform.position = Vector3.zero;
-                MainData.ReadingFile = false;
                 MainData.CanReadFile = false;
                 Debugger.Log("读档生成场景实例完成", LogTag.Forever);
             }
@@ -765,10 +768,12 @@ public class GameLogic : SingletonByMono<GameLogic>
         }
         if (Input.GetKeyDown(KeyCode.F10))
         {
-            RobotAnimCenter robotAnimCenter = GameObject.FindObjectOfType<RobotAnimCenter>();
-            robotAnimCenter.PlayAnimByBool("CanInteraction", true);
-            robotAnimCenter.PlayAnimByName("Robot_Pick");
-            robotAnimCenter.PlayAnimByBool("CanInteraction", false);
+            //RobotAnimCenter robotAnimCenter = GameObject.FindObjectOfType<RobotAnimCenter>();
+            //robotAnimCenter.PlayAnimByBool("CanInteraction", true);
+            //robotAnimCenter.PlayAnimByName("Robot_Pick");
+            //robotAnimCenter.PlayAnimByBool("CanInteraction", false);
+
+            SendRoomInfoData(GetOriginOffset());
         }
 
         if (Input.GetKeyDown(KeyCode.F12))

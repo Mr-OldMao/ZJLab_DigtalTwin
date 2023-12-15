@@ -42,6 +42,11 @@ public class DataSave : SingletonByMono<DataSave>
         try
         {
             m_DpList.Clear();
+
+            //更新全局实体数据
+            UpdateEnityInfoTool.GetInstance.UpdateSceneEntityInfo();
+            DataSave.GetInstance.SaveGetThingGraph_data_items(MainData.CacheSceneItemsInfo);
+
             string saveTime = saveTime = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
             DataPackage dataPackage = new DataPackage() { sceneID = MainData.SceneID, saveTime = saveTime };
             dataPackage.dataPackageInfo = new Serialization<DataPackageInfo>(m_DpList);
