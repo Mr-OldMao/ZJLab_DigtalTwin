@@ -121,7 +121,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
 
         List<Transform> navNodes = GameObject.Find(controlCommit.objectName + "_" + controlCommit.objectId)?.transform.Finds<Transform>("NavNode");
 
-        if (navNodes?.Count>0)
+        if (navNodes?.Count > 0)
         {
             foreach (var item in navNodes)
             {
@@ -130,7 +130,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 Debugger.Log("add " + navNodeData.pos);
             }
         }
-        
+
 
         //GameObject rootNode = GameObject.Find(controlCommit.objectName + "_" + controlCommit.objectId);
         //for (int i = 0; i < rootNode?.transform.childCount; i++)
@@ -406,7 +406,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     break;
                 //打开门
                 case RobotOrderAnimData.Open_Door_Inside:
-                //case Order.Open_Door_Outside:
+                    //case Order.Open_Door_Outside:
                     GameLogic.GetInstance.ListenerAllDoorOpenEvent(true);
 
                     Debugger.Log("openDoor", LogTag.Forever);
@@ -414,7 +414,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     break;
                 //关闭门
                 case RobotOrderAnimData.Close_Door_Inside:
-                //case Order.Close_Door_Outside:
+                    //case Order.Close_Door_Outside:
                     GameLogic.GetInstance.ListenerAllDoorCloseEvent(true);
                     Debugger.Log("closeDoor", LogTag.Forever);
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Inside");
@@ -684,11 +684,12 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     Debugger.LogWarning(taskFailDes);
                     return;
                 }
-                if (MainData.ControlCommitCompletedList.Find((p) => { return p.task_id == controlCommit.taskId; }) != null)
-                {
-                    isRight = false;
-                    taskFailDes = "新增决策指令失败,已完成过当前决策指令，id，task_id：" + controlCommit.taskId + ",json：" + controlCommitJsonStr;
-                }
+                //点击启动后的 对于同一个sceneID 的实例， 其taskId始终一致， 除非停止再开启
+                //if (MainData.ControlCommitCompletedList.Find((p) => { return p.task_id == controlCommit.taskId; }) != null)
+                //{
+                //    isRight = false;
+                //    taskFailDes = "新增决策指令失败,已完成过当前决策指令，id，task_id：" + controlCommit.taskId + ",json：" + controlCommitJsonStr;
+                //}
             }
             else
             {
