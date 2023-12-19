@@ -48,7 +48,7 @@ public class GameLaunch : SingletonByMono<GameLaunch>
     private void InitFramework()
     {
 #if !UNITY_EDITOR
-        DebuggerConfig.CanPrintConsoleLog = true;
+        //DebuggerConfig.CanPrintConsoleLog = true;
         DebuggerConfig.CanPrintConsoleLogError = true;
         DebuggerConfig.CanSaveLogDataFile = false; 
 #endif

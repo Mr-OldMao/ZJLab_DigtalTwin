@@ -163,10 +163,10 @@ public class AIRobotMove : MonoBehaviour
                 {
                     Debugger.Log("目标点太近无法移动");
                     if (TaskCenter.GetInstance.GetCurExecuteTask == null
-                || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Close_Door_Inside
-                || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Close_Door_Outside
-                || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Open_Door_Inside
-                || TaskCenter.GetInstance.GetCurExecuteTask.name == Order.Open_Door_Outside)
+                || TaskCenter.GetInstance.GetCurExecuteTask.name == RobotOrderAnimData.Close_Door_Inside
+                || TaskCenter.GetInstance.GetCurExecuteTask.name == RobotOrderAnimData.Close_Door_Outside
+                || TaskCenter.GetInstance.GetCurExecuteTask.name == RobotOrderAnimData.Open_Door_Inside
+                || TaskCenter.GetInstance.GetCurExecuteTask.name == RobotOrderAnimData.Open_Door_Outside)
                     {
                         return;
                     }
@@ -263,13 +263,9 @@ public class AIRobotMove : MonoBehaviour
         m_NavMeshAgent.SetDestination(targetPos);
         m_NavMeshAgent.isStopped = true;
         res3 = m_NavMeshAgent.pathStatus == NavMeshPathStatus.PathComplete;
-        Debug.Log("res1 " + res1 + " res2  " + res2 + "  res3 " + res3);
+        Debugger.Log("res1 " + res1 + " res2  " + res2 + "  res3 " + res3 +",   res："+ res);
 
         res = res1 && res2 && res3;
-
-        Debug.Log("res " + res);
-
-
         return res;
     }
 
@@ -338,7 +334,7 @@ public class AIRobotMove : MonoBehaviour
              //    targetPoint.position = newNavNode;
              //    Move(targetPoint, null, true);
              //}
-             return p < listenerTime;
+             return p < listenerTime && TaskCenter.GetInstance.CanExecuteTask;
          }, delay);
     }
 

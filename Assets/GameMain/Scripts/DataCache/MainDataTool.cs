@@ -55,8 +55,10 @@ public class MainDataTool : SingletonByMono<MainDataTool>
                 + ",Http_Port：" + MainData.ConfigData.HttpConfig.Port
                 + ",Mqtt_IP：" + MainData.ConfigData.MqttConfig.ClientIP
                 + ",Vs_Frame：" + MainData.ConfigData.VideoStreaming.Frame
-                + ",Vs_Quality：" + MainData.ConfigData.VideoStreaming.Quality,
+                + ",Vs_Quality：" + MainData.ConfigData.VideoStreaming.Quality
+                + ",ShowLog：" + MainData.ConfigData.CoreConfig.ShowLog,
                 LogTag.Forever);
+            DebuggerConfig.CanPrintConsoleLog = MainData.ConfigData.CoreConfig.ShowLog == 1;
             MsgEvent.SendMsg(MsgEventName.InitComplete);
         });
     }

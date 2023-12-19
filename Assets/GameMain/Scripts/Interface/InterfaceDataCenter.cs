@@ -483,7 +483,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                 case TOPIC_CHANGESTATE:
                     ChangeStateData changeStateData = JsonTool.GetInstance.JsonToObjectByLitJson<ChangeStateData>(msg);
                     string sceneID = changeStateData.idScene;
-                    if (sceneID != MainData.SceneID)
+                    if (sceneID == MainData.SceneID)
                     {
                         ProgramState programState = (ProgramState)Enum.Parse(typeof(ProgramState), changeStateData.state);
                         //ChangeProgramState(id, programState);
@@ -647,7 +647,7 @@ public class ControlResult
     /// <summary>
     /// 当前所在的房间，房间类型
     /// </summary>
-    public string targetRommType;
+    public string targetRoomType;
 }
 
 /// <summary>

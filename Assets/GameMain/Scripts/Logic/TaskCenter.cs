@@ -121,12 +121,16 @@ public class TaskCenter : SingletonByMono<TaskCenter>
 
         List<Transform> navNodes = GameObject.Find(controlCommit.objectName + "_" + controlCommit.objectId)?.transform.Finds<Transform>("NavNode");
 
-        foreach (var item in navNodes)
+        if (navNodes?.Count>0)
         {
-            NavNodeData navNodeData = new NavNodeData { pos = item.position, rot = item.rotation.eulerAngles };
-            m_TargetPos.Add(navNodeData);
-            Debugger.Log("add " + navNodeData.pos);
+            foreach (var item in navNodes)
+            {
+                NavNodeData navNodeData = new NavNodeData { pos = item.position, rot = item.rotation.eulerAngles };
+                m_TargetPos.Add(navNodeData);
+                Debugger.Log("add " + navNodeData.pos);
+            }
         }
+        
 
         //GameObject rootNode = GameObject.Find(controlCommit.objectName + "_" + controlCommit.objectId);
         //for (int i = 0; i < rootNode?.transform.childCount; i++)
@@ -188,7 +192,6 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 Debugger.LogError("所用NavNode均不可使用， item :" + controlCommit.objectName + "_" + controlCommit.objectId);
             }
         }
-
 
 
         if (!isFindNavNode)
@@ -309,16 +312,17 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         //到达指定位置，与物体交互，播放动画
         RobotInteractionByOrder(() =>
         {
+
             //任务执行成功回调后返回指令执行结果
             ControlResult controlResult = new ControlResult
             {
-                motionId = GetCurExecuteTask.motionId,
-                name = GetCurExecuteTask.name,
-                task_id = GetCurExecuteTask.taskId,
-                simulatorId = GetCurExecuteTask.simulatorId,
+                motionId = GetCurExecuteTask?.motionId,
+                name = GetCurExecuteTask?.name,
+                task_id = GetCurExecuteTask?.taskId,
+                simulatorId = GetCurExecuteTask?.simulatorId,
                 stateCode = 0,
                 stateMsg = "suc",
-                targetRommType = GetTargetRoomType().ToString()
+                //targetRoomType = GetTargetRoomType().ToString()
             };
             InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
             IsExecuteTask = false;
@@ -355,10 +359,10 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             switch (orderStr)
             {
                 //行走
-                case Order.WALK:
+                case RobotOrderAnimData.Walk:
                     break;
                 //拿取
-                case Order.Grab_item:
+                case RobotOrderAnimData.Grab_item:
                     //物品父节点放置在机器人手中
                     grabObj = GrabEntity(1f);
                     //string objName1 = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
@@ -394,23 +398,23 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Grab_item");
                     break;
                 //放下
-                case Order.Grab_item_pull:
+                case RobotOrderAnimData.Grab_item_pull:
                     //物品父节点放置在机器人手中
                     string objName2 = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
                     grabObj = MainData.CacheItemsEntity[objName2];
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PutDown");
                     break;
                 //打开门
-                case Order.Open_Door_Inside:
-                case Order.Open_Door_Outside:
+                case RobotOrderAnimData.Open_Door_Inside:
+                //case Order.Open_Door_Outside:
                     GameLogic.GetInstance.ListenerAllDoorOpenEvent(true);
 
                     Debugger.Log("openDoor", LogTag.Forever);
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Outside");
                     break;
                 //关闭门
-                case Order.Close_Door_Inside:
-                case Order.Close_Door_Outside:
+                case RobotOrderAnimData.Close_Door_Inside:
+                //case Order.Close_Door_Outside:
                     GameLogic.GetInstance.ListenerAllDoorCloseEvent(true);
                     Debugger.Log("closeDoor", LogTag.Forever);
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Inside");
@@ -423,11 +427,11 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     //);
                     break;
                 //擦桌子
-                case Order.Robot_CleanTable:
+                case RobotOrderAnimData.Robot_CleanTable:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_CleanTable");
                     break;
                 //操作阀门
-                case Order.Wheel:
+                case RobotOrderAnimData.Wheel:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Wheel");
                     string key = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
                     if (MainData.CacheItemsEntity.ContainsKey(key))
@@ -448,55 +452,55 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     }
                     break;
                 //充电
-                case Order.Pile:
+                case RobotOrderAnimData.Pile:
                     animSecond = 0.1f;
                     break;
                 //蹲下拾取
-                case Order.Pick_item:
+                case RobotOrderAnimData.Pick_item:
                     //物品父节点放置在机器人手中
                     grabObj = GrabEntity(0.5f);
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Pick");
                     break;
                 //推
-                case Order.Push_End:
-                case Order.Push_Enter:
-                case Order.Push_Exit:
-                case Order.Push_Idle:
-                case Order.Push_Loop:
-                case Order.Push_Idle_inPlace:
-                case Order.Push_Start:
+                //case Order.Push_End:
+                //case Order.Push_Enter:
+                //case Order.Push_Exit:
+                //case Order.Push_Idle:
+                //case Order.Push_Loop:
+                //case Order.Push_Idle_inPlace:
+                case RobotOrderAnimData.Push_Start:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Box_Push");
                     //箱子动画 todo
 
                     break;
                 //拉
-                case Order.Pull_Start:
+                case RobotOrderAnimData.Pull_Start:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Box_Pull");
                     //箱子动画 todo
 
                     break;
                 //按下按钮
-                case Order.Press_Button:
+                case RobotOrderAnimData.Press_Button:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PressBtn");
                     break;
                 //空闲姿态
-                case Order.IDLE:
+                case RobotOrderAnimData.Idle:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Idle");
                     break;
                 //敲门
-                case Order.Knock_on_door:
+                case RobotOrderAnimData.Knock_on_door:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Knock_on_door");
                     break;
                 //跳跃
-                case Order.Jump:
+                case RobotOrderAnimData.Jump:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Jump_in_Place");
                     break;
                 //射箭
-                case Order.CDA_Release:
+                case RobotOrderAnimData.CDA_Release:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_CDA_Release");
                     break;
                 //回旋踢
-                case Order.Combat_Spinning_Kick:
+                case RobotOrderAnimData.Combat_Spinning_Kick:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Combat_Spinning_Kick");
                     break;
 
@@ -521,7 +525,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 {
                     Debug.Log("play anim complete , orderStr :" + orderStr);
                     //取消物品父节点放置在机器人手中
-                    if (orderStr == Order.Grab_item_pull)
+                    if (orderStr == RobotOrderAnimData.Grab_item_pull)
                     {
                         if (m_DicCacheGrabParent.ContainsKey(grabObj))
                         {
@@ -625,12 +629,18 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             task_id = GetCurExecuteTask.taskId,
             stateCode = stateCode,
             stateMsg = stateMsg,
-            targetRommType = GetTargetRoomType().ToString()
+            //targetRoomType = GetTargetRoomType().ToString()
         };
         InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
         IsExecuteTask = false;
         GetCurExecuteTask = null;
         m_TargetPos.Clear();
+
+        if (m_CorLimitTask != null)
+        {
+            StopCoroutine(m_CorLimitTask);
+            m_CorLimitTask = null;
+        }
 
         m_AIRobotMove.ShowRobotPath(false);
     }
@@ -641,7 +651,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// <returns></returns>
     private RoomType GetTargetRoomType()
     {
-        return default;
+        return RoomType.TeaRoom;
     }
 
     private void Update()
@@ -768,49 +778,4 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         }
     }
 
-}
-
-public enum RobotTaskState
-{
-
-}
-
-class Order
-{
-    public const string Open_Door_Inside = "Open_Door_Inside";
-    public const string Open_Door_Outside = "Open_Door_Outside";
-    public const string Close_Door_Inside = "Close_Door_Inside";
-    public const string Close_Door_Outside = "Close_Door_Outside";
-    public const string Drink = "Drink";
-    public const string Grab_item = "Grab_item";
-    public const string Grab_item_pull = "Grab_item_pull";
-    public const string Heal_bandages = "Heal_bandages";
-    public const string Knock_on_door = "Knock_on_door";
-    public const string Lever_Floor_Pull = "Lever_Floor_Pull";
-    public const string Lever_Floor_Push = "Lever_Floor_Push";
-    public const string Lever_Wall_Pull = "Lever_Wall_Pull";
-    public const string Lever_Wall_Push = "Lever_Wall_Push";
-    public const string Pick_item = "Pick_item";
-    public const string Press_Button = "Press_Button";
-    public const string Press_Loop = "Press_Loop";
-    public const string Push_End = "Push_End";
-    public const string Push_Enter = "Push_Enter";
-    public const string Push_Exit = "Push_Exit";
-    public const string Push_Idle = "Push_Idle";
-    public const string Push_Idle_inPlace = "Push_Idle_inPlace";
-    public const string Push_Loop = "Push_Loop";
-    public const string Push_Start = "Push_Start";
-
-    public const string Pull_Start = "Pull_Start";
-    public const string IDLE = "IDLE";
-    public const string WALK = "WALK";
-
-    public const string Wheel = "Wheel";
-    public const string Robot_CleanTable = "Robot_CleanTable";
-    public const string Pile = "Pile";
-    //public const string Turn_Door = "Turn_Door";
-
-    public const string Jump = "Jump";
-    public const string CDA_Release = "CDA_Release";
-    public const string Combat_Spinning_Kick = "Combat_Spinning_Kick";
 }

@@ -763,7 +763,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             //TaskCenter.GetInstance.TestSendOrder(Order.Pile, "Pile", "sim:1034");
             //TaskCenter.GetInstance.TestSendOrder(Order.Turn_Door, "DoorX", "3_7");
 
-            TaskCenter.GetInstance.TestSendOrder(Order.Press_Button, "Sofa", "sim:1015");
+            TaskCenter.GetInstance.TestSendOrder(RobotOrderAnimData.Press_Button, "Sofa", "sim:1015");
 
         }
         if (Input.GetKeyDown(KeyCode.F10))

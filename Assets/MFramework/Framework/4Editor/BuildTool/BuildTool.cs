@@ -1,17 +1,12 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using UnityEditor;
-using UnityEditor.AddressableAssets.Build;
 using UnityEditor.Build;
-using UnityEditor.Build.Content;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
-
 /// <summary>
 /// 标题：自动打包工具
 /// 作者：毛俊峰
@@ -80,21 +75,23 @@ public class BuildTool : IPreprocessBuildWithReport, IPostprocessBuildWithReport
         }
         else
         {
-            productName = "之江数字孪生程序_";
+            productName = "之江数字孪生程序_"; 
         }
 #if UNITY_WEBGL
         productName += "Webgl_";
+        outPutFolderPath = "D:/UnityProject/JHGit/ZJLab_DigtalTwin/Assets/../_Build/_Web";
 #elif UNITY_STANDALONE_LINUX
         productName += "PCLinux_";
+        outPutFolderPath = "D:/UnityProject/JHGit/ZJLab_DigtalTwin/Assets/../_Build/_Linux";
+
 #elif UNITY_STANDALONE_WIN
         productName += "PCWin_";
+        outPutFolderPath = "D:/UnityProject/JHGit/ZJLab_DigtalTwin/Assets/../_Build/_Win";
 #endif
         productName += curTime;
-        Debug.Log(GameLaunch.GetInstance.scene +","+ productName);
         PlayerSettings.productName = productName;
         appName = PlayerSettings.productName;
         //test end
-         
 
         //curBuildOutPutAllPath = outPutFolderPath + "/" + appName + "_v" + PlayerSettings.bundleVersion + "_" + curTime;
         curBuildOutPutAllPath = outPutFolderPath + "/" + appName;
@@ -123,7 +120,16 @@ public class BuildTool : IPreprocessBuildWithReport, IPostprocessBuildWithReport
             buildEndAutoOpenFolderPath = curBuildOutPutAllPath;
             curBuildOutPutAllPath += "/" + appName + ".exe";
         }
+        else if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneLinux64)
+        {
+            buildEndAutoOpenFolderPath = curBuildOutPutAllPath;
+            curBuildOutPutAllPath += "/" + appName;
+        }
+        Debug.Log("curBuildOutPutAllPath :  " + curBuildOutPutAllPath);
+
         BuildPipeline.BuildPlayer(FindEnableEditorrScenes(), curBuildOutPutAllPath, EditorUserBuildSettings.activeBuildTarget, BuildOptions.None);
+
+
         OpenDirectory(buildEndAutoOpenFolderPath);
     }
 

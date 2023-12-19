@@ -71,7 +71,7 @@ public class AnimDoor : MonoBehaviour
                         //Debugger.Log("333" + (transform.name != (TaskCenter.GetInstance.GetCurExecuteTask.name + "_" + TaskCenter.GetInstance.GetCurExecuteTask.motionId)));
                         //只要当前任务指令不是“敲门”,且不是指令所想要敲的那扇门“敲门”，都默认经过门口，机器人开门，门打开
                         //if (TaskCenter.GetInstance.GetCurExecuteTask == null || (TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door && TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Turn_Door))
-                        if (TaskCenter.GetInstance.GetCurExecuteTask == null || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door
+                        if (TaskCenter.GetInstance.GetCurExecuteTask == null || TaskCenter.GetInstance.GetCurExecuteTask.name != RobotOrderAnimData.Knock_on_door
                         // ||(string.Equals(TaskCenter.GetInstance.GetCurExecuteTask.name, Order.Turn_Door) && transform.name != TaskCenter.GetInstance.GetCurExecuteTask .name+ "_"+ TaskCenter.GetInstance.GetCurExecuteTask.motionId)
                         )
 
@@ -92,7 +92,7 @@ public class AnimDoor : MonoBehaviour
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
                         if (p.gameObject.tag != "Player") return;
-                        if (TaskCenter.GetInstance.GetCurExecuteTask == null || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door)
+                        if (TaskCenter.GetInstance.GetCurExecuteTask == null || TaskCenter.GetInstance.GetCurExecuteTask.name != RobotOrderAnimData.Knock_on_door)
 
                         //|| Vector3.Distance(GameObject.FindObjectOfType<AIRobotMove>().targetPoint.position
                         //, GameObject.FindObjectOfType<AIRobotMove>().transform.position) > 3f)
@@ -111,7 +111,7 @@ public class AnimDoor : MonoBehaviour
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
                         if (p.gameObject.tag != "Player") return;
-                        if (TaskCenter.GetInstance.GetCurExecuteTask == null || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door)
+                        if (TaskCenter.GetInstance.GetCurExecuteTask == null || TaskCenter.GetInstance.GetCurExecuteTask.name != RobotOrderAnimData.Knock_on_door)
 
                         //|| Vector3.Distance(GameObject.FindObjectOfType<AIRobotMove>().targetPoint.position
                         //, GameObject.FindObjectOfType<AIRobotMove>().transform.position) > 3f)
@@ -130,7 +130,7 @@ public class AnimDoor : MonoBehaviour
                     m_ListenerCollider1Arr[i].callbackTriggerEnter += (p) =>
                     {
                         if (p.gameObject.tag != "Player") return;
-                        if (TaskCenter.GetInstance.GetCurExecuteTask == null || TaskCenter.GetInstance.GetCurExecuteTask.name != Order.Knock_on_door)
+                        if (TaskCenter.GetInstance.GetCurExecuteTask == null || TaskCenter.GetInstance.GetCurExecuteTask.name != RobotOrderAnimData.Knock_on_door)
 
                         //|| Vector3.Distance(GameObject.FindObjectOfType<AIRobotMove>().targetPoint.position
                         //, GameObject.FindObjectOfType<AIRobotMove>().transform.position) > 3f)

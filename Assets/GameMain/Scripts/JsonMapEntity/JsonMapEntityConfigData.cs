@@ -22,6 +22,10 @@ public class ConfigData
         /// 发送视觉感知实体信息频率, n秒/次
         /// </summary>
         public float SendEntityInfoHZ;
+        /// <summary>
+        /// 是否显示控制台日志 1-显示 0-不显示
+        /// </summary>
+        public int ShowLog;
     }
     public class ConfigData_HttpConfig
 	{
