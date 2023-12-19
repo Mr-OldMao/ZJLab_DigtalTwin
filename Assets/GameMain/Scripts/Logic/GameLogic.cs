@@ -8,6 +8,8 @@ using static GetThingGraph;
 using static GenerateRoomBorderModel;
 using System.Collections;
 using System.IO;
+using System.Linq;
+using static JsonWebRoomDataList;
 /// <summary>
 /// 标题：程序逻辑入口
 /// 功能：程序主逻辑
@@ -45,7 +47,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "Simulator:1702643793139|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "Simulator:1702969418396|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 #else
 #if UNITY_STANDALONE_LINUX
@@ -63,73 +65,112 @@ public class GameLogic : SingletonByMono<GameLogic>
     /// </summary>
     private void InitCompleteEventCallback()
     {
-        //优先级 测试版 > 本地读档 > 服务器读档 > 不读当(随机生成)
-        //根据配置文件判定是否需要读档本地文件
-        if (MainData.UseTestData)
+        //异步加载ab资源
+        LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity", "UIForm", "Mat" }, () =>
         {
-            Debugger.Log("测试版运行", LogTag.Forever);
-            this.EnterMainScene();
-        }
-        else if (!string.IsNullOrEmpty(MainData.ConfigData.CoreConfig.LocalReadFileName))
-        {
-            MainData.CanReadFile = true;
-            Debugger.Log("尝试本地读档 CoreConfig.LocalReadFileName：" + MainData.ConfigData.CoreConfig.LocalReadFileName, LogTag.Forever);
-            string localReadFilePath = Application.streamingAssetsPath + "/" + MainData.ConfigData.CoreConfig.LocalReadFileName;
-            if (File.Exists(localReadFilePath))
+            Debugger.Log("ab资源加载完毕回调");
+            m_IsLoadedAssets = true;
+
+            //优先级 测试版 > 本地读档 > 服务器读档 > 不读当(随机生成)
+            //根据配置文件判定是否需要读档本地文件
+            if (MainData.UseTestData)
             {
-                //读取本地数据
-                DataRead.GetInstance.ReadAllDataByLocalFile(Application.streamingAssetsPath, MainData.ConfigData.CoreConfig.LocalReadFileName, (b) =>
+                Debugger.Log("测试版运行", LogTag.Forever);
+                this.EnterMainScene();
+            }
+            else if (!string.IsNullOrEmpty(MainData.ConfigData.CoreConfig.LocalReadFileName))
+            {
+                MainData.CanReadFile = true;
+                Debugger.Log("尝试本地读档 CoreConfig.LocalReadFileName：" + MainData.ConfigData.CoreConfig.LocalReadFileName, LogTag.Forever);
+                string localReadFilePath = Application.streamingAssetsPath + "/" + MainData.ConfigData.CoreConfig.LocalReadFileName;
+                if (File.Exists(localReadFilePath))
                 {
-                    if (b)
+                    //读取本地数据
+                    DataRead.GetInstance.ReadAllDataByLocalFile(Application.streamingAssetsPath, MainData.ConfigData.CoreConfig.LocalReadFileName, (b) =>
                     {
-                        Debugger.Log("本地读档成功! SceneID:" + MainData.SceneID, LogTag.Forever);
-                        this.EnterMainScene();
-                    }
-                    else
+                        if (b)
+                        {
+                            Debugger.Log("本地读档成功! SceneID:" + MainData.SceneID, LogTag.Forever);
+                            this.EnterMainScene();
+                        }
+                        else
+                        {
+                            Debugger.LogError("本地读档失败，请检查文件内容是否合法 CoreConfig.LocalReadFileName：" + MainData.ConfigData.CoreConfig.LocalReadFileName);
+                        }
+                    });
+                }
+                else
+                {
+                    Debugger.LogError("本地读档失败，配置文件Config.json中LocalReadFileName字段写入文件名不存在../StreamingAssets/目录下，请检查文件是否存在 CoreConfig.LocalReadFileName：" + MainData.ConfigData.CoreConfig.LocalReadFileName);
+                }
+            }
+            else if (MainData.CanReadFile)
+            {
+                Debugger.Log("尝试从服务器读档", LogTag.Forever);
+                //根据SceneID从服务器读取数据
+                DataRead.GetInstance.ReadAllDataByServerSceneID((b) =>
+                {
+                    InterfaceDataCenter.GetInstance.GetWebRoomDataList((JsonWebRoomDataList data) =>
                     {
-                        Debugger.LogError("本地读档失败，请检查文件内容是否合法 CoreConfig.LocalReadFileName：" + MainData.ConfigData.CoreConfig.LocalReadFileName);
-                    }
+                        //当前实例是否存在于web端列表中  是否为新的场景实例 ,T-新场景实例，首次进入程序 F-不存在当前实例，或者为旧场景实例已被删除
+                        bool isExistWebList = false;
+                        if (data != null && data.data != null)
+                        {
+                            JsonWebRoomDataList_data jsonWebRoomDataList_Data = data.data.ToList().Find(p => { return p.id == MainData.SceneID; });
+                            if (jsonWebRoomDataList_Data != null)
+                            {
+                                //flag = 1 已被删除web端列表中不显示， 0 web端在列表中显示
+                                isExistWebList = jsonWebRoomDataList_Data.flag != 1;
+                            }
+                            else
+                            {
+                                isExistWebList = false;
+                                Debugger.LogError("不存在当前web端实例信息 sceneID：" + MainData.SceneID);
+                            }
+                        }
+
+
+                        if (isExistWebList)
+                        {
+                            if (b)
+                            {
+                                this.EnterMainScene();
+                            }
+                            else
+                            {
+                                Debugger.Log("当前为新场景实例，即将不读档，生成随机场景实例，sceneID：" + MainData.SceneID, LogTag.Forever);
+                                MainData.CanReadFile = false;
+                                MsgEvent.SendMsg(MsgEventName.InitComplete);
+                            }
+                        }
+                        else
+                        {
+                            Debugger.LogError("从服务器读档失败，无法获取场景信息，当前场景不存在！sceneID：" + MainData.SceneID);
+                            UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
+                            {
+                                txtHintContent = "无法获取场景信息，当前场景ID已被删除！\nsceneID：" + MainData.SceneID,
+                                delayCloseUIFormTime = 0
+                            });
+                        }
+                    });
+
                 });
             }
             else
             {
-                Debugger.LogError("本地读档失败，配置文件Config.json中LocalReadFileName字段写入文件名不存在../StreamingAssets/目录下，请检查文件是否存在 CoreConfig.LocalReadFileName：" + MainData.ConfigData.CoreConfig.LocalReadFileName);
+                Debugger.Log("不读档，生成随机场景实例", LogTag.Forever);
+                Debugger.Log("MainDataDisplayAA   SceneID：" + MainData.SceneID
+                              + ",UseTestData：" + MainData.UseTestData
+                              + ",SendEntityInfoHZ：" + MainData.ConfigData.CoreConfig.SendEntityInfoHZ
+                              + ",Http_IP：" + MainData.ConfigData.HttpConfig.IP
+                              + ",Http_Port：" + MainData.ConfigData.HttpConfig.Port
+                              + ",Mqtt_IP：" + MainData.ConfigData.MqttConfig.ClientIP
+                              + ",Vs_Frame：" + MainData.ConfigData.VideoStreaming.Frame
+                              + ",Vs_Quality：" + MainData.ConfigData.VideoStreaming.Quality,
+                              LogTag.Forever);
+                this.EnterMainScene();
             }
-        }
-        else if (MainData.CanReadFile)
-        {
-            Debugger.Log("尝试从服务器读档", LogTag.Forever);
-            //根据SceneID从服务器读取数据
-            DataRead.GetInstance.ReadAllDataByServerSceneID((b) =>
-            {
-                if (b)
-                {
-                    this.EnterMainScene();
-                }
-                else
-                {
-                    Debugger.LogError("从服务器读档失败，无法进入场景，即将不读档，生成随机场景实例");
-                    MainData.CanReadFile = false;
-                    MsgEvent.SendMsg(MsgEventName.InitComplete);
-
-                    //this.EnterMainScene();
-                }
-            });
-        }
-        else
-        {
-            Debugger.Log("不读档，生成随机场景实例", LogTag.Forever);
-            Debugger.Log("MainDataDisplayAA   SceneID：" + MainData.SceneID
-                          + ",UseTestData：" + MainData.UseTestData
-                          + ",SendEntityInfoHZ：" + MainData.ConfigData.CoreConfig.SendEntityInfoHZ
-                          + ",Http_IP：" + MainData.ConfigData.HttpConfig.IP
-                          + ",Http_Port：" + MainData.ConfigData.HttpConfig.Port
-                          + ",Mqtt_IP：" + MainData.ConfigData.MqttConfig.ClientIP
-                          + ",Vs_Frame：" + MainData.ConfigData.VideoStreaming.Frame
-                          + ",Vs_Quality：" + MainData.ConfigData.VideoStreaming.Quality,
-                          LogTag.Forever);
-            this.EnterMainScene();
-        }
+        });
     }
 
     private void OnDisable()
@@ -144,12 +185,12 @@ public class GameLogic : SingletonByMono<GameLogic>
         //注册消息事件
         RegisterMsgEvent();
 
-        //异步加载ab资源
-        LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity", "UIForm", "Mat" }, () =>
-        {
-            Debugger.Log("ab资源加载完毕回调");
-            m_IsLoadedAssets = true;
-        });
+        ////异步加载ab资源
+        //LoadAssetsByAddressable.GetInstance.LoadAssetsAsyncByLable(new List<string> { "ItemLable", "RoomBorderLable", "RobotEntity", "UIForm", "Mat" }, () =>
+        //{
+        //    Debugger.Log("ab资源加载完毕回调");
+        //    m_IsLoadedAssets = true;
+        //});
 
         //接入网络通信
         SendNetworkHTTP();

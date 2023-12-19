@@ -15,6 +15,7 @@ using static GetThingGraph;
 /// </summary>
 public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 {
+    #region HTTP
     //服务器10.101.80.21   本机10.11.81.241
     private static string URL_SUBROOT = "http://" + MainData.ConfigData?.HttpConfig.IP + ":" + MainData.ConfigData?.HttpConfig.Port + "/";//"http://10.101.80.21:4006/";
 
@@ -29,6 +30,10 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 
     //改变仿真引擎状态
     private static string URL_CHANGE_SIMULATOR_STATE = URL_SUBROOT + "simulator/changeSimulatorState";
+
+    //Web端房间数据列表
+    public const string URL_SCENE_QUERYLIST = "http://10.101.80.74:8080/simulation/scene/queryList";
+    #endregion
 
     /*MQTT*/
     #region 仿真
@@ -408,6 +413,25 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
             Debugger.LogError("读档失败 m:" + m + ",n:" + n);
             callbackFail?.Invoke();
         });
+    }
+
+
+    /// <summary>
+    /// 获取Web端房间数据列表
+    /// </summary>
+    public void GetWebRoomDataList(Action<JsonWebRoomDataList> callback)
+    {
+        MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Get, URL_SCENE_QUERYLIST, new Dictionary<string, string> { }, (string jsonStr) =>
+        {
+            Debugger.Log("获取Web端房间数据列表 jsonStr:" + jsonStr);
+            JsonWebRoomDataList jsonWebRoomDataList = JsonTool.GetInstance.JsonToObjectByLitJson<JsonWebRoomDataList>(jsonStr);
+            callback?.Invoke(jsonWebRoomDataList);
+        }, null, null, (m, n) =>
+        {
+            Debugger.LogError("存档失败 m:" + m + ",n:" + n);
+            callback?.Invoke(null);
+        });
+
     }
 
     #endregion
