@@ -511,6 +511,19 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case RobotOrderAnimData.Combat_Spinning_Kick:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Combat_Spinning_Kick");
                     break;
+                //双手抱胸
+                case RobotOrderAnimData.Hand_Chest:
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Hand_Chest");
+                    break;
+                //双手叉腰
+                case RobotOrderAnimData.Hand_Waist:
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Hand_Waist");
+                    break;
+                //查找
+                case RobotOrderAnimData.Find:
+                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Find");
+                    break;
+
 
                 ////转动门把手
                 //case Order.Turn_Door:
@@ -520,6 +533,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 //case Order.:
                 //    animSecond = robotAnimCenter.PlayAnimByName("");
                 //    break;
+
                 default:
                     Debug.LogError("当前指令动画未配置 orderAnim: " + orderStr + "，motionId:" + GetCurExecuteTask.motionId);
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Other");

@@ -42,4 +42,9 @@ public class RobotOrderAnimData
     public const string Jump = "Jump";
     public const string CDA_Release = "CDA_Release";
     public const string Combat_Spinning_Kick = "Combat_Spinning_Kick";
+
+    public const string Hand_Chest = "Hand_Chest";
+    public const string Hand_Waist = "Hand_Waist";
+    public const string Find = "Find";
+
 }
