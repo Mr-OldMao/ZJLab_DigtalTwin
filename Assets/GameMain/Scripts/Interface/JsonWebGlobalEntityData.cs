@@ -9,6 +9,7 @@ using System;
 public class JsonWebGlobalEntityData
 {
     public string sceneID = MainData.SceneID;
+    public string tmpId = MainData.tmpID;
     public string entityID;
     public string entityType;
     /// <summary>

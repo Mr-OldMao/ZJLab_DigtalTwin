@@ -114,4 +114,5 @@ public class PostThingGraph
     public List<GetThingGraph_data_items> items;
 	public string id;
     public string idScene = MainData.SceneID;
+    public string tmpId = MainData.tmpID;
 }

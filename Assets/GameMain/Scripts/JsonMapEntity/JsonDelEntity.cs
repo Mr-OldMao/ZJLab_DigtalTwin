@@ -6,6 +6,7 @@
 public class JsonDelEntity
 {
     public string idScene = MainData.SceneID;
+    public string tmpId;
     public JsonDelEntity_entityInfo[] entityInfo;
 	public class JsonDelEntity_entityInfo
 	{

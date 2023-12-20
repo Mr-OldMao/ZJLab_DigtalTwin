@@ -561,14 +561,14 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     break;
                 case TOPIC_ADD_GOODS:
                     JsonAddEntity jsonAddEntity = JsonTool.GetInstance.JsonToObjectByLitJson<JsonAddEntity>(msg);
-                    if (jsonAddEntity.idScene == MainData.SceneID)
+                    if (jsonAddEntity.idScene == MainData.SceneID && jsonAddEntity.tmpId == MainData.tmpID)
                     {
                         MainDataTool.GetInstance.AddEntityToTargetPlace(jsonAddEntity);
                     }
                     break;
                 case TOPIC_DEL_GOODS:
                     JsonDelEntity jsonDelEntity = JsonTool.GetInstance.JsonToObjectByLitJson<JsonDelEntity>(msg);
-                    if (jsonDelEntity.idScene == MainData.SceneID)
+                    if (jsonDelEntity.idScene == MainData.SceneID && jsonDelEntity.tmpId == MainData.tmpID)
                     {
                         MainDataTool.GetInstance.DelEntityToTargetPlace(jsonDelEntity);
                     }
@@ -642,8 +642,6 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// <param name="items"></param>
     public void SendMQTTUpdateEntity(JsonWebGlobalEntityData items)
     {
-        Debugger.Log("test 7");
-
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
         NetworkMqtt.GetInstance.Publish(TOPIC_Web_GLOBAL, jsonStr);
     }

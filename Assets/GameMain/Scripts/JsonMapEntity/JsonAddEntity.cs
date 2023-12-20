@@ -6,6 +6,7 @@
 public class JsonAddEntity
 {
     public string idScene = MainData.SceneID;
+	public string tmpId;
     public JsonAddEntity_entityInfo[] entityInfo;
 	public class JsonAddEntity_entityInfo
 	{

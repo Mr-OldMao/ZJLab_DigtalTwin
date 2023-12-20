@@ -47,7 +47,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "Simulator:1703036777065|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "Simulator:1703036842597|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 #else
 #if UNITY_STANDALONE_LINUX
@@ -193,20 +193,24 @@ public class GameLogic : SingletonByMono<GameLogic>
         //});
 
         //接入网络通信
-        SendNetworkHTTP();
         NetworkMQTT();
-
-        //等待ab资源加载完毕，以及http接口获取的场景数据，解析生成场景实体
-        UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() =>
+        SendNetworkHTTP(() =>
         {
-            return m_IsLoadedAssets && MainData.getEnvGraph != null && MainData.getThingGraph != null;
-        }, () =>
-        {
-            //加载UI窗体
-            UIManager.GetInstance.Show<UIFormMain>();
-            //生成场景中所有房间和物品
-            GenerateScene();
+            //等待ab资源加载完毕，以及http接口获取的场景数据，解析生成场景实体
+            UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() =>
+            {
+                return m_IsLoadedAssets && MainData.getEnvGraph != null && MainData.getThingGraph != null && !string.IsNullOrEmpty(MainData.tmpID);
+            }, () =>
+            {
+                //加载UI窗体
+                UIManager.GetInstance.Show<UIFormMain>();
+                //生成场景中所有房间和物品
+                GenerateScene();
+            });
         });
+      
+
+      
     }
 
     private void CreateRootNode()
