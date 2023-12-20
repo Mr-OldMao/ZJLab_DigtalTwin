@@ -597,6 +597,8 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// <param name="items"></param>
     public void SendMQTTUpdateEntity(JsonWebGlobalEntityData items)
     {
+        Debugger.Log("test 7");
+
         string jsonStr = JsonTool.GetInstance.ObjectToJsonStringByLitJson(items);
         NetworkMqtt.GetInstance.Publish(TOPIC_Web_GLOBAL, jsonStr);
     }

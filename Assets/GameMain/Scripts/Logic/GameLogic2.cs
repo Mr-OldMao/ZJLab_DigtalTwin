@@ -20,7 +20,7 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
 
     public Dictionary<string, EntityInfo> m_DicPeopleEntityArray = new Dictionary<string, EntityInfo>();
 
-
+    private Animator m_RobotAnim;
 
     private Transform m_RobotRootNode;
     private Transform m_PeopleRootNode;
@@ -30,6 +30,17 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
         public int type;
         public GameObject entity;
         public Transform cvsRobot;
+
+        public Animator anim;
+
+        /// <summary>
+        /// 更新实体历史最新坐标位置的时间戳
+        /// </summary>
+        public long UpdatePosNowTimestamp;
+        /// <summary>
+        /// 实体历史最新的位置
+        /// </summary>
+        public Vector3 nowPos;
     }
 
 
@@ -69,8 +80,28 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
             });
         });
 
+        InvokeRepeating("ListenerRobotStateByPos", 0, 2);
 
     }
+
+    /// <summary>
+    /// 监听所有机器人的位置状态通过坐标位置
+    /// </summary>
+    private void ListenerRobotStateByPos()
+    {
+        Debugger.Log("ListenerRobotStateByPos");
+        foreach (EntityInfo entityInfo in m_DicRobotEntityArray.Values)
+        {
+            Vector3 curPos = entityInfo.entity.transform.localPosition;
+            bool isMoving = JudgeIsMove(curPos, entityInfo.nowPos);
+            if (isMoving)
+            {
+                entityInfo.nowPos = curPos;
+            }
+            entityInfo.anim.SetBool("IsMoving", isMoving);
+        }
+    }
+
     private void NetworkMQTT()
     {
         InterfaceDataCenter.GetInstance.InitMQTT();
@@ -88,12 +119,11 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
         if (MainData.feature_People_Perceptions?.Count > 0)
         {
             Feature_People_Perception feature_People_Perception = MainData.feature_People_Perceptions.Dequeue();
-            Debugger.Log("feature_People_Perception.robotId：" + feature_People_Perception.robotId);
             DisposePeoplePos(feature_People_Perception);
             DisposePeopleUI(feature_People_Perception);
         }
 
-        if (Input.GetKey(KeyCode.F6))
+        if (Input.GetKeyDown(KeyCode.F6))
         {
             int timestamp = int.Parse(System.DateTime.Now.ToString("HHmmss"));
 
@@ -104,7 +134,7 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
     ""data"":{
         ""feature"":{
             ""orientation"":[" + rotValue + @",0.0,0.0],
-            ""position"":[0.0,0.0,1.0]
+            ""position"":[1.0,0.0,0.0]
         }
     },
     ""clientId"":""test01""
@@ -116,7 +146,7 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
             //    testJson);
         }
 
-        if (Input.GetKey(KeyCode.F7))
+        if (Input.GetKeyDown(KeyCode.F7))
         {
             int timestamp = int.Parse(System.DateTime.Now.ToString("HHmmss"));
 
@@ -133,15 +163,37 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
     /// </summary>
     private void DisposeRobotPos(Feature_Robot_Pos feature_Robot_Pos)
     {
-        GameObject entity = GetEntityInfo(feature_Robot_Pos.robotId).entity;
+        EntityInfo entityInfo = GetEntityInfo(feature_Robot_Pos.robotId);
+        GameObject entity = entityInfo.entity;
+
         if (entity != null)
         {
             Feature_Robot_Pos_data_feature transInfo = feature_Robot_Pos.data.feature;
-            entity.transform.localPosition = new Vector3(transInfo.position[0], 0, transInfo.position[1]);
-            //entity.transform.rotation = Quaternion.Euler(new Vector3(transInfo.orientation[2], transInfo.orientation[1], transInfo.orientation[0]));
+            Vector3 targetPos = new Vector3(transInfo.position[0], 0, transInfo.position[1]);
 
+            bool isMoving = JudgeIsMove(entity.transform.localPosition, targetPos);
+
+            if (entityInfo?.anim != null)
+            {
+                if (entityInfo.UpdatePosNowTimestamp == 0)//首次生成实体
+                {
+                    entityInfo.anim.SetBool("IsMoving", false);
+                }
+                else
+                {
+                    entityInfo.anim.SetBool("IsMoving", isMoving);
+                }
+            }
+
+            //更新坐标位置最新的时间戳
+            if (isMoving)
+            {
+                entityInfo.UpdatePosNowTimestamp = feature_Robot_Pos.timestamp;
+            }
+            entityInfo.nowPos = targetPos;
+
+            entity.transform.localPosition = targetPos;
             float newRetoteValue = -transInfo.orientation[0] + 360;
-
             entity.transform.localRotation = Quaternion.Euler(new Vector3(0, newRetoteValue, 0));
         }
     }
@@ -183,7 +235,6 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
                     {
                         float rotAngle = (float)peopleInfo.angle;
                         float newRetoteValue = (-rotAngle) + 90;
-                        Debugger.Log(entity + "newRetoteValue" + newRetoteValue);
                         // float newRetoteValue = (float)peopleInfo.angle;
                         entity.transform.localRotation = Quaternion.Euler(new Vector3(0, newRetoteValue, 0));
                     }
@@ -237,6 +288,16 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
         return t;
     }
 
+    /// <summary>
+    /// 判断是否移动了
+    /// </summary>
+    /// <param name="v1"></param>
+    /// <param name="v2"></param>
+    /// <returns></returns>
+    private bool JudgeIsMove(Vector3 v1, Vector3 v2)
+    {
+        return Vector3.Distance(v1, v2) > 0.01f;
+    }
 
     private EntityInfo GetEntityInfo(string id, bool isRobot = true)
     {
@@ -258,7 +319,8 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
                 {
                     entity = obj,
                     id = id,
-                    cvsRobot = obj.transform.Find("CvsRobot")
+                    cvsRobot = obj.transform.Find("CvsRobot"),
+                    anim = obj.GetComponentInChildren<Animator>()
                 };
                 obj.transform.parent = m_RobotRootNode;
                 obj.name = id;
@@ -292,7 +354,8 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
                 {
                     entity = obj,
                     id = id,
-                    cvsRobot = obj.transform.Find("CvsRobot")
+                    cvsRobot = obj.transform.Find("CvsRobot"),
+                    anim = null
                 };
                 obj.transform.parent = m_PeopleRootNode;
                 obj.name = id;

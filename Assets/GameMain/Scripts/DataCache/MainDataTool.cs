@@ -296,7 +296,6 @@ public class MainDataTool : SingletonByMono<MainDataTool>
                     {
                         Destroy(entity);
                         result = true;
-
                         //更新全局实体数据
                         UpdateEnityInfoTool.GetInstance.UpdateSceneEntityInfo();
                         DataSave.GetInstance.SaveGetThingGraph_data_items(MainData.CacheSceneItemsInfo);
@@ -320,6 +319,7 @@ public class MainDataTool : SingletonByMono<MainDataTool>
                 entityID = targetID,
                 postThingGraph = MainData.CacheSceneItemsInfo
             };
+            Debugger.Log("Send Del Msg");
             InterfaceDataCenter.GetInstance.SendMQTTUpdateEntity(jsonWebGlobalEntityData);
 
 
