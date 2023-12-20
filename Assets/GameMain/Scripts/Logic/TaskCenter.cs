@@ -319,7 +319,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 motionId = GetCurExecuteTask?.motionId,
                 name = GetCurExecuteTask?.name,
                 task_id = GetCurExecuteTask?.taskId,
-                simulatorId = GetCurExecuteTask?.simulatorId,
+                //simulatorId = GetCurExecuteTask?.simulatorId,
                 stateCode = 0,
                 stateMsg = "suc",
                 //targetRoomType = GetTargetRoomType().ToString()
@@ -401,8 +401,16 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case RobotOrderAnimData.Grab_item_pull:
                     //物品父节点放置在机器人手中
                     string objName2 = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
-                    grabObj = MainData.CacheItemsEntity[objName2];
-                    animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PutDown");
+                    if (MainData.CacheItemsEntity.ContainsKey(objName2))
+                    {
+                        grabObj = MainData.CacheItemsEntity[objName2];
+                        animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_PutDown");
+                    }
+                    else
+                    {
+                        Debugger.Log("not find entity name:" + objName2);
+                        animSecond = 0f;
+                    }
                     break;
                 //打开门
                 case RobotOrderAnimData.Open_Door_Inside:
@@ -527,7 +535,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                     //取消物品父节点放置在机器人手中
                     if (orderStr == RobotOrderAnimData.Grab_item_pull)
                     {
-                        if (m_DicCacheGrabParent.ContainsKey(grabObj))
+                        if (grabObj != null && m_DicCacheGrabParent.ContainsKey(grabObj))
                         {
                             grabObj.transform.parent = m_DicCacheGrabParent[grabObj].transform;
                             foreach (var item in grabObj.GetComponentsInChildren<MeshCollider>())
@@ -564,9 +572,10 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     {
         //物品父节点放置在机器人手中
         string objName1 = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
-        GameObject grabObj = MainData.CacheItemsEntity[objName1];
-        if (grabObj != null)
+        GameObject grabObj = null;
+        if (MainData.CacheItemsEntity.ContainsKey(objName1))
         {
+            grabObj = MainData.CacheItemsEntity[objName1];
             //当前物品的父对象实体
             UnityTool.GetInstance.DelayCoroutine(delayTime, () =>
             {
@@ -663,7 +672,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// 新增一条指令到队列
     /// </summary>
     /// <param name="controlCommitJsonStr"></param>
-    public void AddOrder(string controlCommitJsonStr)
+    public void TryAddOrder(string controlCommitJsonStr)
     {
         ControlCommit controlCommit = JsonTool.GetInstance.JsonToObjectByLitJson<ControlCommit>(controlCommitJsonStr);
         bool isRight = true;
@@ -673,14 +682,21 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         {
             if (!string.IsNullOrEmpty(controlCommit.taskId))
             {
-                if (controlCommit.sceneID == MainData.SceneID || controlCommit.simulatorId == MainData.SceneID)
+                if (controlCommit.sceneID == MainData.SceneID && controlCommit.tmpId == MainData.tmpID)
                 {
                     isRight = true;
                 }
                 else
                 {
                     isRight = false;
-                    taskFailDes = "SceneID不匹配，忽视当前决策指令，curSceneID：" + MainData.SceneID + "，simulatorId：" + controlCommit.simulatorId + "，sceneID：" + controlCommit.sceneID + ",json：" + controlCommitJsonStr;
+                    if (controlCommit.sceneID != MainData.SceneID)
+                    {
+                        taskFailDes = "新增决策指令失败 SceneID不匹配，忽视当前决策指令，curSceneID：" + MainData.SceneID + "，curTmpID：" + MainData.tmpID + "，cbSceneID：" + controlCommit.sceneID + "，cbTmpID：" + controlCommit.tmpId + ",json：" + controlCommitJsonStr;
+                    }
+                    else if (controlCommit.tmpId != MainData.tmpID)
+                    {
+                        taskFailDes = "新增决策指令失败 tmpId不匹配，忽视当前决策指令，curSceneID：" + MainData.SceneID + "，curTmpID：" + MainData.tmpID + "，cbSceneID：" + controlCommit.sceneID + "，cbTmpID：" + controlCommit.tmpId + ",json：" + controlCommitJsonStr;
+                    }
                     Debugger.LogWarning(taskFailDes);
                     return;
                 }

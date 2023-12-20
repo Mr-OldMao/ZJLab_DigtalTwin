@@ -111,19 +111,19 @@ public class UIFormMain : UIFormBase
     {
         BtnStart.onClick.AddListenerCustom(() =>
         {
-            OnClickStateBtn(ProgramState.start, MainData.SceneID);
+            OnClickStateBtn(ProgramState.start, MainData.SceneID, MainData.tmpID);
         });
         btnStop.onClick.AddListenerCustom(() =>
         {
-            OnClickStateBtn(ProgramState.stop, MainData.SceneID);
+            OnClickStateBtn(ProgramState.stop, MainData.SceneID, MainData.tmpID);
         });
         btnPause.onClick.AddListenerCustom(() =>
         {
-            OnClickStateBtn(ProgramState.pause, MainData.SceneID);
+            OnClickStateBtn(ProgramState.pause, MainData.SceneID, MainData.tmpID);
         });
         btnResume.onClick.AddListenerCustom(() =>
         {
-            OnClickStateBtn(ProgramState.resume, MainData.SceneID);
+            OnClickStateBtn(ProgramState.resume, MainData.SceneID, MainData.tmpID);
         });
         btnCameraFree.onClick.AddListenerCustom(() =>
         {
@@ -212,9 +212,9 @@ public class UIFormMain : UIFormBase
         });
     }
 
-    public void OnClickStateBtn(ProgramState programState, string sceneID)
+    public void OnClickStateBtn(ProgramState programState, string sceneId, string tmpId)
     {
-        InterfaceDataCenter.GetInstance.ChangeProgramState(sceneID, programState);
+        InterfaceDataCenter.GetInstance.ChangeProgramState(sceneId, tmpId, programState);
         switch (programState)
         {
             case ProgramState.start:

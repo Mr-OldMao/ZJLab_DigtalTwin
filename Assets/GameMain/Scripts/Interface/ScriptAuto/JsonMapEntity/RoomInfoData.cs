@@ -18,4 +18,5 @@ public class RoomInfoData
 		public int[] maxPos;
 	}
     public string idScene = MainData.SceneID;
+	public string tmpId = MainData.tmpID;
 }

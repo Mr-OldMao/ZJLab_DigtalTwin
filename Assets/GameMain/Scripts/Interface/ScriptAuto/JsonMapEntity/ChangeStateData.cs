@@ -7,4 +7,5 @@ public class ChangeStateData
 {  
 	public string state;
 	public string idScene;
+	public string tmpId;
 }

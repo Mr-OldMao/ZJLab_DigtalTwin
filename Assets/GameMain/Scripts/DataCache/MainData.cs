@@ -12,6 +12,8 @@ using static GetThingGraph;
 /// </summary>
 public class MainData
 {
+
+
     /// <summary>
     /// 当前是否使用测试数据
     /// </summary>
@@ -37,10 +39,16 @@ public class MainData
     /// 是否允许读档
     /// </summary>
     public static bool CanReadFile { get; set; } = true;
+
     /// <summary>
     /// 场景ID 接口参数ID
     /// </summary>
     public static string SceneID = string.Empty;
+
+    /// <summary>
+    ///等效于token 用于标识同一个sceneID下的 多个客户端
+    /// </summary>
+    public static string tmpID = string.Empty;
 
     /// <summary>
     /// 物体与房间的邻接关系数据
@@ -85,6 +93,6 @@ public class MainData
     /// <summary>
     /// 访客坐标信息
     /// </summary>
-    public static Queue<Feature_People_Perception> feature_People_Perceptions { get; set; } = new Queue<Feature_People_Perception> { }; 
+    public static Queue<Feature_People_Perception> feature_People_Perceptions { get; set; } = new Queue<Feature_People_Perception> { };
     #endregion
 }

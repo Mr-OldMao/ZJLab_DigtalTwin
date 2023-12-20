@@ -47,7 +47,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "Simulator:1702953764423|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "Simulator:1703036777065|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 #else
 #if UNITY_STANDALONE_LINUX
@@ -226,14 +226,18 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         bool getThingGraph = false;
         bool getEnvGraph = false;
-
+        bool getTmpId = false;
         InterfaceDataCenter.GetInstance.CacheGetThingGraph(MainData.SceneID, () => getThingGraph = true, () =>
         {
             MainData.CanReadFile = false;
             MsgEvent.SendMsg(MsgEventName.InitComplete);
         });
         InterfaceDataCenter.GetInstance.CacheGetEnvGraph(MainData.SceneID, () => getEnvGraph = true);
-        UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() => { return getThingGraph && getEnvGraph; }, () => callbackSuc?.Invoke());
+
+
+        //获取token
+        InterfaceDataCenter.GetInstance.GetTmpID(MainData.SceneID, (token) => getTmpId = true);
+        UnityTool.GetInstance.DelayCoroutineWaitReturnTrue(() => { return getThingGraph && getEnvGraph && getTmpId; }, () => callbackSuc?.Invoke());
     }
 
     private void NetworkMQTT()

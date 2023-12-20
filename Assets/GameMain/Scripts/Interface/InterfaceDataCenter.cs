@@ -1,9 +1,7 @@
 using MFramework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using static DataRead;
 using static GenerateRoomData;
 using static GetEnvGraph;
 using static GetThingGraph;
@@ -30,6 +28,9 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
 
     //改变仿真引擎状态
     private static string URL_CHANGE_SIMULATOR_STATE = URL_SUBROOT + "simulator/changeSimulatorState";
+
+    //改变仿真引擎状态
+    private static string URL_GENERATE_TMPID = URL_SUBROOT + "simulator/generateTmpId";
 
     //Web端房间数据列表
     public const string URL_SCENE_QUERYLIST = "http://10.101.80.74:8080/simulation/scene/queryList";
@@ -79,6 +80,49 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     #endregion
 
     #region HTTP
+
+    /// <summary>
+    /// 获取TmpID 即Token
+    /// </summary>
+    public void GetTmpID(string id, Action<string> callback)
+    {
+        if (string.IsNullOrEmpty(MainData.tmpID))
+        {
+            if (MainData.UseTestData)
+            {
+                string tmpId = UnityEngine.Random.Range(1000000000, 9999999999).ToString();
+                MainData.tmpID = tmpId;
+                Debugger.Log("tempId:" + tmpId);
+                callback?.Invoke(tmpId);
+            }
+            else
+            {
+                string rawJsonStr = "{\"id\":\"" + id + "\"}";
+                MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_GENERATE_TMPID, new Dictionary<string, string>(), (string jsonStr) =>
+                {
+                    Debugger.Log("获取Token成功 jsonStr:" + jsonStr);
+                    JsonGenerateTempID jsonGenerateTempID = JsonTool.GetInstance.JsonToObjectByLitJson<JsonGenerateTempID>(jsonStr);
+                    string tmpId = jsonGenerateTempID.message;
+                    MainData.tmpID = tmpId;
+                    Debugger.Log("tempId:" + tmpId);
+                    callback?.Invoke(tmpId);
+                }, null, rawJsonStr, (m, n) =>
+                {
+                    Debugger.LogError("获取Token失败,系统生成随机token m:" + m + ",n:" + n);
+                    string tmpId = UnityEngine.Random.Range(1000000000, 9999999999).ToString();
+                    MainData.tmpID = tmpId;
+                    Debugger.Log("tempId:" + tmpId);
+                    callback?.Invoke(tmpId);
+                });
+            }
+        }
+        else
+        {
+            Debugger.Log("tempId:" + MainData.tmpID);
+            callback?.Invoke(MainData.tmpID);
+        }
+    }
+
     /// <summary>
     /// 缓存环境场景图,房间与房间的邻接关系
     /// </summary>
@@ -337,11 +381,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     /// <summary>
     /// 改变仿真引擎状态
     /// </summary>
-    /// <param name="id">仿真引擎实例的id号码</param>    
+    /// <param name="sceneId">仿真引擎实例的id号码</param>    
     /// <param name="state">仿真引擎状态标识</param>
-    public void ChangeProgramState(string id, ProgramState state, Action calllbackSuc = null, Action callbackFail = null)
+    public void ChangeProgramState(string sceneId, string tmpId, ProgramState state, Action calllbackSuc = null, Action callbackFail = null)
     {
-        string rawJsonStr = "{  \"id\":\"" + id + "\"  ,\"state\":\"" + state.ToString() + "\" }";
+        string rawJsonStr = "{  \"id\":\"" + sceneId + "\"  ,\"state\":\"" + state.ToString() + "\" ,\"tmpId\" :\"" + tmpId + "\"  }";
         Debugger.Log("改变仿真引擎状态 rawJsonStr:" + rawJsonStr);
         MFramework.NetworkHttp.GetInstance.SendRequest(RequestType.Post, URL_CHANGE_SIMULATOR_STATE, new Dictionary<string, string>(), (string jsonStr) =>
         {
@@ -502,16 +546,17 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
             {
                 case TOPIC_WEB_SEND:
                 case TOPIC_SEND:
-                    TaskCenter.GetInstance.AddOrder(msg);
+                    TaskCenter.GetInstance.TryAddOrder(msg);
                     break;
                 case TOPIC_CHANGESTATE:
                     ChangeStateData changeStateData = JsonTool.GetInstance.JsonToObjectByLitJson<ChangeStateData>(msg);
                     string sceneID = changeStateData.idScene;
-                    if (sceneID == MainData.SceneID)
+                    string tmpID = changeStateData.tmpId;
+                    if (sceneID == MainData.SceneID && tmpID == MainData.tmpID)
                     {
                         ProgramState programState = (ProgramState)Enum.Parse(typeof(ProgramState), changeStateData.state);
                         //ChangeProgramState(id, programState);
-                        UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().OnClickStateBtn(programState, sceneID);
+                        UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().OnClickStateBtn(programState, sceneID, tmpID);
                     }
                     break;
                 case TOPIC_ADD_GOODS:
@@ -641,7 +686,7 @@ public enum ProgramState
 }
 
 /// <summary>
-/// MQTT 控制结果数据结构
+/// MQTT 指令回调数据结构 recv
 /// </summary>
 public class ControlResult
 {
@@ -666,6 +711,7 @@ public class ControlResult
     /// </summary>
     public string simulatorId = MainData.SceneID;
     public string sceneID = MainData.SceneID;
+    public string tmpId = MainData.tmpID;
     /// <summary>
     /// 任务id，具有唯⼀性
     /// </summary>
@@ -677,11 +723,12 @@ public class ControlResult
 }
 
 /// <summary>
-/// MQTT 控制指令数据结构
+/// MQTT 接收控制指令数据结构 send
 /// </summary>
 public class ControlCommit
 {
     public string sceneID;
+    public string tmpId;
     /// <summary>
     /// 动作或者控制id
     /// </summary>
@@ -714,10 +761,10 @@ public class ControlCommit
     /// 操作⽬标物体的id
     /// </summary>
     public string objectId;
-    /// <summary>
-    /// 仿真实例id，具有唯⼀性
-    /// </summary>
-    public string simulatorId;
+    ///// <summary>
+    ///// 仿真实例id，具有唯⼀性
+    ///// </summary>
+    //public string simulatorId;
     /// <summary>
     /// 任务id，具有唯⼀性
     /// </summary>
