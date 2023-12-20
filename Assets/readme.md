@@ -128,3 +128,133 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
 
 
 
+
+
+## 映射表
+
+### 机器人动画映射表
+
+| 动画描述 | 动画指令名称         |
+| -------- | -------------------- |
+| 行走     | Walk                 |
+| 拿取     | Grab_item            |
+| 放下     | Grab_item_pull       |
+| 打开门   | Open_Door_Inside     |
+| 关闭门   | Close_Door_Inside    |
+| 擦桌子   | Robot_CleanTable     |
+| 操作阀门 | Wheel                |
+| 充电     | Pile                 |
+| 蹲下拾取 | Pick_item            |
+| 推       | Push_Start           |
+| 拉       | Pull_Start           |
+| 按下按钮 | Press_Button         |
+| 空闲姿态 | Idle                 |
+| 敲门     | Knock_on_door        |
+| 跳跃     | Jump                 |
+| 射箭     | CDA_Release          |
+| 回旋踢   | Combat_Spinning_Kick |
+| 双手抱胸 | Hand_Chest           |
+| 双手叉腰 | Hand_Waist           |
+| 查找     | Find                 |
+
+
+
+### 房间映射表
+
+| 房间名称 | 类型(唯一标识) |
+| -------- | -------------- |
+| 客厅     | LivingRoom     |
+| 卧室     | BedRoom        |
+| 浴室     | BathRoom       |
+| 书房     | StudyRoom      |
+| 厨房     | KitChenRoom    |
+| 储藏室   | StorageRoom    |
+| 办公室   | OfficeRoom     |
+| 茶水间   | TeaRoom        |
+| 大厅     | LobbyRoom      |
+| 实验室   | LabRoom        |
+
+
+
+### 物品映射表
+
+| 物品名称 | 类型(唯一标识) |
+| -------- | -------------- |
+| 浴池     | Bathtub        |
+| 床       | Bed            |
+| 厨房灶台 | Bigsink        |
+| 垃圾桶   | Bin            |
+| 书       | Book           |
+| 柜子     | Cabinet        |
+| 椅子     | Chair          |
+| 衣架     | Clothes        |
+| 杯子     | Cup            |
+| 书桌     | Desk           |
+| 饮品     | Drink          |
+| 食物     | Food           |
+| 刀       | Knife          |
+| 台灯     | Lamp           |
+| 台式电脑 | PC             |
+| 充电桩   | Pile           |
+| 绿植     | Plant          |
+| 锅       | Pot            |
+| 洗手池   | Sink           |
+| 沙发     | Sofa           |
+| 电视     | TV             |
+
+
+
+## 接口
+
+### Http接口
+
+```c#
+    private static string URL_SUBROOT = "http://" + MainData.ConfigData?.HttpConfig.IP + ":" + MainData.ConfigData?.HttpConfig.Port + "/";
+    //获取场景图，物体与房间的邻接关系
+    private static string URL_GET_THING_GRAPH = URL_SUBROOT + "simulator/getThingGraph";
+    //提交场景图，物体与房间的邻接关系
+    private static string URL_POST_THING_GRAPH = URL_SUBROOT + "simulator/postThingGraph";
+    //获取环境场景图,房间与房间的邻接关系
+    private static string URL_GET_ENV_GRAPH = URL_SUBROOT + "simulator/getEnvGraph";
+    //改变仿真引擎状态
+    private static string URL_CHANGE_SIMULATOR_STATE = URL_SUBROOT + "simulator/changeSimulatorState";
+    //改变仿真引擎状态
+    private static string URL_GENERATE_TMPID = URL_SUBROOT + "simulator/generateTmpId";
+    //Web端房间数据列表
+    public const string URL_SCENE_QUERYLIST = "http://10.101.80.74:8080/simulation/scene/queryList";
+```
+
+
+
+### Mqtt接口
+
+```c#
+    //更新全局场景图
+    private const string TOPIC_GLOBAL = "/simulator/thingGraph/global";
+    //更新相机视⻆场景图
+    private const string TOPIC_CAMERA = "/simulator/thingGraph/camera";
+    //接收服务器控制指令
+    public const string TOPIC_SEND = "simulator/send";
+    //发控制结果给服务器
+    public const string TOPIC_RECV = "simulator/recv";
+    //发送房间信息
+    public const string TOPIC_ROOMINFODATA = "simulator/roomInfoData";
+    //引擎状态
+    public const string TOPIC_CHANGESTATE = "simulator/changeState";
+    //直播流信息
+    public static string TOPIC_LIVEDATA = "simulator/liveStreaming_" + MainData.SceneID;
+    //新增房间实体模型
+    public const string TOPIC_ADD_GOODS = "simulator/addGoods";
+    //删除房间实体模型
+    public const string TOPIC_DEL_GOODS = "simulator/delGoods";
+    //测试从Web端 接收服务器控制指令
+    public const string TOPIC_WEB_SEND = "simulator/web/send";
+    //测试 发控制结果给Web端
+    public const string TOPIC_WEB_RECV = "simulator/web/recv";
+    //给web端更新全局场景图
+    public const string TOPIC_Web_GLOBAL = "/simulator/thingGraph/web/global";
+    //web端的房间布局变更
+    public const string TOPIC_WEB_CHANGEPOSITION = "simulator/changePosition";
+    //web端自定义相机坐标
+    public const string TOPIC_WEB_CHANGEVIEWPOSITON = "simulator/changeViewPositon";
+```
