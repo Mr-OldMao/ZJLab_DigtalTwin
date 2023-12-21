@@ -560,6 +560,14 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                             {
                                 item.enabled = true;
                             }
+                            if (grabObj.GetComponentsInChildren<Rigidbody>() != null)
+                            {
+                                foreach (var item in grabObj.GetComponentsInChildren<Rigidbody>())
+                                {
+                                    item.useGravity = true;
+                                    item.isKinematic = false;
+                                }
+                            }
                             m_DicCacheGrabParent.Remove(grabObj);
                         }
                     }
@@ -590,6 +598,23 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         if (MainData.CacheItemsEntity.ContainsKey(objName1))
         {
             grabObj = MainData.CacheItemsEntity[objName1];
+            if (grabObj.GetComponentsInChildren<Rigidbody>() != null)
+            {
+                foreach (var item in grabObj.GetComponentsInChildren<Rigidbody>())
+                {
+                    item.useGravity = false;
+                    item.isKinematic = true;
+                }
+            }
+            GameObject model = grabObj.transform.Find<Transform>("Model")?.gameObject;
+            if (model != null)
+            {
+                model.transform.localPosition = Vector3.zero;
+                for (int i = 0; i < model.transform.childCount; i++)
+                {
+                    model.transform.GetChild(i).transform.localPosition = Vector3.zero;
+                }
+            }
             //当前物品的父对象实体
             UnityTool.GetInstance.DelayCoroutine(delayTime, () =>
             {
@@ -601,10 +626,11 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 {
                     m_DicCacheGrabParent.Add(grabObj, grabOldParentNode);
                 }
-                foreach (var item in grabObj.transform.Finds<Transform>("Model"))
-                {
-                    item.transform.localPosition = Vector3.zero;
-                }
+                //foreach (var item in grabObj.transform.Finds<Transform>("Model"))
+                //{
+                //    item.transform.localPosition = Vector3.zero;
+                //}
+                model.transform.localPosition = Vector3.zero;
                 foreach (var item in grabObj.GetComponentsInChildren<MeshCollider>())
                 {
                     item.enabled = false;
@@ -613,6 +639,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 {
                     item.enabled = false;
                 }
+               
             });
         }
         else

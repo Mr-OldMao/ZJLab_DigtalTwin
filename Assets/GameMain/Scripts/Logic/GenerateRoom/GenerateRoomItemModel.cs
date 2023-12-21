@@ -718,8 +718,10 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         {
             GameObject entityPrefab = LoadAssetsByAddressable.GetInstance.GetEntityRes(entityName);
             targetItem = Instantiate(entityPrefab);
+          
             targetItem.transform.SetParent(parentTrans, false);
             targetItem.name = targetItemName;
+            Debugger.Log("111111" + targetItem);
         }
         targetItem.transform.position = pos;
     }

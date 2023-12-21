@@ -253,16 +253,19 @@ public class AIRobotMove : MonoBehaviour
             res1 = targetPos.z >= minY && targetPos.z <= maxY;
         }
 
-        //判断目标点及周边一定范围内是否有可到达的点位
-        res2 = false;
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(targetPos, out hit, 0.1f, NavMesh.AllAreas))
-        {
-            res2 = true;
-        }
-        m_NavMeshAgent.SetDestination(targetPos);
-        m_NavMeshAgent.isStopped = true;
-        res3 = m_NavMeshAgent.pathStatus == NavMeshPathStatus.PathComplete;
+        ////判断目标点及周边一定范围内是否有可到达的点位
+        //res2 = false;
+        //NavMeshHit hit;
+        //if (NavMesh.SamplePosition(targetPos, out hit, 0.1f, NavMesh.AllAreas))
+        //{
+        //    res2 = true;
+        //}
+        //m_NavMeshAgent.SetDestination(targetPos);
+        //m_NavMeshAgent.isStopped = true;
+        res2 = true;
+
+        //res3 = m_NavMeshAgent.pathStatus == NavMeshPathStatus.PathComplete;
+        res3 = true;
         Debugger.Log("res1 " + res1 + " res2  " + res2 + "  res3 " + res3 +",   res："+ res);
 
         res = res1 && res2 && res3;

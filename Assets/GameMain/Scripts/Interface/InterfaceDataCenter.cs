@@ -565,12 +565,20 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                     {
                         MainDataTool.GetInstance.AddEntityToTargetPlace(jsonAddEntity);
                     }
+                    else
+                    {
+                        Debugger.LogError("add fail ,curSceneID：" + MainData.SceneID + ",curTmpId：" + MainData.tmpID + ",targetSceneID：" + jsonAddEntity.idScene + ",targetTmpId：" + jsonAddEntity.tmpId);
+                    }
                     break;
                 case TOPIC_DEL_GOODS:
                     JsonDelEntity jsonDelEntity = JsonTool.GetInstance.JsonToObjectByLitJson<JsonDelEntity>(msg);
                     if (jsonDelEntity.idScene == MainData.SceneID && jsonDelEntity.tmpId == MainData.tmpID)
                     {
                         MainDataTool.GetInstance.DelEntityToTargetPlace(jsonDelEntity);
+                    }
+                    else
+                    {
+                        Debugger.LogError("del fail ,curSceneID：" + MainData.SceneID + ",curTmpId：" + MainData.tmpID + ",targetSceneID：" + jsonDelEntity.idScene + ",targetTmpId：" + jsonDelEntity.tmpId);
                     }
                     break;
                 case TOPIC_ROBOT_POS:
