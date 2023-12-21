@@ -262,9 +262,12 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
         byte[] msgBytes = null;
         if (firstScreenShot == null)
         {
-            firstScreenShot = new Texture2D((int)(Screen.width), (int)(Screen.height), TextureFormat.RGB24, false);
-            threeScreenShot = new Texture2D((int)(Screen.width), (int)(Screen.height), TextureFormat.RGB24, false);
+            //firstScreenShot = new Texture2D((int)(Screen.width), (int)(Screen.height), TextureFormat.RGB24, false);
+            //threeScreenShot = new Texture2D((int)(Screen.width), (int)(Screen.height), TextureFormat.RGB24, false); 
+            firstScreenShot = new Texture2D(1920, 1080, TextureFormat.RGB24, false);
+            threeScreenShot = new Texture2D(1920, 1080, TextureFormat.RGB24, false);
         }
+
         // 读取屏幕像素进行渲染
         RenderTexture.active = firstCameraView;
         firstScreenShot.ReadPixels(new Rect(0, 0, firstCameraView.width, firstCameraView.height), 0, 0, false);
@@ -282,15 +285,15 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
                new Msg.Data {
                     data =  Convert.ToBase64String(bytesFirst),
                     title = "FirstCameraVideoStreaming",
-                    width = (int)(Screen.width ),
-                    height =(int)(Screen.height )
+                    width = 1920,// (int)(Screen.width ),
+                    height = 1080//(int)(Screen.height )
                 },
                new Msg.Data
                {
                     data = Convert.ToBase64String(bytesThree),
                     title = "ThreeCameraVideoStreaming",
-                    width = (int)(Screen.width),
-                    height =(int)(Screen.height)
+                    width = 1920,//(int)(Screen.width),
+                    height =1080//(int)(Screen.height)
                }
              }
         };
@@ -317,6 +320,7 @@ public class LiveStreaming : SingletonByMono<LiveStreaming>
     public class Msg
     {
         public string sceneID = MainData.SceneID;
+        public string tmpId = MainData.tmpID;
         public Data[] msgData;
         public class Data
         {
