@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 743545649}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BodyContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 4915995470856386579}
   - component: {fileID: 7900583391585244267}
   - component: {fileID: 7142664484550001450}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: CvsRobot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,7 +158,7 @@ GameObject:
   - component: {fileID: 4234141185095738694}
   - component: {fileID: 3497231592707272423}
   - component: {fileID: 1440312902853841496}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: txtRobotID
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -238,7 +238,7 @@ GameObject:
   - component: {fileID: 6131219583156866600}
   - component: {fileID: 202771141126220198}
   - component: {fileID: 6410377753884131957}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: txtTime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -318,7 +318,7 @@ GameObject:
   - component: {fileID: 8411010968693500903}
   - component: {fileID: 5783748041241290620}
   - component: {fileID: 7241081419086938051}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: txtPeopleID
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -399,7 +399,7 @@ GameObject:
   - component: {fileID: 564854945243025880}
   - component: {fileID: 113399385499202979}
   - component: {fileID: 8084312240792715183}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -505,7 +505,7 @@ GameObject:
   - component: {fileID: 7596781559622589905}
   - component: {fileID: 3961760656930976511}
   - component: {fileID: 4689465282771511922}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: txtType
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -583,7 +583,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8863362581115358701}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PeoplePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -618,7 +618,7 @@ GameObject:
   - component: {fileID: 8485850462908255929}
   - component: {fileID: 2383458147168217121}
   - component: {fileID: 2201301416125611264}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: EventSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}

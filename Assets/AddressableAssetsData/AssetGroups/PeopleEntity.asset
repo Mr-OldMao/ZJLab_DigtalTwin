@@ -47,8 +47,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - PeopleEntity
-  - m_GUID: a0f414444da526540bcb20ddbe4895e4
-    m_Address: Assets/GameMain/AB/Prefab/Entity/People/Humano_04Diverse_14_30K.prefab
+  - m_GUID: 84ebe07df65cc2f42b39b7420649166f
+    m_Address: Assets/GameMain/AB/Prefab/Entity/People/Humano_04Diverse_13_30K.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - PeopleEntity
@@ -57,8 +57,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - PeopleEntity
-  - m_GUID: 5edeaeedac97a6243b7ee470bade4a29
-    m_Address: Assets/GameMain/AB/Prefab/Entity/People/Humano_04Diverse_13_30K.prefab
+  - m_GUID: 664b096b96acfc9468e1baf26034c7df
+    m_Address: Assets/GameMain/AB/Prefab/Entity/People/Humano_04Diverse_14_30K.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - PeopleEntity
@@ -97,8 +97,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - PeopleEntity
-  - m_GUID: 2f159442561e56b4a9dfe94289915c09
-    m_Address: Assets/GameMain/AB/Prefab/Entity/People/Humano_04Diverse_20_30K.prefab
+  - m_GUID: 24d2c49452ba7364bb07f5d42dd0d91c
+    m_Address: Assets/GameMain/AB/Prefab/Entity/People/Humano_04Diverse_05_30K.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - PeopleEntity
@@ -107,8 +107,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - PeopleEntity
-  - m_GUID: 325a039cb4812c843a366957e6f71e57
-    m_Address: Assets/GameMain/AB/Prefab/Entity/People/Humano_04Diverse_05_30K.prefab
+  - m_GUID: f8ee91646f971fb42beb224b4f1c79f8
+    m_Address: Assets/GameMain/AB/Prefab/Entity/People/Humano_04Diverse_20_30K.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - PeopleEntity

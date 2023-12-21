@@ -1,6 +1,7 @@
 using MFramework;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using static Feature_People_Perception;
@@ -80,18 +81,24 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
             });
         });
 
-        InvokeRepeating("ListenerRobotStateByPos", 0, 2);
+        InvokeRepeating("ListenerEntityStateByPos", 2, 2);
 
     }
 
     /// <summary>
-    /// 监听所有机器人的位置状态通过坐标位置
+    /// 监听所有实体的位置状态通过坐标位置
     /// </summary>
-    private void ListenerRobotStateByPos()
+    private void ListenerEntityStateByPos()
     {
-        Debugger.Log("ListenerRobotStateByPos");
-        foreach (EntityInfo entityInfo in m_DicRobotEntityArray.Values)
+        Debugger.Log("ListenerEntityStateByPos");
+
+
+        List<string> delRobotList = null;
+        List<string> delPeopleList = null;
+
+        foreach (string key in m_DicRobotEntityArray.Keys)
         {
+            EntityInfo entityInfo = m_DicRobotEntityArray[key];
             Vector3 curPos = entityInfo.entity.transform.localPosition;
             bool isMoving = JudgeIsMove(curPos, entityInfo.nowPos);
             if (isMoving)
@@ -99,8 +106,68 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
                 entityInfo.nowPos = curPos;
             }
             entityInfo.anim.SetBool("IsMoving", isMoving);
+
+            //清除2秒内没有动的数据和实体模型
+            if (!isMoving)
+            {
+                if (delRobotList == null)
+                {
+                    delRobotList = new List<string>();
+                }
+                delRobotList.Add(key);
+            }
+        }
+
+        foreach (string key in m_DicPeopleEntityArray.Keys)
+        {
+            EntityInfo entityInfo = m_DicPeopleEntityArray[key];
+            Vector3 curPos = entityInfo.entity.transform.localPosition;
+            bool isMoving = JudgeIsMove(curPos, entityInfo.nowPos);
+
+            //清除2秒内没有动的数据和实体模型
+            if (!isMoving)
+            {
+                if (delPeopleList == null)
+                {
+                    delPeopleList = new List<string>();
+                }
+                delPeopleList.Add(key);
+            }
+        }
+
+        if (delRobotList!= null)
+        {
+            for (int i = 0; i < delRobotList.Count; i++)
+            {
+                if (m_DicRobotEntityArray.ContainsKey(delRobotList[i]))
+                {
+                    EntityInfo ei = m_DicRobotEntityArray[delRobotList[i]];
+                    if (ei.entity != null)
+                    {
+                        Destroy(ei.entity);
+                    }
+                    m_DicRobotEntityArray.Remove(delRobotList[i]);
+                }
+            }
+        }
+        if (delPeopleList != null)
+        {
+            for (int i = 0; i < delPeopleList.Count; i++)
+            {
+                if (m_DicPeopleEntityArray.ContainsKey(delPeopleList[i]))
+                {
+                    EntityInfo ei = m_DicPeopleEntityArray[delPeopleList[i]];
+                    if (ei.entity != null)
+                    {
+                        Destroy(ei.entity);
+                    }
+                    m_DicPeopleEntityArray.Remove(delPeopleList[i]);
+                }
+            }
         }
     }
+
+
 
     private void NetworkMQTT()
     {
@@ -221,14 +288,16 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
             for (int i = 0; i < peopleInfos?.Length; i++)
             {
                 Feature_People_Perception_data_feature peopleInfo = peopleInfos[i];
-                GameObject entity = GetEntityInfo(peopleInfo.track_id.ToString(), false).entity;
+                EntityInfo entityInfo = GetEntityInfo(peopleInfo.track_id.ToString(), false);
+                GameObject entity = entityInfo.entity;
                 if (entity != null)
                 {
                     float[] pos = peopleInfo.location;
 
 
-
-                    entity.transform.localPosition = new Vector3(pos[0], 0, pos[1]);
+                    Vector3 tatgetPos = new Vector3(pos[0], 0, pos[1]);
+                    entityInfo.nowPos = tatgetPos;
+                    entity.transform.localPosition = tatgetPos;
 
 
                     if (peopleInfo.angle != null)
@@ -364,5 +433,19 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
         }
 
         return res;
+    }
+
+    public void ClearCacheData()
+    {
+        foreach (var item in m_DicRobotEntityArray.Values)
+        {
+            Destroy(item.entity);
+        }
+        foreach (var item in m_DicPeopleEntityArray.Values)
+        {
+            Destroy(item.entity);
+        }
+        m_DicRobotEntityArray.Clear();
+        m_DicPeopleEntityArray.Clear();
     }
 }

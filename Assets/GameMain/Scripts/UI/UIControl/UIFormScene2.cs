@@ -14,8 +14,10 @@ public class UIFormScene2 : UIFormBase
 	private Button btnCamFree;
 	[SerializeField]
 	private Button btnCamTop;
-	[SerializeField]
-	private Button btnCamFixed;
+    [SerializeField]
+    private Button btnCamFixed;
+    [SerializeField]
+    private Button btnClearCacheData; 
 	[SerializeField]
 	private Transform rectBtnGroup;
 	
@@ -25,8 +27,9 @@ public class UIFormScene2 : UIFormBase
     public static string AssetPathNew { get => AssetPathRootDir + "/UIFormScene2.prefab"; protected set => _ = AssetPathRootDir + "/UIFormScene2.prefab"; }
     public Button BtnCamFree { get => btnCamFree; set => btnCamFree = value; }
 	public Button BtnCamTop { get => btnCamTop; set => btnCamTop = value; }
-	public Button BtnCamFixed { get => btnCamFixed; set => btnCamFixed = value; }
-	public Transform RectBtnGroup { get => rectBtnGroup; set => rectBtnGroup = value; }
+    public Button BtnCamFixed { get => btnCamFixed; set => btnCamFixed = value; }
+    public Button BtnClearCacheData { get => btnClearCacheData; set => btnClearCacheData = value; }
+    public Transform RectBtnGroup { get => rectBtnGroup; set => rectBtnGroup = value; }
 	
 
     protected override void Awake()
@@ -39,8 +42,9 @@ public class UIFormScene2 : UIFormBase
 	{
 		btnCamFree = transform.Find<Button>("btnCamFree");
 		btnCamTop = transform.Find<Button>("btnCamTop");
-		btnCamFixed = transform.Find<Button>("btnCamFixed");
-		rectBtnGroup = transform.Find<Transform>("rectBtnGroup");
+        btnCamFixed = transform.Find<Button>("btnCamFixed");
+        btnClearCacheData = transform.Find<Button>("btnClearCacheData");
+        rectBtnGroup = transform.Find<Transform>("rectBtnGroup");
 }
 	
 	protected override void RegisterUIEvnet()
@@ -56,12 +60,17 @@ public class UIFormScene2 : UIFormBase
 			Debug.Log("button click btnCamTop");
             CameraGroupScene2.GetInstance.ShowCamera(CameraGroupScene2.CameraType.Top);
         });
-		btnCamFixed.onClick.AddListenerCustom(() =>
-		{
-			Debug.Log("button click btnCamFixed");
+        btnCamFixed.onClick.AddListenerCustom(() =>
+        {
+            Debug.Log("button click btnCamFixed");
             CameraGroupScene2.GetInstance.ShowCamera(CameraGroupScene2.CameraType.Fixed);
         });
-	}
+        btnClearCacheData.onClick.AddListenerCustom(() =>
+        {
+            Debug.Log("button click btnClearCacheData");
+            GameLogic2.GetInstance.ClearCacheData();
+        });
+    }
 
 	public void Init()
 	{
