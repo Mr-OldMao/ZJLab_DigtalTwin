@@ -258,3 +258,95 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
     //web端自定义相机坐标
     public const string TOPIC_WEB_CHANGEVIEWPOSITON = "simulator/changeViewPositon";
 ```
+
+## 接口json示例
+
+### 新增物品
+
+```
+{
+    "tmpId": "TMP:Simulator:1703140098963-1703140397313",
+    "idScene": "Simulator:1703140098963",
+    "entityInfo": [
+        {
+            "id": "sim:1008",
+            "type": "Desk",
+            "modelId": "Desk_1",
+            "pos": {
+                "x": 2,
+                "y": 2
+            },
+            "dynamic": 0,
+            "roomInfo": {
+                "roomType": "LivingRoom",
+                "roomID": "sim:1"
+            },
+            "putArea": "In",
+            "parentEntityInfo": {}
+        }
+    ]
+}
+```
+
+```json
+{
+    "tmpId": "TMP:Simulator:1703120770813-1703128011536",
+    "idScene": "Simulator:1703120770813",
+    "entityInfo": [
+        {
+            "id": "sim:1008",
+            "type": "Chair",
+            "modelId": "Chair_1",
+            "pos": {
+                "x": 3.3,
+                "y": 2.5
+            },
+            "dynamic": 0,
+            "roomInfo": {
+                "roomType": "LivingRoom",
+                "roomID": "sim:1"
+            },
+            "putArea": "Below",
+            "parentEntityInfo": {
+                "id": "sim:1008",
+                "type": "Desk"
+            }
+        }
+    ]
+}
+```
+
+### 删除物品
+
+删除Book_sim:1008物品以及被依赖的所有物品
+
+```json
+{
+    "tmpId": "TMP:Simulator:1703120770813-1703128299541",
+    "idScene": "Simulator:1703120770813",
+    "entityInfo": [
+        {
+            "id": "sim:1008",
+            "type": "Book",
+            "delChind": 1
+        }
+    ]
+}
+```
+
+仅删除Desk_sim:1007物品，所以依赖的物品的父对象由当前物品变为当前房间
+
+```
+{
+    "tmpId": "TMP:Simulator:1703120770813-1703128694016",
+    "idScene": "Simulator:1703120770813",
+    "entityInfo": [
+        {
+            "id": "sim:1007",
+            "type": "Desk",
+            "delChind": 0
+        }
+    ]
+}
+```
+
