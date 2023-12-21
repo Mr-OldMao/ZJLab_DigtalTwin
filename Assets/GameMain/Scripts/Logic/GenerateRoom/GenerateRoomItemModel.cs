@@ -295,7 +295,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         {
             for (int i = 0; i < getThingGraph.Count; i++)
             {
-                var data = getThingGraph?[i];
+                GetThingGraph_data_items data = getThingGraph?[i];
                 RoomType roomType = (RoomType)Enum.Parse(typeof(RoomType), data.name);
                 //为每个实体找位置放置
                 PutItem(roomType, data.id, data.relatedThing, new ItemDependInfo
@@ -304,6 +304,21 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                     dependItemID = data.id,
                     dependItemName = data.name,
                 });
+
+                Debugger.Log(data.relatedThing);
+                ////on、in下的子物体 
+                //for (int j = 0; j < data.relatedThing?.Count; j++)
+                //{
+                //    GetThingGraph_data_items_relatedThing_target chindData = data.relatedThing[j].target;
+                //    RoomType chindRoomType = (RoomType)Enum.Parse(typeof(RoomType), chindData.name);
+                //    //为每个实体找位置放置
+                //    PutItem(chindRoomType, chindData.id, chindData.relatedThing, new ItemDependInfo
+                //    {
+                //        isDepend = false,
+                //        dependItemID = chindData.id,
+                //        dependItemName = chindData.name,
+                //    });
+                //}
             }
         }
     }
@@ -505,7 +520,10 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 {
                     Transform putAreaTrans = parentItem.transform.Find("PutArea/" + itemDependInfo.posRelation.ToString());
                     clone.transform.parent = putAreaTrans;
-                    clone.transform.position = putAreaTrans.position;
+
+                    //clone.transform.position = putAreaTrans.position;
+                    clone.transform.localPosition = Vector3.zero;
+
                     clone.transform.Find<Transform>("Model").transform.localPosition = Vector3.zero;
                     clone.gameObject.SetActive(true);
                 }
@@ -680,18 +698,44 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                         //Destroy(clone);
                     }
 
-                    if (relatedThingArr[i].target.relatedThing?.Count > 0)
-                    {
-                        PutItem(roomType, roomID, relatedThingArr[i].target.relatedThing,
-                            new ItemDependInfo
-                            {
-                                isDepend = true,
-                                dependItemName = relatedThingArr[i].target.name,
-                                dependItemID = relatedThingArr[i].target.id,
-                                posRelation = (PosRelation)Enum.Parse(typeof(PosRelation), relatedThingArr[i].relationship)
-                            });
-                    }
+                    //if (relatedThingArr[i].target.relatedThing?.Count > 0)
+                    //{
+                    //    PutItem(roomType, roomID, relatedThingArr[i].target.relatedThing,
+                    //        new ItemDependInfo
+                    //        {
+                    //            isDepend = true,
+                    //            dependItemName = relatedThingArr[i].target.name,
+                    //            dependItemID = relatedThingArr[i].target.id,
+                    //            posRelation = (PosRelation)Enum.Parse(typeof(PosRelation), relatedThingArr[i].relationship)
+                    //        });
+                    //}
 
+                }
+                if (relatedThingArr[i].target.relatedThing?.Count > 0)
+                {
+                    //PutItem(roomType, roomID, relatedThingArr[i].target.relatedThing,
+                    //    new ItemDependInfo
+                    //    {
+                    //        isDepend = true,
+                    //        dependItemName = relatedThingArr[i].target.name,
+                    //        dependItemID = relatedThingArr[i].target.id,
+                    //        posRelation = (PosRelation)Enum.Parse(typeof(PosRelation), relatedThingArr[i].relationship)
+                    //    });
+                    for (int j = 0; j < relatedThingArr[i].target.relatedThing.Count; j++)
+                    {
+                        List<GetThingGraph_data_items_relatedThing> newRelatedThing = new List<GetThingGraph_data_items_relatedThing>
+                        {
+                            relatedThingArr[i].target.relatedThing[j]
+                        };
+                        PutItem(roomType, roomID, newRelatedThing,
+                       new ItemDependInfo
+                       {
+                           isDepend = true,
+                           dependItemName = relatedThingArr[i].target.name,
+                           dependItemID = relatedThingArr[i].target.id,
+                           posRelation = (PosRelation)Enum.Parse(typeof(PosRelation), relatedThingArr[i].target.relatedThing[j].relationship)
+                       });
+                    }
                 }
             }
         }
@@ -718,7 +762,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         {
             GameObject entityPrefab = LoadAssetsByAddressable.GetInstance.GetEntityRes(entityName);
             targetItem = Instantiate(entityPrefab);
-          
+
             targetItem.transform.SetParent(parentTrans, false);
             targetItem.name = targetItemName;
             Debugger.Log("111111" + targetItem);

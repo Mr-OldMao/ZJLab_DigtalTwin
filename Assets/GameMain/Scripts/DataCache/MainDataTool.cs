@@ -113,8 +113,11 @@ public class MainDataTool : SingletonByMono<MainDataTool>
                                $"{parentEntityInfo.id}," +
                                $"putArea:{entityInfo.putArea}");
                         clone.transform.SetParent(parentObj.transform);
-                        //实体位置pos，高度y使用PutArea/xxx 节点的高度，x/y使用web前端发来的数值
-                        clone.transform.position = new Vector3(entityInfo.pos.x, parentObj.transform.position.y, entityInfo.pos.y);
+                        ////实体位置pos，高度y使用PutArea/xxx 节点的高度，x/y使用web前端发来的数值
+                        //clone.transform.position = new Vector3(entityInfo.pos.x, parentObj.transform.position.y, entityInfo.pos.y);
+
+                        //实体位置固定
+                        clone.transform.localPosition = Vector3.zero;
                         clone.transform.Find("Model").transform.localPosition = Vector3.zero;
                     }
                     else
@@ -195,6 +198,10 @@ public class MainDataTool : SingletonByMono<MainDataTool>
             else
             {
                 parentContainer = FindTargetIDData(ref MainData.CacheSceneItemsInfo.items[i].relatedThing, parentEntityName);
+                if (parentContainer != null)
+                {
+                    break;
+                }
             }
         }
         if (parentContainer != null)
