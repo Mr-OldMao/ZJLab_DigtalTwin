@@ -491,13 +491,16 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
             switch (GameLaunch.GetInstance.scene)
             {
                 case GameLaunch.Scenes.MainScene1:
-                    NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS, TOPIC_DEL_GOODS, TOPIC_WEB_CHANGEPOSITION, TOPIC_WEB_CHANGEVIEWPOSITON);
-                    //TEST
-                    NetworkMqtt.GetInstance.Subscribe(
-                        TOPIC_WEB_SEND, TOPIC_WEB_RECV,
-                        TOPIC_Web_GLOBAL,
-                        //TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA,
-                        TOPIC_RECV, TOPIC_ROOMINFODATA);
+                    NetworkMqtt.GetInstance.Subscribe(TOPIC_SEND, TOPIC_CHANGESTATE, TOPIC_ADD_GOODS, TOPIC_DEL_GOODS, TOPIC_WEB_CHANGEPOSITION, TOPIC_WEB_CHANGEVIEWPOSITON, TOPIC_WEB_SEND);
+                    if (MainData.ConfigData.CoreConfig.ShowLog == 1)
+                    {
+                        //TEST
+                        NetworkMqtt.GetInstance.Subscribe(
+                             TOPIC_WEB_RECV,
+                            TOPIC_Web_GLOBAL,
+                            //TOPIC_LIVEDATA, TOPIC_GLOBAL, TOPIC_CAMERA,
+                            TOPIC_RECV, TOPIC_ROOMINFODATA);
+                    }
                     break;
                 case GameLaunch.Scenes.MainScene2:
                     NetworkMqtt.GetInstance.Subscribe(TOPIC_PEOPLE_PERCEPTION, TOPIC_ROBOT_POS);
@@ -760,7 +763,7 @@ public class ControlCommit
     /// </summary>
     public string[] perception;
     /// <summary>
-    /// 操作⽬标物体的id
+    /// 操作⽬标物体的类型
     /// </summary>
     public string objectName;
     /// <summary>

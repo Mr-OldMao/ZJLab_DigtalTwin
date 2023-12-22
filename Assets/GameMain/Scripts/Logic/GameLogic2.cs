@@ -1,7 +1,6 @@
 using MFramework;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using static Feature_People_Perception;
@@ -81,8 +80,12 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
             });
         });
 
-        InvokeRepeating("ListenerEntityStateByPos", 2, 2);
+        InvokeRepeating("ListenerEntityStateByPos", 2, 1);
+    }
 
+    private long GetCurTime()
+    {
+        return   (DateTime.Now.ToUniversalTime().Ticks - 621355968000000000) / 10000000; 
     }
 
     /// <summary>
@@ -90,7 +93,10 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
     /// </summary>
     private void ListenerEntityStateByPos()
     {
-        Debugger.Log("ListenerEntityStateByPos");
+        long curTIme1 = GetCurTime();
+;
+
+        Debugger.Log("ListenerEntityStateByPos  curTIme1:" + curTIme1);
 
 
         List<string> delRobotList = null;
@@ -108,7 +114,8 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
             entityInfo.anim.SetBool("IsMoving", isMoving);
 
             //清除2秒内没有动的数据和实体模型
-            if (!isMoving)
+            bool isSecond = curTIme1 - entityInfo.UpdatePosNowTimestamp > 2;
+            if (!isMoving && isSecond)
             {
                 if (delRobotList == null)
                 {
@@ -125,7 +132,8 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
             bool isMoving = JudgeIsMove(curPos, entityInfo.nowPos);
 
             //清除2秒内没有动的数据和实体模型
-            if (!isMoving)
+            bool isSecond = curTIme1 - entityInfo.UpdatePosNowTimestamp > 2;
+            if (!isMoving && isSecond)
             {
                 if (delPeopleList == null)
                 {
@@ -255,7 +263,7 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
             //更新坐标位置最新的时间戳
             if (isMoving)
             {
-                entityInfo.UpdatePosNowTimestamp = feature_Robot_Pos.timestamp;
+                entityInfo.UpdatePosNowTimestamp = GetCurTime();// feature_Robot_Pos.timestamp;
             }
             entityInfo.nowPos = targetPos;
 
@@ -296,9 +304,18 @@ public class GameLogic2 : SingletonByMono<GameLogic2>
 
 
                     Vector3 tatgetPos = new Vector3(pos[0], 0, pos[1]);
+
+                    bool isMoving = JudgeIsMove(entity.transform.localPosition, tatgetPos);
+                    //更新坐标位置最新的时间戳
+                    if (isMoving)
+                    {
+                        entityInfo.UpdatePosNowTimestamp = GetCurTime();// feature_People_Perception.timestamp;
+                    }
+
                     entityInfo.nowPos = tatgetPos;
                     entity.transform.localPosition = tatgetPos;
 
+                   
 
                     if (peopleInfo.angle != null)
                     {

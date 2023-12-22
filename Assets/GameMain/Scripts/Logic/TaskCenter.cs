@@ -3,7 +3,6 @@ using UnityEngine;
 using MFramework;
 using System;
 using UnityEngine.AI;
-using UnityEngine.UIElements;
 /// <summary>
 /// 标题：任务中心
 /// 功能：根据指令用于派发任务，处理任务
@@ -102,7 +101,6 @@ public class TaskCenter : SingletonByMono<TaskCenter>
     /// </summary>
     public void ParseOrderExcute(ControlCommit controlCommit)
     {
-
         //强制改变机器人状态
         m_RobotAnimCenter.PlayAnimByBool("IsMoving", false);
         m_AIRobotMove.curRobotState = AIRobotMove.RobotBaseState.Idel;
@@ -113,6 +111,19 @@ public class TaskCenter : SingletonByMono<TaskCenter>
 
         IsExecuteTask = true;
         GetCurExecuteTask = controlCommit;
+
+        if (controlCommit.name == RobotOrderAnimData.Grab_item || controlCommit.name == RobotOrderAnimData.Grab_item_pull || controlCommit.name == RobotOrderAnimData.Pick_item)
+        {
+            string taskFailDes = string.Empty;
+            bool isRight = JudgeGrabInterfaceOrder(controlCommit, ref taskFailDes);
+            if (!isRight)
+            {
+                Debugger.LogError(taskFailDes);
+                TaskExecuteFail(Vector3.zero, 1, taskFailDes);
+                return;
+            }
+        }
+
         Vector3 targetPos = Vector3.zero;
         Vector3 targetRot = Vector3.zero;
 
@@ -639,7 +650,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 {
                     item.enabled = false;
                 }
-               
+
             });
         }
         else
@@ -747,6 +758,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 //    isRight = false;
                 //    taskFailDes = "新增决策指令失败,已完成过当前决策指令，id，task_id：" + controlCommit.taskId + ",json：" + controlCommitJsonStr;
                 //}
+
+
             }
             else
             {
@@ -764,7 +777,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         if (isRight)
         {
             MainData.ControlCommit.Enqueue(controlCommit);
-            Debugger.Log("新增决策指令成功 , json：" + controlCommitJsonStr, LogTag.Forever);
+            Debugger.Log("新增决策指令成功,当前指令缓存数量：" + MainData.ControlCommit.Count + " , json：" + controlCommitJsonStr, LogTag.Forever);
         }
         else
         {
@@ -772,6 +785,33 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             TaskExecuteFail(Vector3.zero, 1, taskFailDes);
         }
     }
+
+    /// <summary>
+    /// 判断抓取、放下交互命令是否合法
+    /// </summary>
+    /// <param name="controlCommit"></param>
+    /// <param name="taskFailDes"></param>
+    /// <returns></returns>
+    private bool JudgeGrabInterfaceOrder(ControlCommit controlCommit, ref string taskFailDes)
+    {
+        bool res = false;
+        GameObject obj = GameObject.Find(controlCommit.objectName + "_" + controlCommit.objectId);
+        if (obj != null)
+        {
+            res = !obj.isStatic;
+            if (!res)
+            {
+                taskFailDes = "任务执行失败，无法进行抓取、放下交互，目标交互为非动态实体 , obj :" + controlCommit.objectName + "_" + controlCommit.objectId;
+            }
+        }
+        else
+        {
+            res = false;
+            taskFailDes = "任务执行失败，未找到所要交互的物体, obj :" + controlCommit.objectName + "_" + controlCommit.objectId;
+        }
+        return res;
+    }
+
 
     /// <summary>
     /// 监听任务

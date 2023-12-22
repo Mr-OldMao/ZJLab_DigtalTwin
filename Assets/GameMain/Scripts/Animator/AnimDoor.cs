@@ -158,7 +158,7 @@ public class AnimDoor : MonoBehaviour
         {
             if (CurDoorState == DoorState.Closed)
             {
-                Debug.Log("selfName:" + selfName);
+                Debugger.Log("selfName:" + selfName);
                 PlayDoorAnim(animName, true);
             }
         }
@@ -166,7 +166,7 @@ public class AnimDoor : MonoBehaviour
         {
             if (CurDoorState == DoorState.Opened)
             {
-                Debug.Log("selfName:" + selfName);
+                Debugger.Log("selfName:" + selfName);
                 PlayDoorAnim(animName, false);
             }
         }
