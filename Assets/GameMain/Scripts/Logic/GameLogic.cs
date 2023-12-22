@@ -47,7 +47,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "Simulator:1703226014170|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "Simulator:1703225037387|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 #else
 #if UNITY_STANDALONE_LINUX
@@ -808,7 +808,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             //TaskCenter.GetInstance.TestSendOrder(Order.Knock_on_door, "DoorX", testDoorID);
 
             //TaskCenter.GetInstance.TestSendOrder(Order.Pull_Start, "BoxPull", "sim:1032");
-            //TaskCenter.GetInstance.TestSendOrder(Order.Push_Enter, "BoxPash", "sim:1031");
+            //TaskCenter.GetInstance.TestSendOrder(Order.Push_Enter, "BoxPush", "sim:1031");
             //TaskCenter.GetInstance.TestSendOrder(Order.Wheel, "Wheel", "sim:1033");
             //TaskCenter.GetInstance.TestSendOrder(Order.Pile, "Pile", "sim:1034");
             //TaskCenter.GetInstance.TestSendOrder(Order.Turn_Door, "DoorX", "3_7");
@@ -832,6 +832,9 @@ public class GameLogic : SingletonByMono<GameLogic>
             {
                 m_Debugger.SetActive(!m_Debugger.gameObject.activeSelf);
             }
+
+           GameObject Boxpash_1 = GameObject.Find("Boxpush_1");
+            Boxpash_1.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, 5));
         }
     }
     public string testDoorID;

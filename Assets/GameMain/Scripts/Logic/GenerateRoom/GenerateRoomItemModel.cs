@@ -415,7 +415,7 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
         PutCustomItem(RoomType.StorageRoom, "Plant", GetDefaultItemID);
 
 
-        PutCustomItem(RoomType.StorageRoom, "BoxPash", GetDefaultItemID);
+        PutCustomItem(RoomType.StorageRoom, "BoxPush", GetDefaultItemID);
         PutCustomItem(RoomType.StorageRoom, "BoxPull", GetDefaultItemID);
         PutCustomItem(RoomType.StorageRoom, "Wheel", GetDefaultItemID);
         PutCustomItem(RoomType.LivingRoom, "Pile", GetDefaultItemID);

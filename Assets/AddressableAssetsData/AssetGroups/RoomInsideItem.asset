@@ -288,7 +288,7 @@ MonoBehaviour:
     m_SerializedLabels:
     - ItemLable
   - m_GUID: 885acdaa8af637145af10448a1dd2671
-    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Boxpash_1.prefab
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Boxpush_1.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable
@@ -304,6 +304,11 @@ MonoBehaviour:
     - ItemLable
   - m_GUID: 3fe0fded0bdfc564494d91b783c2a625
     m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Pile_1.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ItemLable
+  - m_GUID: 7e45261ff36910746a79dfc87d72347d
+    m_Address: Assets/GameMain/AB/Prefab/Entity/IndoorItem/Box.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - ItemLable

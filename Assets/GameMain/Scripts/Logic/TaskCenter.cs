@@ -376,36 +376,6 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case RobotOrderAnimData.Grab_item:
                     //物品父节点放置在机器人手中
                     grabObj = GrabEntity(1f);
-                    //string objName1 = GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId;
-                    //grabObj = MainData.CacheItemsEntity[objName1];
-                    //if (grabObj != null)
-                    //{
-                    //    //当前物品的父对象实体
-                    //    Transform grabOldParentNode = grabObj.transform.parent;
-                    //    grabObj.transform.parent = m_RobotAnimCenter.RobotHandleNode;
-                    //    grabObj.transform.localPosition = Vector3.zero;
-                    //    grabObj.transform.localRotation = Quaternion.Euler(Vector3.zero);
-                    //    if (!m_DicCacheGrabParent.ContainsKey(grabObj))
-                    //    {
-                    //        m_DicCacheGrabParent.Add(grabObj, grabOldParentNode);
-                    //    }
-                    //    foreach (var item in grabObj.transform.Finds<Transform>("Model"))
-                    //    {
-                    //        item.transform.localPosition = Vector3.zero;
-                    //    }
-                    //    foreach (var item in grabObj.GetComponentsInChildren<MeshCollider>())
-                    //    {
-                    //        item.enabled = false;
-                    //    }
-                    //    foreach (var item in grabObj.GetComponentsInChildren<NavMeshObstacle>())
-                    //    {
-                    //        item.enabled = false;
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    Debug.LogError("obj is null ,objName: " + objName1);
-                    //}
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Grab_item");
                     break;
                 //放下
@@ -489,14 +459,14 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 //case Order.Push_Idle_inPlace:
                 case RobotOrderAnimData.Push_Start:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Box_Push");
-                    //箱子动画 todo
-
+                    //箱子动画
+                    BoxAnim(true);
                     break;
                 //拉
                 case RobotOrderAnimData.Pull_Start:
                     animSecond = m_RobotAnimCenter.PlayAnimByName("Robot_Box_Pull");
-                    //箱子动画 todo
-
+                    //箱子动画
+                    BoxAnim(false);
                     break;
                 //按下按钮
                 case RobotOrderAnimData.Press_Button:
@@ -597,6 +567,31 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         else
         {
             Debug.LogError("animSecond = robotAnimCenter is null");
+        }
+    }
+
+    private void BoxAnim(bool isPush)
+    {
+        if (GetCurExecuteTask.objectName == "Box")
+        {
+            GameObject boxObj = GameObject.Find(GetCurExecuteTask.objectName + "_" + GetCurExecuteTask.objectId);
+            GameObject player = GameObject.FindWithTag("Player");
+            if (boxObj != null)
+            {
+                //判断离哪个节点近
+                List<Transform> navNodes = boxObj.transform.Finds<Transform>("NavNode");
+                float dicNavNode1 = Vector3.Distance(player.transform.position, navNodes[0].transform.position);
+                float dicNavNode2 = Vector3.Distance(player.transform.position, navNodes[1].transform.position);
+                Transform targetNavNode = dicNavNode1 < dicNavNode2 ? navNodes[0] : navNodes[1];
+                Vector3 forceDir = targetNavNode.Find("forceDir").transform.localPosition;
+                if (!isPush)
+                {
+                    forceDir = -forceDir;
+                }
+                //施加力
+                UnityTool.GetInstance.DelayCoroutine(1.1f, () => boxObj.GetComponent<Rigidbody>().AddForce(forceDir * 1));
+                UnityTool.GetInstance.DelayCoroutine(3.2f, () => boxObj.GetComponent<Rigidbody>().AddForce(forceDir * 3));
+            }
         }
     }
 
