@@ -178,29 +178,29 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
 
 ### 物品映射表
 
-| 物品名称 | 类型(唯一标识) |
-| -------- | -------------- |
-| 浴池     | Bathtub        |
-| 床       | Bed            |
-| 厨房灶台 | Bigsink        |
-| 垃圾桶   | Bin            |
-| 书       | Book           |
-| 柜子     | Cabinet        |
-| 椅子     | Chair          |
-| 衣架     | Clothes        |
-| 杯子     | Cup            |
-| 书桌     | Desk           |
-| 饮品     | Drink          |
-| 食物     | Food           |
-| 刀       | Knife          |
-| 台灯     | Lamp           |
-| 台式电脑 | PC             |
-| 充电桩   | Pile           |
-| 绿植     | Plant          |
-| 锅       | Pot            |
-| 洗手池   | Sink           |
-| 沙发     | Sofa           |
-| 电视     | TV             |
+| 物品名称 | 类型(唯一标识) | 静态属性 |
+| -------- | -------------- | -------- |
+| 浴池     | Bathtub        | true     |
+| 床       | Bed            | true     |
+| 厨房灶台 | Bigsink        | true     |
+| 垃圾桶   | Bin            | false    |
+| 书       | Book           | false    |
+| 柜子     | Cabinet        | true     |
+| 椅子     | Chair          | true     |
+| 衣架     | Clothes        | false    |
+| 杯子     | Cup            | false    |
+| 书桌     | Desk           | true     |
+| 饮品     | Drink          | false    |
+| 食物     | Food           | false    |
+| 刀       | Knife          | false    |
+| 台灯     | Lamp           | true     |
+| 台式电脑 | PC             | true     |
+| 充电桩   | Pile           | true     |
+| 绿植     | Plant          | true     |
+| 锅       | Pot            | false    |
+| 洗手池   | Sink           | true     |
+| 沙发     | Sofa           | true     |
+| 电视     | TV             | true     |
 
 
 
@@ -347,6 +347,32 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
             "delChind": 0
         }
     ]
+}
+```
+
+### 任务指令
+
+拿取吊灯
+
+```
+{
+    "motionId": "motion://Grab_item",
+    "name": "Grab_item",
+    "objectId": "sim:1001",
+    "objectName": "Toplamp",
+    "position": [
+        2.0,
+        0.0,
+        3.5
+    ],
+    "rotation": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "sceneID": "Simulator:1702954572478",
+    "taskId": "task:grab1703215659222",
+    "tmpId": "TMP:Simulator:1702954572478-1703215654114"
 }
 ```
 

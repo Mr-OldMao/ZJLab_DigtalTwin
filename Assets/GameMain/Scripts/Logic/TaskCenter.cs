@@ -582,6 +582,10 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                             m_DicCacheGrabParent.Remove(grabObj);
                         }
                     }
+                });
+
+                UnityTool.GetInstance.DelayCoroutine(animSecond + 1f, () =>
+                {
                     animCompleteCallback?.Invoke();
                 });
             }
@@ -798,7 +802,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         GameObject obj = GameObject.Find(controlCommit.objectName + "_" + controlCommit.objectId);
         if (obj != null)
         {
-            res = !obj.isStatic;
+            //res = !obj.isStatic;
+            res = !ItemStaticData.GetItemStatic(controlCommit.objectName);
             if (!res)
             {
                 taskFailDes = "任务执行失败，无法进行抓取、放下交互，目标交互为非动态实体 , obj :" + controlCommit.objectName + "_" + controlCommit.objectId;
@@ -809,6 +814,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             res = false;
             taskFailDes = "任务执行失败，未找到所要交互的物体, obj :" + controlCommit.objectName + "_" + controlCommit.objectId;
         }
+        Debugger.LogError("判断抓取、放下交互命令是否合法 res:" + res + ",obj: " + controlCommit.objectName + "_" + controlCommit.objectId);
         return res;
     }
 

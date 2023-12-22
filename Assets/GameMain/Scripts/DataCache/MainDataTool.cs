@@ -216,7 +216,8 @@ public class MainDataTool : SingletonByMono<MainDataTool>
                     name = curType,
                     position = new float[] { curPos.x, curPos.y, curPos.z },
                     rotation = new float[] { curRot.x, curRot.y, curRot.z },
-                    dynamic = isDynamic,
+                    //dynamic = isDynamic,
+                    dynamic = !ItemStaticData.GetItemStatic(curType),
                     relatedThing = null
                 }
             });

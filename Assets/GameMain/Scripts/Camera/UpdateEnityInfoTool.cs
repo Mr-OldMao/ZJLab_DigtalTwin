@@ -53,7 +53,8 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
                 {
                     relatedThingArr[tempJ].target.position = new float[] { modelTrans.position.x, modelTrans.position.y, modelTrans.position.z };
                     relatedThingArr[tempJ].target.rotation = new float[] { modelTrans.rotation.eulerAngles.x, modelTrans.rotation.eulerAngles.y, modelTrans.rotation.eulerAngles.z };
-                    relatedThingArr[tempJ].target.dynamic = !targetObj.isStatic;
+                    //relatedThingArr[tempJ].target.dynamic = !targetObj.isStatic;
+                    relatedThingArr[tempJ].target.dynamic = !ItemStaticData.GetItemStatic(relatedThingArr[tempJ].target.name);
                 }
                 else
                 {

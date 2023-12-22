@@ -47,7 +47,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "Simulator:1702953764423|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "Simulator:1703226014170|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 #else
 #if UNITY_STANDALONE_LINUX
@@ -586,7 +586,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                         id = doorID,
                         name = doorName,
                         relatedThing = null,
-                        dynamic = true,
+                        dynamic = false,
                         position = new float[] { modelTrans.position.x, modelTrans.position.y, modelTrans.position.z },
                         rotation = new float[] { modelTrans.rotation.eulerAngles.x, modelTrans.rotation.eulerAngles.y, modelTrans.rotation.eulerAngles.z },
                     },
@@ -610,7 +610,8 @@ public class GameLogic : SingletonByMono<GameLogic>
             id = itemID,
             name = itemName,
             relatedThing = new List<GetThingGraph_data_items_relatedThing>(),
-            dynamic = !curNode.gameObject.isStatic
+            //dynamic = !curNode.gameObject.isStatic
+            dynamic = !ItemStaticData.GetItemStatic(itemName)
         };
         //判断是否有下一次节点
         Transform putAreaTrans = curNode.Find("PutArea");
