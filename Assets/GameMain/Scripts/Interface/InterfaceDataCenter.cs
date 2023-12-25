@@ -5,7 +5,6 @@ using UnityEngine;
 using static GenerateRoomData;
 using static GetEnvGraph;
 using static GetThingGraph;
-using static UnityEditor.Progress;
 /// <summary>
 /// 标题：接口数据管理中心
 /// 功能：处理HTTP接口的下发，数据的缓存，处理MQTT协议数据的订阅监听，数据下发
@@ -110,7 +109,7 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                 }, null, rawJsonStr, (m, n) =>
                 {
                     Debugger.LogError("获取Token失败,系统生成随机token m:" + m + ",n:" + n);
-                    string tmpId = UnityEngine.Random.Range(1000000000, 9999999999).ToString();
+                    string tmpId = UnityEngine.Random.Range(10000, 99999).ToString();
                     MainData.tmpID = tmpId;
                     Debugger.Log("tempId:" + tmpId);
                     callback?.Invoke(tmpId);
@@ -227,6 +226,10 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
                 items = MainData.getEnvGraph.data.items,
                 idScene = MainData.SceneID
             });
+            callbackSuc?.Invoke();
+        }
+        else if (MainData.getEnvGraph != null && !string.IsNullOrEmpty(MainData.ConfigData.CoreConfig.LocalReadFileName)) //是本地读档
+        {
             callbackSuc?.Invoke();
         }
         else
@@ -393,8 +396,6 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
         {
             Debugger.LogError("提交场景图失败，m:" + m + ",n:" + n);
         });
-
-
     }
 
 

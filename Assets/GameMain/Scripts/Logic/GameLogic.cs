@@ -47,7 +47,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "Simulator:1703469121173|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "Simulator:1703494904334|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 #else
 #if UNITY_STANDALONE_LINUX
@@ -246,6 +246,11 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     private void NetworkMQTT()
     {
+        if (MainData.UseTestData || !string.IsNullOrEmpty(MainData.ConfigData.CoreConfig.LocalReadFileName))
+        {
+            Debugger.Log("当前为测试模式，或者本地读档，不使用mqtt服务");
+            return;
+        }
         InterfaceDataCenter.GetInstance.InitMQTT();
     }
 
@@ -390,7 +395,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         staticModelRootNode.transform.position = Vector3.zero;
         //写入各个房间之间的邻接关系
         List<RoomBaseInfo> roomBaseInfos = new List<RoomBaseInfo>();
-        if (!MainData.CanReadFile)
+        if (!MainData.CanReadFile && string.IsNullOrEmpty(MainData.ConfigData.CoreConfig.LocalReadFileName))
         {
             for (int i = 0; i < MainData.getEnvGraph?.data?.items.Length; i++)
             {
@@ -451,6 +456,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             roomBaseInfos = DataRead.GetInstance.ReadRoomBaseInfos();
         }
 
+         
 
 
 
