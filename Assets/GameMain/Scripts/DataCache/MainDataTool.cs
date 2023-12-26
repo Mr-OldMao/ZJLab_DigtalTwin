@@ -5,6 +5,7 @@ using MFramework;
 using static GetThingGraph;
 using static JsonAddEntity;
 using static GameLogic2;
+using UnityEngine.UI;
 /// <summary>
 /// 标题：更新数据缓存
 /// 功能：
@@ -129,7 +130,15 @@ public class MainDataTool : SingletonByMono<MainDataTool>
                         clone.transform.Find("Model").transform.localPosition = Vector3.zero;
                     }
                     string key = entityInfo.type + "_" + entityInfo.id;
+
                     clone.name = key;
+                    if (obj.name.Contains("Other"))
+                    {
+                        Debugger.Log("cur obj is Other ,key:" + key);
+                        clone.GetComponentInChildren<Text>().text = key;
+                    }
+
+
 
                     //缓存数据1
                     if (!MainData.CacheItemsEntity.ContainsKey(key))

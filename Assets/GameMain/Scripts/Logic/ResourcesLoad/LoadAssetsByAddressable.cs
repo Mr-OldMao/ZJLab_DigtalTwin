@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Collections;
 using static LoadAssetsByAddressable;
+using System.Security.Cryptography;
 
 /// <summary>
 /// 标题：基于Addressable进行ab包的异步加载
@@ -80,7 +81,7 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
         bool loadMatComplete = false;
         bool loadPrefabComplete = false;
 
-        if (GameLaunch.GetInstance.scene ==  GameLaunch.Scenes.MainScene1)
+        if (GameLaunch.GetInstance.scene == GameLaunch.Scenes.MainScene1)
         {
             Addressables.LoadAssetsAsync<Material>(lables, (p) =>
            {
@@ -279,7 +280,8 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
             }
             else
             {
-                Debugger.LogError("dicCacheEntityRes not exist，entityName：" + entityName);
+                res = dicCacheAssets["Other"].items[0];
+                Debugger.LogError("dicCacheEntityRes not exist，entityName：" + entityName + ",auto use Other prefab ,res:" + res);
             }
         }
         else
@@ -291,28 +293,45 @@ public class LoadAssetsByAddressable : SingletonByMono<LoadAssetsByAddressable>
 
     public void GetEntityRes(string entityName, string assetName, Action<GameObject> callback)
     {
-        if (dicCacheAssets != null && dicCacheAssets.ContainsKey(entityName))
+        if (dicCacheAssets != null)
         {
+
+
             PimDeWitte.UnityMainThreadDispatcher.UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
                 GameObject res = null;
-                foreach (var item in dicCacheAssets[entityName].items)
+                if (dicCacheAssets.ContainsKey(entityName))
                 {
-                    if (item.name == assetName)
+                    foreach (var item in dicCacheAssets[entityName].items)
                     {
-                        res = item;
-                        break;
+                        if (item.name == assetName)
+                        {
+                            res = item;
+                            break;
+                        }
                     }
+                    if (res == null)
+                    {
+                        Debugger.LogError("未找到指定资源，改用随机资源");
+                        int randomIndex = UnityEngine.Random.Range(0, dicCacheAssets[entityName].items.Count);
+                        res = dicCacheAssets[entityName].items[randomIndex];
+                    }
+                    callback?.Invoke(res);
                 }
-                if (res == null)
+                else
                 {
-                    Debugger.LogError("未找到指定资源，改用随机资源");
-                    int randomIndex = UnityEngine.Random.Range(0, dicCacheAssets[entityName].items.Count);
-                    res = dicCacheAssets[entityName].items[randomIndex];
+                    Debugger.LogError("未找到资源，改用固定资源 Other");
+                    res = dicCacheAssets["Other"]?.items[0];
+                    callback?.Invoke(res);
                 }
-                callback?.Invoke(res);
+
 
             });
+
+        }
+        else
+        {
+            callback?.Invoke(null);
         }
     }
     private IEnumerator Do()

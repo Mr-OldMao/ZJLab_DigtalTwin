@@ -95,6 +95,8 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
 
 资源路径：Assets/GameMain/AB/...
 
+技术实现：Addressabe
+
 
 
 ## 程序运行流程
@@ -358,7 +360,7 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
 
 仅删除Desk_sim:1007物品，所以依赖的物品的父对象由当前物品变为当前房间
 
-```
+```json
 {
     "tmpId": "TMP:Simulator:1703120770813-1703128694016",
     "idScene": "Simulator:1703120770813",
@@ -376,14 +378,14 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
 
 topic：simulator/send
 
-拿取吊灯
+拿取书
 
-```
+```json
 {
     "motionId": "motion://Grab_item",
     "name": "Grab_item",
     "objectId": "sim:1001",
-    "objectName": "Toplamp",
+    "objectName": "Book",
     "position": [
         2.0,
         0.0,

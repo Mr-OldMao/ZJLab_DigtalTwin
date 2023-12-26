@@ -47,7 +47,8 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "Simulator:1703552696880|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "Simulator:1703570777129" +
+            "|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 #else
 #if UNITY_STANDALONE_LINUX
