@@ -178,6 +178,10 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
                 }
             }
         }
+        if (obj == null)
+        {
+            Debugger.LogError("obj is null ");
+        }
         bool res = false;
         Vector3 objPos = obj.transform.position;
         Vector2 viewPos = cameraListener.WorldToViewportPoint(objPos);
