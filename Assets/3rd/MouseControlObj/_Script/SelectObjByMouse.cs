@@ -273,10 +273,14 @@ namespace MFramework
                             }
                             CurSelectObjInfo = new SelectObjInfo(entity, baseMouseControlObj);
                             //材质替换 替换entity同级下的所有实体
-                            foreach (MeshRenderer meshRenderer in entity.transform.parent.GetComponentsInChildren<MeshRenderer>())
+                            if (entity.transform.parent.GetComponentsInChildren<MeshRenderer>() != null)
                             {
-                                meshRenderer.material = m_MatSelectObj;
+                                foreach (MeshRenderer meshRenderer in entity.transform.parent.GetComponentsInChildren<MeshRenderer>())
+                                {
+                                    meshRenderer.material = m_MatSelectObj;
+                                }
                             }
+                           
                             Debugger.Log("已选中实体：" + entity + "，parent：" + addScriptTrans);
                         }
                     }
