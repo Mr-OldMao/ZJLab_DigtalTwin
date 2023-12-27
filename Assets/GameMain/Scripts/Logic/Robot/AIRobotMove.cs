@@ -168,7 +168,7 @@ public class AIRobotMove : MonoBehaviour
                 || TaskCenter.GetInstance.GetCurExecuteTask.name == RobotOrderAnimData.Open_Door_Inside
                 || TaskCenter.GetInstance.GetCurExecuteTask.name == RobotOrderAnimData.Open_Door_Outside)
                     {
-                        return;
+                       return;
                     }
                 }
                 Move(targetPoint);
@@ -378,6 +378,14 @@ public class AIRobotMove : MonoBehaviour
     /// <param name="callback">t-原地没动</param>
     private void JudgeMoveSite(float delay, Action<bool> callback)
     {
+        Debugger.Log("JudgeMoveSite  " + TaskCenter.GetInstance.GetCurExecuteTask?.name);
+        if (TaskCenter.GetInstance.GetCurExecuteTask?.name == RobotOrderAnimData.Close_Door_Inside
+            || TaskCenter.GetInstance.GetCurExecuteTask?.name == RobotOrderAnimData.Open_Door_Inside
+            || TaskCenter.GetInstance.GetCurExecuteTask?.name == RobotOrderAnimData.Knock_on_door)
+        {
+            return;
+        }
+
         Vector3 pos = transform.position;
 
         UnityTool.GetInstance.DelayCoroutine(delay, () =>

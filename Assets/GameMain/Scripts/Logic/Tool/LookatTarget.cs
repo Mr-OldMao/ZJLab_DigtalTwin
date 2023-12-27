@@ -22,7 +22,8 @@ public class LookatTarget : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        target = FindObjectOfType<AIRobotMove>()?.gameObject;
+        //target = FindObjectOfType<AIRobotMove>()?.gameObject;
+        target = CameraControl.GetInstance.GetCameraEntity(CameraControl.CameraType.Free)?.gameObject;
         if (target == null)
         {
             Debugger.LogError("target is null,");

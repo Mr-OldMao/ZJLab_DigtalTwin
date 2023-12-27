@@ -285,20 +285,23 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
 
 ### 新增物品
 
-
-
 ```json
 {
-    "tmpId": "TMP:Simulator:1703225037387-1703237492458",
-    "idScene": "Simulator:1703225037387",
+    "tmpId": "TMP:Simulator:1703640645117-1703661471970",
+    "idScene": "Simulator:1703640645117",
     "entityInfo": [
         {
-            "id": "sim:1009",
-            "type": "Box",
-            "modelId": "Box_1",
+            "id": "sim:1112",
+            "type": "AAA",
+            "modelId": "AAA_1",
             "pos": {
-                "x": 9,
+                "x": 7,
                 "y": 6
+            },
+            "scale" :{
+                "x": 2,
+                "y": 1,
+                "z": 2
             },
             "dynamic": 0,
             "roomInfo": {
@@ -312,6 +315,8 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
 }
 ```
 
+
+
 ```json
 {
     "tmpId": "TMP:Simulator:1703120770813-1703128011536",
@@ -324,6 +329,11 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
             "pos": {//当前仅当无父对象即parentEntityInfo为空时有意义
                 "x": 3.3,
                 "y": 2.5
+            },
+             "scale" :{
+                "x": 2,
+                "y": 1,
+                "z": 2
             },
             "dynamic": 0,
             "roomInfo": {
