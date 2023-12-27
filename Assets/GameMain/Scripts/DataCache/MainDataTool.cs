@@ -116,6 +116,10 @@ public class MainDataTool : SingletonByMono<MainDataTool>
                         clone.transform.SetParent(parentObj.transform);
                         ////实体位置pos，高度y使用PutArea/xxx 节点的高度，x/y使用web前端发来的数值
                         //clone.transform.position = new Vector3(entityInfo.pos.x, parentObj.transform.position.y, entityInfo.pos.y);
+                        if (entityInfo.scale != null)
+                        {
+                            clone.transform.localScale = new Vector3(entityInfo.scale.x, entityInfo.scale.y, entityInfo.scale.z);
+                        }
 
                         //实体位置固定
                         clone.transform.localPosition = Vector3.zero;
@@ -128,6 +132,10 @@ public class MainDataTool : SingletonByMono<MainDataTool>
                         clone.transform.SetParent(parentObj.transform, false);
                         clone.transform.position = new Vector3(entityInfo.pos.x, 0, entityInfo.pos.y);
                         clone.transform.Find("Model").transform.localPosition = Vector3.zero;
+                        if (entityInfo.scale != null)
+                        {
+                            clone.transform.localScale = new Vector3(entityInfo.scale.x, entityInfo.scale.y, entityInfo.scale.z);
+                        }
                     }
                     string key = entityInfo.type + "_" + entityInfo.id;
 

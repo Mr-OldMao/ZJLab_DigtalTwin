@@ -501,6 +501,11 @@ public class GenerateRoomItemModel : SingletonByMono<GenerateRoomItemModel>
                 parentTrans.SetParent(ItemEntityGroupNode.transform);
             }
             clone.transform.SetParent(parentTrans, false);
+            if (relatedThingArr[i].target.scale != null && relatedThingArr[i].target.scale[0] != 0 && relatedThingArr[i].target.scale[1] != 0 && relatedThingArr[i].target.scale[2] != 0)
+            {
+                clone.transform.localScale = new Vector3(relatedThingArr[i].target.scale[0], relatedThingArr[i].target.scale[1], relatedThingArr[i].target.scale[2]);
+
+            }
             clone.name = entityName + "_" + relatedThingArr[i].target.id;
 
             clone.SetActive(false);

@@ -53,6 +53,7 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
                 {
                     relatedThingArr[tempJ].target.position = new float[] { modelTrans.position.x, modelTrans.position.y, modelTrans.position.z };
                     relatedThingArr[tempJ].target.rotation = new float[] { modelTrans.rotation.eulerAngles.x, modelTrans.rotation.eulerAngles.y, modelTrans.rotation.eulerAngles.z };
+                    relatedThingArr[tempJ].target.scale = new float[] { modelTrans.localScale.x, modelTrans.localScale.y, modelTrans.localScale.z };
                     //relatedThingArr[tempJ].target.dynamic = !targetObj.isStatic;
                     relatedThingArr[tempJ].target.dynamic = !ItemStaticData.GetItemStatic(relatedThingArr[tempJ].target.name);
                 }
@@ -98,7 +99,8 @@ public class UpdateEnityInfoTool : SingletonByMono<UpdateEnityInfoTool>
                 relatedThing = new List<GetThingGraph_data_items_relatedThing>(),
                 dynamic = MainData.CacheSceneItemsInfo.items[tempI].dynamic,
                 position = MainData.CacheSceneItemsInfo.items[tempI].position,
-                rotation = MainData.CacheSceneItemsInfo.items[tempI].rotation
+                rotation = MainData.CacheSceneItemsInfo.items[tempI].rotation,
+                scale = MainData.CacheSceneItemsInfo.items[tempI].scale
             };
             MainData.CacheCameraItemsInfo.items.Add(temp);
             for (int j = 0; j < MainData.CacheSceneItemsInfo.items[tempI].relatedThing.Count; j++)

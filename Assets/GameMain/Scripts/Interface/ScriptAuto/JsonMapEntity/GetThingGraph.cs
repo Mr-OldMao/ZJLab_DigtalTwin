@@ -42,6 +42,8 @@ public class GetThingGraph
 		/// 
 		/// </summary>
 		public float[] rotation;
+
+		public float[] scale;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -90,10 +92,11 @@ public class GetThingGraph
 		/// 
 		/// </summary>
 		public float[] rotation;
-		/// <summary>
-		/// 
-		/// </summary>
-		public string id;
+        public float[] scale;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string id;
 		/// <summary>
 		/// 
 		/// </summary>

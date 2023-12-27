@@ -19,10 +19,18 @@ public class JsonAddEntity
         public int dynamic;
         public string putArea;
         public JsonAddEntity_entityInfo_pos pos;
+		public JsonAddEntity_entityInfo_scaale scale;
 		public JsonAddEntity_entityInfo_roomInfo roomInfo;
 		public JsonAddEntity_entityInfo_parentEntityInfo parentEntityInfo;
 	}
-	public class JsonAddEntity_entityInfo_pos
+    public class JsonAddEntity_entityInfo_scaale
+    {
+        public float x;
+        public float y;
+        public float z;
+    }
+
+    public class JsonAddEntity_entityInfo_pos
 	{
 		public float x;
 		public float y;

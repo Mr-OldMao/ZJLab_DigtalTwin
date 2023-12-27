@@ -10,6 +10,7 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using static JsonWebRoomDataList;
+using UnityEngine.UIElements;
 /// <summary>
 /// 标题：程序逻辑入口
 /// 功能：程序主逻辑
@@ -47,8 +48,8 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "Simulator:1703554866079" +
-            "|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
+        paramStr = "Simulator:1703640645117" +
+            "|0";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 #else
 #if UNITY_STANDALONE_LINUX
@@ -151,7 +152,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
                             UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
                             {
-                                txtHintContent = des+"\nsceneID：" + MainData.SceneID,
+                                txtHintContent = des + "\nsceneID：" + MainData.SceneID,
                                 delayCloseUIFormTime = 0
                             });
                         }
@@ -211,9 +212,9 @@ public class GameLogic : SingletonByMono<GameLogic>
                 GenerateScene();
             });
         });
-      
 
-      
+
+
     }
 
     private void CreateRootNode()
@@ -470,7 +471,7 @@ public class GameLogic : SingletonByMono<GameLogic>
             roomBaseInfos = DataRead.GetInstance.ReadRoomBaseInfos();
         }
 
-         
+
 
 
 
@@ -570,6 +571,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                 name = roomName,
                 position = new float[] { 0, 0, 0 },
                 rotation = new float[] { 0, 0, 0 },
+                scale = new float[] { 1, 1, 1 },
                 relatedThing = new List<GetThingGraph_data_items_relatedThing>(),
                 dynamic = false,
             };
@@ -610,6 +612,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                         dynamic = false,
                         position = new float[] { modelTrans.position.x, modelTrans.position.y, modelTrans.position.z },
                         rotation = new float[] { modelTrans.rotation.eulerAngles.x, modelTrans.rotation.eulerAngles.y, modelTrans.rotation.eulerAngles.z },
+
                     },
                     relationship = "In"
                 });
@@ -628,6 +631,7 @@ public class GameLogic : SingletonByMono<GameLogic>
         {
             position = new float[] { curModelEntityNoded.position.x, curModelEntityNoded.position.y, curModelEntityNoded.position.z },
             rotation = new float[] { curModelEntityNoded.rotation.eulerAngles.x, curModelEntityNoded.rotation.eulerAngles.y, curModelEntityNoded.rotation.eulerAngles.z },
+            scale = new float[] { curNode.localScale[0], curNode.localScale[1], curNode.localScale[2] },
             id = itemID,
             name = itemName,
             relatedThing = new List<GetThingGraph_data_items_relatedThing>(),
@@ -757,95 +761,95 @@ public class GameLogic : SingletonByMono<GameLogic>
 
     public void Update()
     {
-//        if (Input.GetKey(KeyCode.F2))
-//        {
-//            string testJson =
-//                 "{\"test\":\"" + System.DateTime.Now.ToString("HHmmss") + "\"}";
+        //        if (Input.GetKey(KeyCode.F2))
+        //        {
+        //            string testJson =
+        //                 "{\"test\":\"" + System.DateTime.Now.ToString("HHmmss") + "\"}";
 
-//            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_SEND,
-//                testJson);
-//        }
+        //            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_SEND,
+        //                testJson);
+        //        }
 
-//        if (Input.GetKeyDown(KeyCode.F4))
-//        {
-//            string testJson =
-//                //"{\"entityInfo\":[{\"id\":\"sim:20\",\"type\":\"Book\",\"modelId\":\"Book_1\",\"pos\":{\"x\":4.5,\"y\":13.4},\"roomInfo\":{\"roomType\":\"LivingRoom\",\"roomID\":\"sim:3\"},\"parentEntityInfo\":{\"id\":\"sim:7\",\"type\":\"BIN\",\"PutArea\":\"In\"}}]}"
-//                //"{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:2\",\r\n            \"type\": \"FOOD\",\r\n            \"modelId\": \"Food_1\",\r\n            \"pos\": {\r\n                \"x\": 7,\r\n                \"y\": 7\r\n            },\r\n            \"dynamic\": -1,\r\n            \"putArea\": \"In\",\r\n            \"roomInfo\": {\r\n                \"roomType\": \"LivingRoom\",\r\n                \"roomID\": \"sim:10\"\r\n            },\r\n            \"parentEntityInfo\": {\r\n                \"id\": \"sim:8\",\r\n                \"type\": \"POT\"\r\n            }\r\n        }\r\n    ]\r\n}"
-//                //"{\"entityInfo\":[{\"id\":\"sim:8\",\"type\":\"Book\",\"modelId\":\"Book_1\",\"pos\":{\"x\":8.033,\"y\":5.967},\"dynamic\":0,\"roomInfo\":{\"roomType\":\"LivingRoom\",\"roomID\":\"sim:1\"},\"PutArea\":\"On\",\"parentEntityInfo\":{\"id\":\"sim:6\",\"type\":\"BED\"}}]}"
-//                "{\"entityInfo\":[{\"id\":\"sim:10\",\"type\":\"Desk\",\"modelId\":\"Desk_1\",\"pos\":{\"x\":1,\"y\":7},\"dynamic\":0,\"roomInfo\":{\"roomType\":\"LivingRoom\",\"roomID\":\"sim:3\"},\"putArea\":\"In\",\"parentEntityInfo\":{}}]}"
-//                ;
+        //        if (Input.GetKeyDown(KeyCode.F4))
+        //        {
+        //            string testJson =
+        //                //"{\"entityInfo\":[{\"id\":\"sim:20\",\"type\":\"Book\",\"modelId\":\"Book_1\",\"pos\":{\"x\":4.5,\"y\":13.4},\"roomInfo\":{\"roomType\":\"LivingRoom\",\"roomID\":\"sim:3\"},\"parentEntityInfo\":{\"id\":\"sim:7\",\"type\":\"BIN\",\"PutArea\":\"In\"}}]}"
+        //                //"{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:2\",\r\n            \"type\": \"FOOD\",\r\n            \"modelId\": \"Food_1\",\r\n            \"pos\": {\r\n                \"x\": 7,\r\n                \"y\": 7\r\n            },\r\n            \"dynamic\": -1,\r\n            \"putArea\": \"In\",\r\n            \"roomInfo\": {\r\n                \"roomType\": \"LivingRoom\",\r\n                \"roomID\": \"sim:10\"\r\n            },\r\n            \"parentEntityInfo\": {\r\n                \"id\": \"sim:8\",\r\n                \"type\": \"POT\"\r\n            }\r\n        }\r\n    ]\r\n}"
+        //                //"{\"entityInfo\":[{\"id\":\"sim:8\",\"type\":\"Book\",\"modelId\":\"Book_1\",\"pos\":{\"x\":8.033,\"y\":5.967},\"dynamic\":0,\"roomInfo\":{\"roomType\":\"LivingRoom\",\"roomID\":\"sim:1\"},\"PutArea\":\"On\",\"parentEntityInfo\":{\"id\":\"sim:6\",\"type\":\"BED\"}}]}"
+        //                "{\"entityInfo\":[{\"id\":\"sim:10\",\"type\":\"Desk\",\"modelId\":\"Desk_1\",\"pos\":{\"x\":1,\"y\":7},\"dynamic\":0,\"roomInfo\":{\"roomType\":\"LivingRoom\",\"roomID\":\"sim:3\"},\"putArea\":\"In\",\"parentEntityInfo\":{}}]}"
+        //                ;
 
-//            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_ADD_GOODS,
-//                testJson);
-//        }
+        //            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_ADD_GOODS,
+        //                testJson);
+        //        }
 
-//        if (Input.GetKeyDown(KeyCode.F6))
-//        {
-//            string testJson =
-//                //"{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:9\",\r\n            \"type\": \"FOOD\",\r\n            \"delChind\":0\r\n        }\r\n    ]\r\n}"
-//                "{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:8\",\r\n            \"type\": \"POT\",\r\n            \"delChind\":0\r\n        }\r\n    ]\r\n}"
-//                ;
-//            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_DEL_GOODS,
-//        testJson);
-//        }
-//        if (Input.GetKeyDown(KeyCode.F7))
-//        {
-//            Debugger.Log("测试发送web端的房间布局变更mqtt消息");
-//            string testJson =
-//                @"
-//{
-//    ""sceneID"": """ + MainData.SceneID + @""",
-//    ""roomType"": """",
-//    ""roomID"": ""sim:6"",
-//    ""offsetPos"":{
-//            ""x"": " + x + @",
-//            ""y"": " + y + @"
-//    },
-//    ""ChangeTime"": ""20231123_165011""
-//}
-//";
-//            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_WEB_CHANGEPOSITION,
-//        testJson);
-//        }
+        //        if (Input.GetKeyDown(KeyCode.F6))
+        //        {
+        //            string testJson =
+        //                //"{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:9\",\r\n            \"type\": \"FOOD\",\r\n            \"delChind\":0\r\n        }\r\n    ]\r\n}"
+        //                "{\r\n    \"entityInfo\": [\r\n        {\r\n            \"id\": \"sim:8\",\r\n            \"type\": \"POT\",\r\n            \"delChind\":0\r\n        }\r\n    ]\r\n}"
+        //                ;
+        //            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_DEL_GOODS,
+        //        testJson);
+        //        }
+        //        if (Input.GetKeyDown(KeyCode.F7))
+        //        {
+        //            Debugger.Log("测试发送web端的房间布局变更mqtt消息");
+        //            string testJson =
+        //                @"
+        //{
+        //    ""sceneID"": """ + MainData.SceneID + @""",
+        //    ""roomType"": """",
+        //    ""roomID"": ""sim:6"",
+        //    ""offsetPos"":{
+        //            ""x"": " + x + @",
+        //            ""y"": " + y + @"
+        //    },
+        //    ""ChangeTime"": ""20231123_165011""
+        //}
+        //";
+        //            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_WEB_CHANGEPOSITION,
+        //        testJson);
+        //        }
 
-//        if (Input.GetKeyDown(KeyCode.F8))
-//        {
-//            string testJson =
+        //        if (Input.GetKeyDown(KeyCode.F8))
+        //        {
+        //            string testJson =
 
-//                "{\r\n    \"motionId\" : \"motion://Grab_itemv\",\r\n    \"name\"     : \"Grab_itemv\",\r\n    \"stateMsg\" : \"suc\",\r\n    \"stateCode\" : 0,\r\n    \"simulatorId\" : \"\",\r\n    \"task_id\"     : null\r\n}"
-//                ;
-//            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_RECV,
-//        testJson);
-//        }
+        //                "{\r\n    \"motionId\" : \"motion://Grab_itemv\",\r\n    \"name\"     : \"Grab_itemv\",\r\n    \"stateMsg\" : \"suc\",\r\n    \"stateCode\" : 0,\r\n    \"simulatorId\" : \"\",\r\n    \"task_id\"     : null\r\n}"
+        //                ;
+        //            NetworkMqtt.GetInstance.Publish(InterfaceDataCenter.TOPIC_RECV,
+        //        testJson);
+        //        }
 
-//        if (Input.GetKeyDown(KeyCode.F9))
-//        {
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Grab_item, "Book", "sim:1027");
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Open_Door_Inside, "DoorX", testDoorID);
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Grab_item_pull, "Book", "sim:1027");
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Close_Door_Inside, "DoorX", testDoorID);
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Robot_CleanTable, "Desk", "sim:1025");
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Press_Button, "TV", "sim:1016");
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Knock_on_door, "DoorX", testDoorID);
+        //        if (Input.GetKeyDown(KeyCode.F9))
+        //        {
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Grab_item, "Book", "sim:1027");
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Open_Door_Inside, "DoorX", testDoorID);
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Grab_item_pull, "Book", "sim:1027");
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Close_Door_Inside, "DoorX", testDoorID);
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Robot_CleanTable, "Desk", "sim:1025");
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Press_Button, "TV", "sim:1016");
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Knock_on_door, "DoorX", testDoorID);
 
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Pull_Start, "BoxPull", "sim:1032");
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Push_Enter, "BoxPush", "sim:1031");
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Wheel, "Wheel", "sim:1033");
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Pile, "Pile", "sim:1034");
-//            //TaskCenter.GetInstance.TestSendOrder(Order.Turn_Door, "DoorX", "3_7");
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Pull_Start, "BoxPull", "sim:1032");
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Push_Enter, "BoxPush", "sim:1031");
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Wheel, "Wheel", "sim:1033");
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Pile, "Pile", "sim:1034");
+        //            //TaskCenter.GetInstance.TestSendOrder(Order.Turn_Door, "DoorX", "3_7");
 
-//            TaskCenter.GetInstance.TestSendOrder(RobotOrderAnimData.Press_Button, "Sofa", "sim:1015");
+        //            TaskCenter.GetInstance.TestSendOrder(RobotOrderAnimData.Press_Button, "Sofa", "sim:1015");
 
-//        }
-//        if (Input.GetKeyDown(KeyCode.F10))
-//        {
-//            //RobotAnimCenter robotAnimCenter = GameObject.FindObjectOfType<RobotAnimCenter>();
-//            //robotAnimCenter.PlayAnimByBool("CanInteraction", true);
-//            //robotAnimCenter.PlayAnimByName("Robot_Pick");
-//            //robotAnimCenter.PlayAnimByBool("CanInteraction", false);
+        //        }
+        //        if (Input.GetKeyDown(KeyCode.F10))
+        //        {
+        //            //RobotAnimCenter robotAnimCenter = GameObject.FindObjectOfType<RobotAnimCenter>();
+        //            //robotAnimCenter.PlayAnimByBool("CanInteraction", true);
+        //            //robotAnimCenter.PlayAnimByName("Robot_Pick");
+        //            //robotAnimCenter.PlayAnimByBool("CanInteraction", false);
 
-//            SendRoomInfoData(GetOriginOffset());
-//        }
+        //            SendRoomInfoData(GetOriginOffset());
+        //        }
 
         if (Input.GetKeyDown(KeyCode.F12))
         {
@@ -854,7 +858,7 @@ public class GameLogic : SingletonByMono<GameLogic>
                 m_Debugger.SetActive(!m_Debugger.gameObject.activeSelf);
             }
 
-           GameObject Boxpash_1 = GameObject.Find("Boxpush_1");
+            GameObject Boxpash_1 = GameObject.Find("Boxpush_1");
             Boxpash_1.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, 5));
         }
     }
