@@ -352,6 +352,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 //simulatorId = GetCurExecuteTask?.simulatorId,
                 stateCode = 0,
                 stateMsg = "suc",
+                objectName = GetCurExecuteTask?.objectName
                 //targetRoomType = GetTargetRoomType().ToString()
             };
             InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
@@ -712,6 +713,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
             stateCode = stateCode,
             stateMsg = stateMsg,
             //targetRoomType = GetTargetRoomType().ToString()
+            objectName = GetCurExecuteTask?.objectName
         };
         InterfaceDataCenter.GetInstance.SendMQTTControlResult(controlResult);
         IsExecuteTask = false;

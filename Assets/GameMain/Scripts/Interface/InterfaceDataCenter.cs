@@ -738,6 +738,10 @@ public class ControlResult
     /// </summary>
     public int stateCode;
     /// <summary>
+    /// 物体类型
+    /// </summary>
+    public string objectName;
+    /// <summary>
     /// 仿真实例id，具有唯⼀性,即场景ID
     /// </summary>
     public string simulatorId = MainData.SceneID;
