@@ -152,8 +152,29 @@ public class AnimDoor : MonoBehaviour
         }
     }
 
+    private void InterfaceDoor(string collName)
+    {
+        //if (TaskCenter.GetInstance.GetCurExecuteTask == null)
+        //{
+        //    Debugger.LogError("collName:" + collName);
+
+        //    return;
+        //}
+
+        //if (TaskCenter.GetInstance.GetCurExecuteTask.name == RobotOrderAnimData.Knock_on_door
+        //    || TaskCenter.GetInstance.GetCurExecuteTask.name == RobotOrderAnimData.Open_Door_Inside
+        //    || TaskCenter.GetInstance.GetCurExecuteTask.name == RobotOrderAnimData.Close_Door_Inside)
+        //{
+        //    Transform node = GameObject.Find(collName).transform.GetChild(0);
+        //    GameObject player = GameObject.FindGameObjectWithTag("Player");
+        //    player.transform.position = node.position;
+        //    player.transform.rotation = Quaternion.Euler(node.transform.eulerAngles);
+        //}
+    }
+
     private void TryPlayAnim(string animName, string tag, string selfName)
     {
+        InterfaceDoor(selfName);
         if (CanOpenDoor)
         {
             if (CurDoorState == DoorState.Closed)

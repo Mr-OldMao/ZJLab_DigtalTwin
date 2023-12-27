@@ -349,8 +349,13 @@ public class AIRobotMove : MonoBehaviour
         //Debug.Log("coll " + collision.collider.name);
         if (collision.collider.gameObject.name == "TargetPoint")
         {
-            transform.position = targetPoint.position;
-            transform.rotation = Quaternion.Euler(targetPoint.transform.eulerAngles);
+            //if (TaskCenter.GetInstance.GetCurExecuteTask != null && 
+            //    (TaskCenter.GetInstance.GetCurExecuteTask.name != RobotOrderAnimData.Knock_on_door || TaskCenter.GetInstance.GetCurExecuteTask.name != RobotOrderAnimData.Open_Door_Inside || TaskCenter.GetInstance.GetCurExecuteTask.name != RobotOrderAnimData.Close_Door_Inside))
+            {
+                transform.position = targetPoint.position;
+                transform.rotation = Quaternion.Euler(targetPoint.transform.eulerAngles);
+            }
+            
             //transform.LookAt(targetPoint);
 
             //终止协程

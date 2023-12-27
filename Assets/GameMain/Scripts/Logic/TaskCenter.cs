@@ -130,30 +130,49 @@ public class TaskCenter : SingletonByMono<TaskCenter>
         //通过id查要走到的位置
         //GameObject objModel = null;
 
-        List<Transform> navNodes = GameObject.Find(controlCommit.objectName + "_" + controlCommit.objectId)?.transform.Finds<Transform>("NavNode");
 
-        if (navNodes?.Count > 0)
+        bool isFindNavNode = false;
+        bool isInterfaceDoor = false;
+        if (controlCommit.name == RobotOrderAnimData.Open_Door_Inside || controlCommit.name == RobotOrderAnimData.Close_Door_Inside || controlCommit.name == RobotOrderAnimData.Knock_on_door)
         {
-            foreach (var item in navNodes)
+            isInterfaceDoor = true;
+        }
+        string key = string.Empty;
+        if (isInterfaceDoor)
+        {
+            key = isInterfaceDoor ? controlCommit.objectId : controlCommit.objectName + "_" + controlCommit.objectId;
+        }
+
+        List<Transform> navNodes = GameObject.Find(key)?.transform.Finds<Transform>("NavNode");
+
+        if (!isInterfaceDoor)
+        {
+            if (navNodes?.Count > 0)
             {
-                NavNodeData navNodeData = new NavNodeData { pos = item.position, rot = item.rotation.eulerAngles };
-                m_TargetPos.Add(navNodeData);
-                Debugger.Log("add " + navNodeData.pos);
+                foreach (var item in navNodes)
+                {
+                    NavNodeData navNodeData = new NavNodeData { pos = item.position, rot = item.rotation.eulerAngles };
+                    m_TargetPos.Add(navNodeData);
+                    Debugger.Log("add " + navNodeData.pos);
+                }
             }
+        }
+        else
+        {
+            //找最近的NavNode
+            float dis1 = Vector3.Distance(navNodes[0].position, m_AIRobotMove.transform.position);
+            float dis2 = Vector3.Distance(navNodes[1].position, m_AIRobotMove.transform.position);
+
+
+            targetPos = dis1 < dis2 ? navNodes[0].position : navNodes[1].position;
+            targetRot = dis1 < dis2 ? navNodes[0].rotation.eulerAngles : navNodes[1].rotation.eulerAngles;
+            isFindNavNode = true;
         }
 
 
-        //GameObject rootNode = GameObject.Find(controlCommit.objectName + "_" + controlCommit.objectId);
-        //for (int i = 0; i < rootNode?.transform.childCount; i++)
-        //{
-        //    if (rootNode?.transform.GetChild(i).name == "NavNode")
-        //    {
-        //        m_TargetPos.Add(rootNode?.transform.GetChild(i).gameObject);
-        //        Debugger.Log(rootNode?.transform.GetChild(i).gameObject.transform.position);
-        //    }
-        //}
 
-        bool isFindNavNode = false;
+
+        
         if (m_TargetPos?.Count == 1)
         {
             //objModel = m_TargetPos[0].gameObject;
@@ -397,7 +416,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case RobotOrderAnimData.Open_Door_Inside:
                     //case Order.Open_Door_Outside:
                     GameLogic.GetInstance.ListenerAllDoorOpenEvent(true);
-                    GameLogic.GetInstance.ListenerAllDoorCloseEvent(false);
+                    //GameLogic.GetInstance.ListenerAllDoorCloseEvent(false);
 
                     Debugger.Log("openDoor", LogTag.Forever);
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Outside");
@@ -406,7 +425,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case RobotOrderAnimData.Close_Door_Inside:
                     //case Order.Close_Door_Outside:
                     GameLogic.GetInstance.ListenerAllDoorCloseEvent(true);
-                    GameLogic.GetInstance.ListenerAllDoorOpenEvent(false);
+                    //GameLogic.GetInstance.ListenerAllDoorOpenEvent(false);
 
                     Debugger.Log("closeDoor", LogTag.Forever);
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Inside");
