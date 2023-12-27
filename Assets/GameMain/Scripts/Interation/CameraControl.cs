@@ -106,7 +106,16 @@ public class CameraControl : SingletonByMono<CameraControl>
         //}
         m_CameraFree?.gameObject.SetActive(!m_CameraFree.gameObject.activeSelf);
         //CurMainCamera = m_CameraFree.gameObject.activeSelf ? CameraType.Free : beforeMainCamera;
-        string des = m_CameraFree.gameObject.activeSelf ? "关闭自由视角" : "开启自由视角";
+        string des = string.Empty;
+        if (UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().IsLanguageCN)
+        {
+            des = m_CameraFree.gameObject.activeSelf ? "关闭自由视角" : "开启自由视角";
+        }
+        else
+        {
+            des = m_CameraFree.gameObject.activeSelf ? "CloseFreePerspective" : "OpenFreePerspective";
+        }
+
         UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().TxtCameraFree.text = des;
 
         MsgEvent.SendMsg(MsgEventName.ChangeCamera);

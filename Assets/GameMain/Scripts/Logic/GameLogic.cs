@@ -47,7 +47,7 @@ public class GameLogic : SingletonByMono<GameLogic>
 
         string paramStr = string.Empty;
 #if UNITY_EDITOR 
-        paramStr = "Simulator:1703570777129" +
+        paramStr = "Simulator:1703554866079" +
             "|1";// "WinPC_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "|" + "1";  //"Simulator:1700126538734|1"
         MainDataTool.GetInstance.InitMainDataParam(paramStr);
 #else
@@ -147,9 +147,11 @@ public class GameLogic : SingletonByMono<GameLogic>
                         else
                         {
                             Debugger.LogError("从服务器读档失败，无法获取场景信息，当前场景不存在！sceneID：" + MainData.SceneID);
+                            string des = UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().IsLanguageCN ? "无法获取场景信息，当前场景ID已被删除！" : "Cannot get the scene information, the current scene ID has been deleted!\r\n";
+
                             UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
                             {
-                                txtHintContent = "无法获取场景信息，当前场景ID已被删除！\nsceneID：" + MainData.SceneID,
+                                txtHintContent = des+"\nsceneID：" + MainData.SceneID,
                                 delayCloseUIFormTime = 0
                             });
                         }
@@ -260,25 +262,32 @@ public class GameLogic : SingletonByMono<GameLogic>
     {
         MsgEvent.RegisterMsgEvent(MsgEventName.GenerateSceneComplete, () =>
         {
-            UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show("场景生成完毕！");
+            string des = UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().IsLanguageCN ? "场景生成完毕！" : "Scene generation completed";
+            UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
+            {
+                txtHintContent = des,
+                delayCloseUIFormTime = 2
+            });
             //当前场景未存档过，则自动存档一次
             DataRead.GetInstance.ReadAllDataByServerSceneID((isSuc) =>
             {
                 if (!isSuc)
                 {
                     Debugger.Log("当前场景未存档过，自动存档一次", LogTag.Forever);
+                    string des = UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().IsLanguageCN ? "当前场景未存档过，\n即将自动存档!" : "The current scene has not been saved , will be automatically saved!";
                     UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
                     {
-                        txtHintContent = "当前场景未存档过，\n即将自动存档!",
+                        txtHintContent = des,
                         delayCloseUIFormTime = 2
                     });
                     UnityTool.GetInstance.DelayCoroutine(2f, () =>
                     {
                         DataSave.GetInstance.Save(() =>
                         {
+                            string des = UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().IsLanguageCN ? "自动存档成功!" : "Automatic archive success!";
                             UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
                             {
-                                txtHintContent = "自动存档成功!",
+                                txtHintContent = des,
                                 delayCloseUIFormTime = 2
                             });
                         });
@@ -478,7 +487,8 @@ public class GameLogic : SingletonByMono<GameLogic>
                 {
                     m_CurAgainGenerateSceneCount = 0;
                     Debugger.LogError("again generate fail!");
-                    UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams { txtHintContent = "重新生成场景失败，请重试", colorHintContent = Color.red });
+                    string des = UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().IsLanguageCN ? "重新生成场景失败，请重试" : "Failed to regenerate the scene. Please try again";
+                    UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams { txtHintContent = des, colorHintContent = Color.red });
                 }
             }
             else

@@ -74,22 +74,25 @@ public class UIFormCameraHint : UIFormBase
             return;
         }
         string des = string.Empty;
-        switch (cameraType)
-        {
-            case CameraControl.CameraType.Top:
-                des = "顶视图";
-                break;
-            case CameraControl.CameraType.Three:
-                des = "第三人称视角";
-                break;
-            case CameraControl.CameraType.First:
-                des = "第一人称视角";
-                break;
-            case CameraControl.CameraType.Free:
-                des = "自由视角";
-                break;
+        bool isLanguageCN = UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().IsLanguageCN;
+        des = GetLanguageDes(cameraType, isLanguageCN);
 
-        }
+        //switch (cameraType)
+        //{
+        //    case CameraControl.CameraType.Top:
+        //        des = GetLanguageDes(cameraType,isLanguageCN);
+        //        break;
+        //    case CameraControl.CameraType.Three:
+        //        des = "第三人称视角";
+        //        break;
+        //    case CameraControl.CameraType.First:
+        //        des = "第一人称视角";
+        //        break;
+        //    case CameraControl.CameraType.Free:
+        //        des = "自由视角";
+        //        break;
+
+        //}
         if (index == 1)
         {
             txtHintCameraMain.text = des;
@@ -102,6 +105,28 @@ public class UIFormCameraHint : UIFormBase
         {
             txtHintCameraRightDown.text = des; ;
         }
+    }
+
+
+    private string GetLanguageDes(CameraControl.CameraType cameraType,bool isLanguageCN)
+    {
+        string des = string.Empty;
+        switch (cameraType)
+        {
+            case CameraControl.CameraType.Top:
+                des = isLanguageCN?"顶视图": "TopView";
+                break;
+            case CameraControl.CameraType.Three:
+                des = isLanguageCN ? "第三人称视角":"ThirdPersonView";
+                break;
+            case CameraControl.CameraType.First:
+                des = isLanguageCN ? "第一人称视角" : "FirstPersonView";
+                break;
+            case CameraControl.CameraType.Free:
+                des = isLanguageCN ? "自由视角" : "FreeView";
+                break;
+        }
+        return des;
     }
 
 

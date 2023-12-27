@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using MFramework;
+using TMPro;
+using UnityEngine.Networking.Types;
 
 /// <summary>
 /// 以下代码都是通过脚本自动生成的
@@ -30,6 +32,8 @@ public class UIFormMain : UIFormBase
     [SerializeField]
     private Button btnRobotRelocation;
     [SerializeField]
+    private Button btnChangeLanguage;
+    [SerializeField]
     private Button btnRegenerateScene;
     [SerializeField]
     private Button btnSave;
@@ -48,6 +52,7 @@ public class UIFormMain : UIFormBase
     [SerializeField]
     private Button btnEditReset;
 
+    public bool IsLanguageCN { get; private set; }
     public Button BtnStart { get => btnStart; set => btnStart = value; }
     public Button BtnStop { get => btnStop; set => btnStop = value; }
     public Button BtnPause { get => btnPause; set => btnPause = value; }
@@ -66,6 +71,7 @@ public class UIFormMain : UIFormBase
     public Toggle TgeRot { get => tgeRot; set => tgeRot = value; }
     public Toggle TgeScale { get => tgeScale; set => tgeScale = value; }
     public Button BtnEditReset { get => btnEditReset; set => btnEditReset = value; }
+    public Button BtnChangeLanguage { get => btnChangeLanguage; set => btnChangeLanguage = value; }
 
 
 
@@ -100,11 +106,13 @@ public class UIFormMain : UIFormBase
         tgeRot = transform.Find<Toggle>("tgeRot");
         tgeScale = transform.Find<Toggle>("tgeScale");
         btnEditReset = transform.Find<Button>("btnEditReset");
+        btnChangeLanguage = transform.Find<Button>("btnChangeLanguage");
 
         tgeLive.isOn = false;
         tgeEdit.isOn = false;
         rectTgeEditTypeGroup.gameObject.SetActive(false);
         tgeEdit.gameObject.SetActive(false);
+        IsLanguageCN = true;
     }
 
     protected override void RegisterUIEvnet()
@@ -145,12 +153,15 @@ public class UIFormMain : UIFormBase
         });
         btnRegenerateScene.onClick.AddListenerCustom(() =>
         {
+            string des = UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().IsLanguageCN? "正在生成场景，请稍等...": "Generating scene, please wait...";
             UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
             {
-                txtHintContent = "正在生成场景，请稍等...",
+                txtHintContent = des,
                 delayCloseUIFormTime = -1
             });
             //MainData.CanReadFile = MainData.CacheData_CanReadFile;
+            OnClickStateBtn(ProgramState.resume, MainData.SceneID, MainData.tmpID);
+            OnClickStateBtn(ProgramState.stop, MainData.SceneID, MainData.tmpID);
             GameLogic.GetInstance.GenerateScene();
         });
         btnSave.onClick.AddListenerCustom(() =>
@@ -210,6 +221,55 @@ public class UIFormMain : UIFormBase
         {
             SelectObjByMouse.GetInstance.ResetPos();
         });
+
+        btnChangeLanguage.onClick.AddListenerCustom(() =>
+        {
+            IsLanguageCN = !IsLanguageCN;
+            ChangeLanguage(IsLanguageCN);
+        });
+    }
+
+    private void ChangeLanguage(bool isLanguageCN)
+    {
+        if (isLanguageCN)
+        {
+            btnStart.GetComponentInChildren<TextMeshProUGUI>().text = "启动";
+            btnStop.GetComponentInChildren<TextMeshProUGUI>().text = "停止";
+            btnPause.GetComponentInChildren<TextMeshProUGUI>().text = "暂停";
+            btnResume.GetComponentInChildren<TextMeshProUGUI>().text = "继续";
+            btnRegenerateScene.GetComponentInChildren<Text>().text = "重新生成场景";
+            btnRobotRelocation.GetComponentInChildren<Text>().text = "机器人重定位";
+            btnSave.GetComponentInChildren<Text>().text = "场景布局存档";
+            tgeLive.GetComponentInChildren<Text>().text = "实时视频流";
+            btnChangeLanguage.GetComponentInChildren<Text>().text = "切换语言";
+            tgeEdit.transform.Find("Label").GetComponentInChildren<Text>().text = "编辑场景实体";
+            tgePos.GetComponentInChildren<Text>().text = "平移";
+            tgeRot.GetComponentInChildren<Text>().text = "旋转";
+            tgeScale.GetComponentInChildren<Text>().text = "缩放";
+            btnEditReset.GetComponentInChildren<Text>().text = "重置";
+            btnCameraFree.GetComponentInChildren<Text>().text = "开启自由视角";
+        }
+        else
+        {
+            btnStart.GetComponentInChildren<TextMeshProUGUI>().text = "Start";
+            btnStop.GetComponentInChildren<TextMeshProUGUI>().text = "Stop";
+            btnPause.GetComponentInChildren<TextMeshProUGUI>().text = "Pause";
+            btnResume.GetComponentInChildren<TextMeshProUGUI>().text = "Resume";
+            btnRegenerateScene.GetComponentInChildren<Text>().text = "RegenerateScene";
+            btnRobotRelocation.GetComponentInChildren<Text>().text = "RobotRelocation";
+            btnSave.GetComponentInChildren<Text>().text = "SceneLayoutArchive";
+            tgeLive.GetComponentInChildren<Text>().text = "LiveVideoStreaming";
+            btnChangeLanguage.GetComponentInChildren<Text>().text = "SwitchLanguage";
+            tgeEdit.transform.Find("Label").GetComponentInChildren<Text>().text = "EditSceneEntity";
+            tgePos.GetComponentInChildren<Text>().text = "Translate";
+            tgeRot.GetComponentInChildren<Text>().text = "Rotate";
+            tgeScale.GetComponentInChildren<Text>().text = "Scaling";
+            btnEditReset.GetComponentInChildren<Text>().text = "Reset";
+            btnCameraFree.GetComponentInChildren<Text>().text = "OpenFreePerspective";
+
+        }
+
+        MsgEvent.SendMsg(MsgEventName.ChangeCamera);
     }
 
     public void OnClickStateBtn(ProgramState programState, string sceneId, string tmpId)

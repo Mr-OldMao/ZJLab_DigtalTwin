@@ -167,10 +167,18 @@ public class MainDataTool : SingletonByMono<MainDataTool>
                 };
                 InterfaceDataCenter.GetInstance.SendMQTTUpdateEntity(jsonWebGlobalEntityData);
 
-                string resStr = addResult ? "成功" : "失败";
+                string resStr = string.Empty;
+                if (UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().IsLanguageCN)
+                {
+                    resStr = addResult ? "新增物体成功" : "新增物体失败";
+                }
+                else
+                {
+                    resStr = addResult ? "Add object success！" : "Add object Fail";
+                }
                 UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
                 {
-                    txtHintContent = $"新增物体{resStr},{entityInfo.type}_{entityInfo.id}",
+                    txtHintContent = $"{resStr},{entityInfo.type}_{entityInfo.id}",
                     delayCloseUIFormTime = 2
                 });
             });
@@ -340,10 +348,19 @@ public class MainDataTool : SingletonByMono<MainDataTool>
             InterfaceDataCenter.GetInstance.SendMQTTUpdateEntity(jsonWebGlobalEntityData);
 
 
-            string resStr = result ? "成功" : "失败";
+
+            string resStr = string.Empty;
+            if (UIManager.GetInstance.GetUIFormLogicScript<UIFormMain>().IsLanguageCN)
+            {
+                resStr = result ? "删除物体成功" : "删除物体失败";
+            }
+            else
+            {
+                resStr = result ? "Delete object success！" : "Delete object Fail";
+            }
             UIManager.GetInstance.GetUIFormLogicScript<UIFormHintNotBtn>().Show(new UIFormHintNotBtn.ShowParams
             {
-                txtHintContent = $"删除物体{resStr},{targetType}_{targetID}",
+                txtHintContent = $"{resStr},{targetType}_{targetID}",
                 delayCloseUIFormTime = 2
             });
         }

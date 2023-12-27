@@ -397,6 +397,7 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case RobotOrderAnimData.Open_Door_Inside:
                     //case Order.Open_Door_Outside:
                     GameLogic.GetInstance.ListenerAllDoorOpenEvent(true);
+                    GameLogic.GetInstance.ListenerAllDoorCloseEvent(false);
 
                     Debugger.Log("openDoor", LogTag.Forever);
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Outside");
@@ -405,6 +406,8 @@ public class TaskCenter : SingletonByMono<TaskCenter>
                 case RobotOrderAnimData.Close_Door_Inside:
                     //case Order.Close_Door_Outside:
                     GameLogic.GetInstance.ListenerAllDoorCloseEvent(true);
+                    GameLogic.GetInstance.ListenerAllDoorOpenEvent(false);
+
                     Debugger.Log("closeDoor", LogTag.Forever);
                     animSecond = m_RobotAnimCenter.PlayAnimByTrigger("Robot_Close_Door_Inside");
                     //UnityTool.GetInstance.DelayCoroutine(1f, () =>
