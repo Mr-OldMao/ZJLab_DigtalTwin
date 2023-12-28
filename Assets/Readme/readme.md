@@ -1,14 +1,22 @@
-
-
 # 仿真程序手册
 
 
 
 [TOC]
 
+
+
+
+
 ## 仿真程序地址
 
 http://10.101.80.74:8083/
+
+
+
+## 代码远程仓库
+
+git@10.101.80.50:MaoJunFeng/ZJLab_DigtalTwin.git
 
 
 
@@ -27,7 +35,7 @@ http://10.101.80.74:8083/
 ```json
 {
     "CoreConfig": {
-        "SceneID": "", 	//唯一标识当前仿真程序，为空则从Web前端获取此ID，不为空则使用当前ID
+        "SceneID": "", 	//唯一标识当前仿真程序，为空则从Web前端获取此ID，不为空则使用当前ID，PC端需要填入场景ID才可进入仿真引擎
         "UseTestData":1,	//是否使用测试数据，0-不使用 1-使用
         "LocalReadFileName":"",	//本地读档的文件名称xxx.json，根据本地json文件来生成房间布局以及物体，为空则不从本地读档，从服务端获取相关数据，不为空则为本地读档，需填写文件名xxx.json(../StreamingAssets/xxx.json)，测试：SaveScene_test_20231110.json
         "SendEntityInfoHZ": 10.0	//发送视觉感知实体信息频率, n秒/次
@@ -88,6 +96,12 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
 随机生成房间：GenerateRoomData.cs、GenerateRoomItemModel.cs、GenerateRoomBorderModel.cs
 
 机器人AI寻路：AIRobotMove.cs
+
+
+
+## 核心参数
+
+机器人执行指令任务用时上限位置：TaskCenter.cs	=>	public const float TaskLimitTime = 30f;
 
 
 
@@ -197,30 +211,31 @@ Http、Mqtt接口管理：InterfaceDataCenter.cs
 
 ### 物品映射表
 
-| 物品名称 | 类型(唯一标识) | 静态属性 |
-| -------- | -------------- | -------- |
-| 浴池     | Bathtub        | true     |
-| 床       | Bed            | true     |
-| 厨房灶台 | Bigsink        | true     |
-| 垃圾桶   | Bin            | false    |
-| 书       | Book           | false    |
-| 箱子     | Box            | true     |
-| 柜子     | Cabinet        | true     |
-| 椅子     | Chair          | true     |
-| 衣架     | Clothes        | false    |
-| 杯子     | Cup            | false    |
-| 书桌     | Desk           | true     |
-| 饮品     | Drink          | false    |
-| 食物     | Food           | false    |
-| 刀       | Knife          | false    |
-| 台灯     | Lamp           | true     |
-| 台式电脑 | PC             | true     |
-| 充电桩   | Pile           | true     |
-| 绿植     | Plant          | true     |
-| 锅       | Pot            | false    |
-| 洗手池   | Sink           | true     |
-| 沙发     | Sofa           | true     |
-| 电视     | TV             | true     |
+| 物品名称   | 类型(唯一标识) | 静态属性 |
+| ---------- | -------------- | -------- |
+| 浴池       | Bathtub        | true     |
+| 床         | Bed            | true     |
+| 厨房灶台   | Bigsink        | true     |
+| 垃圾桶     | Bin            | false    |
+| 书         | Book           | false    |
+| 箱子       | Box            | true     |
+| 柜子       | Cabinet        | true     |
+| 椅子       | Chair          | true     |
+| 衣架       | Clothes        | false    |
+| 杯子       | Cup            | false    |
+| 书桌       | Desk           | true     |
+| 饮品       | Drink          | false    |
+| 食物       | Food           | false    |
+| 刀         | Knife          | false    |
+| 台灯       | Lamp           | true     |
+| 台式电脑   | PC             | true     |
+| 充电桩     | Pile           | true     |
+| 绿植       | Plant          | true     |
+| 锅         | Pot            | false    |
+| 洗手池     | Sink           | true     |
+| 沙发       | Sofa           | true     |
+| 电视       | TV             | true     |
+| 自定义物品 | Other          | true     |
 
 
 
@@ -465,6 +480,10 @@ topic：simulator/send
 ### 机器人
 
 ![image-20231225154543565](readme.assets/image-20231225154543565.png)
+
+
+
+
 
 
 

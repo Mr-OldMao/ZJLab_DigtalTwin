@@ -58,11 +58,11 @@ public class InterfaceDataCenter : SingletonByMono<InterfaceDataCenter>
     //删除房间实体模型
     public const string TOPIC_DEL_GOODS = "simulator/delGoods";
 
-    //测试从Web端 接收服务器控制指令
+    //从Web端获取服务器控制指令
     public const string TOPIC_WEB_SEND = "simulator/web/send";
-    //测试 发控制结果给Web端
+    //机器人指令执行完毕后，结果回调给Web端
     public const string TOPIC_WEB_RECV = "simulator/web/recv";
-    //给web端更新全局场景图
+    //给web端更新全局场景图，运行时增删物体后回调
     public const string TOPIC_Web_GLOBAL = "/simulator/thingGraph/web/global";
 
     //web端的房间布局变更
